@@ -1,6 +1,4 @@
-package records;
-
-import org.json.JSONObject;
+package com.tecknobit.glider.records;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,8 +9,39 @@ import java.util.Collections;
  * allowing the correct workflow
  *
  * @author Tecknobit - N7ghtm4r3
+ * @see GliderRecord
  **/
-public class Password {
+public class Password extends GliderRecord {
+
+    /**
+     * {@code TAIL_KEY} tail key
+     */
+    public static final String TAIL_KEY = "tail";
+
+    /**
+     * {@code SCOPES_KEY} scopes key
+     */
+    public static final String SCOPES_KEY = "scopes";
+
+    /**
+     * {@code PASSWORD_MAX_LENGTH} password max length
+     */
+    public static final int PASSWORD_MAX_LENGTH = 32;
+
+    /**
+     * {@code PASSWORD_MIN_LENGTH} password min length
+     */
+    public static final int PASSWORD_MIN_LENGTH = 8;
+
+    /**
+     * {@code PASSWORD_LENGTH_KEY} length key
+     */
+    public static final String PASSWORD_LENGTH_KEY = "length";
+
+    /**
+     * {@code PASSWORD_KEY} password key
+     */
+    public static final String PASSWORD_KEY = "password";
 
     /**
      * {@code tail} tail of the {@link #password}
@@ -54,6 +83,32 @@ public class Password {
      * @param status:   status value
      **/
     public Password(String tail, ArrayList<String> scopes, String password, Status status) {
+        this(null, tail, new ArrayList<>(), password, status);
+    }
+
+    /**
+     * Constructor to init {@link Password} object
+     *
+     * @param token: session token value
+     * @param tail:     tail of the password
+     * @param password: password value
+     * @param status:   status value
+     **/
+    public Password(String token, String tail, String password, Status status) {
+        this(token, tail, new ArrayList<>(), password, status);
+    }
+
+    /**
+     * Constructor to init {@link Password} object
+     *
+     * @param token: session token value
+     * @param tail:     tail of the password
+     * @param scopes:   list of scopes where the password can be used
+     * @param password: password value
+     * @param status:   status value
+     **/
+    public Password(String token, String tail, ArrayList<String> scopes, String password, Status status) {
+        super(token);
         this.tail = tail;
         this.scopes = scopes;
         this.password = password;
@@ -124,17 +179,6 @@ public class Password {
      */
     public void deletePassword() {
         status = Status.DELETED;
-    }
-
-    /**
-     * Returns a string representation of the object <br>
-     * Any params required
-     *
-     * @return a string representation of the object as {@link String}
-     */
-    @Override
-    public String toString() {
-        return new JSONObject(this).toString();
     }
 
     /**

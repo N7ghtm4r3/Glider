@@ -1,15 +1,15 @@
-package records;
+package com.tecknobit.glider.records;
 
 import com.tecknobit.apimanager.formatters.TimeFormatter;
-import org.json.JSONObject;
 
 /**
  * The {@link Device} is class useful to store all the information for a {@code Glider}'s device
  * allowing the correct workflow
  *
  * @author Tecknobit - N7ghtm4r3
+ * @see GliderRecord
  **/
-public class Device {
+public class Device extends GliderRecord {
 
     /**
      * {@code name} of the device
@@ -51,7 +51,7 @@ public class Device {
      * @param type:         type of the devices
      **/
     public Device(String name, String ipAddress, String loginDate, String lastActivity, Type type) {
-        this(name, ipAddress, loginDate, lastActivity, type, false);
+        this(null, name, ipAddress, loginDate, lastActivity, type, false);
     }
 
     /**
@@ -66,6 +66,37 @@ public class Device {
      **/
     public Device(String name, String ipAddress, String loginDate, String lastActivity, Type type,
                   boolean blacklisted) {
+        this(null, name, ipAddress, loginDate, lastActivity, type, blacklisted);
+    }
+
+    /**
+     * Constructor to init {@link Device} object
+     *
+     * @param token: session token value
+     * @param name:         name of the device
+     * @param ipAddress:    ip address of the device
+     * @param loginDate:    loginDate date of the device
+     * @param lastActivity: last activity of the device
+     * @param type:         type of the devices
+     **/
+    public Device(String token, String name, String ipAddress, String loginDate, String lastActivity, Type type) {
+        this(token, name, ipAddress, loginDate, lastActivity, type, false);
+    }
+
+    /**
+     * Constructor to init {@link Device} object
+     *
+     * @param token: session token value
+     * @param name:         name of the device
+     * @param ipAddress:    ip address of the device
+     * @param loginDate:    loginDate date of the device
+     * @param lastActivity: last activity of the device
+     * @param type:         type of the devices
+     * @param blacklisted:  whether the device has been blacklisted
+     **/
+    public Device(String token, String name, String ipAddress, String loginDate, String lastActivity, Type type,
+                  boolean blacklisted) {
+        super(token);
         this.name = name;
         this.ipAddress = ipAddress;
         this.loginDate = loginDate;
@@ -166,17 +197,6 @@ public class Device {
      **/
     public void unblacklist() {
         blacklisted = false;
-    }
-
-    /**
-     * Returns a string representation of the object <br>
-     * Any params required
-     *
-     * @return a string representation of the object as {@link String}
-     */
-    @Override
-    public String toString() {
-        return new JSONObject(this).toString();
     }
 
     /**
