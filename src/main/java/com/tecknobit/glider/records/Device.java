@@ -44,7 +44,12 @@ public class Device extends GliderRecord {
         /**
          * {@code blacklisted} key of the device
          **/
-        blacklisted
+        blacklisted,
+
+        /**
+         * {@code target_device} target device key
+         **/
+        target_device
 
     }
 

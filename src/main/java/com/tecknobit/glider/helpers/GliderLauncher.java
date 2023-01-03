@@ -100,6 +100,21 @@ public class GliderLauncher {
          */
         RECOVER_PASSWORD,
 
+        /**
+         * {@code DISCONNECT} disconnect operation
+         */
+        DISCONNECT,
+
+        /**
+         * {@code MANAGE_DEVICE_AUTHORIZATION} blacklist / unblacklist device operation
+         */
+        MANAGE_DEVICE_AUTHORIZATION,
+
+        /**
+         * {@code DELETE_ACCOUNT} account deletion operation
+         */
+        DELETE_ACCOUNT,
+
     }
 
     /**
@@ -167,7 +182,7 @@ public class GliderLauncher {
     /**
      * {@code session} of the {@code Glider}'s service
      */
-    private final Session session;
+    private Session session;
     
     /**
      * {@code hostPort} host port for {@link #session} of the {@code Glider}'s service
@@ -238,7 +253,7 @@ public class GliderLauncher {
         JSONObject response = new JSONObject();
         socketManager.startListener(hostPort, () -> {
             Device device;
-            while (true) {
+            while (session != null) {
                 System.out.println("Waiting...");
                 try {
                     Socket sRequest = socketManager.acceptRequest();
@@ -365,6 +380,64 @@ public class GliderLauncher {
                                     } else
                                         sendErrorResponse();
                                 }
+                                case DISCONNECT -> {
+                                    // TODO: 03/01/2023 payload:
+                                    //  device name
+                                    //  ip
+                                    //  type
+                                    // target_device:
+                                    //  - device name
+                                    //  - ip
+                                    if(JsonHelper.getJSONObject(request, target_device.name()) != null) {
+                                        request = request.getJSONObject(target_device.name());
+                                        System.out.println(request);
+                                        device = databaseManager.getDevice(sessionToken, request.getString(name.name()),
+                                                request.getString(ip_address.name()));
+                                    }
+                                    if(device != null) {
+                                        databaseManager.deleteDevice(sessionToken, device.getName(), device.getIpAddress());
+                                        // TODO: 03/01/2023 response
+                                        // status code
+                                        sendSuccessfulResponse(response);
+                                    } else
+                                        sendErrorResponse();
+                                }
+                                case MANAGE_DEVICE_AUTHORIZATION -> {
+                                    // TODO: 03/01/2023 payload:
+                                    //  device name
+                                    //  ip
+                                    //  type
+                                    // target_device:
+                                    //  - device name
+                                    //  - ip
+                                    request = request.getJSONObject(target_device.name());
+                                    device = databaseManager.getDevice(sessionToken, request.getString(name.name()),
+                                            request.getString(ip_address.name()));
+                                    if(device != null) {
+                                        if(device.isBlacklisted()) {
+                                            databaseManager.unblacklistDevice(sessionToken, device.getName(),
+                                                    device.getIpAddress());
+                                        } else {
+                                            databaseManager.blacklistDevice(sessionToken, device.getName(),
+                                                    device.getIpAddress());
+                                        }
+                                        // TODO: 03/01/2023 response
+                                        // status code
+                                        sendSuccessfulResponse(response);
+                                    } else
+                                        sendErrorResponse();
+                                }
+                                case DELETE_ACCOUNT -> {
+                                    // TODO: 03/01/2023 payload:
+                                    //  device name
+                                    //  ip
+                                    //  type
+                                    databaseManager.deleteSession(session);
+                                    session = null;
+                                    // TODO: 03/01/2023 response AND CLOSE SOCKETMANAGER ALL LISTENERS WITH THE SPECIFIC METHOD
+                                    // status code
+                                    sendSuccessfulResponse(response);
+                                }
                                 default -> sendErrorResponse();
                             }
                         } else
@@ -378,6 +451,7 @@ public class GliderLauncher {
                     response.clear();
                 }
             }
+            System.out.println("This session has been deleted");
         });
     }
 

@@ -224,6 +224,8 @@ public class DatabaseManager {
     /**
      * Method to get a {@link Device} from the database
      * @param token: token of the session linked to the device to fetch
+     * @param name:         name of the device
+     * @param ipAddress:    ip address of the device
      *
      * @return device as {@link Device}
      * @throws SQLException when an error occurred
@@ -271,6 +273,71 @@ public class DatabaseManager {
         }
         rDevices.close();
         return devices;
+    }
+
+    /**
+     * Method to blacklist a {@link Device} to avoid its reconnection or its possibility to use the same
+     * {@link Session}
+     *
+     * @param device: device to blacklist
+     * @throws SQLException when an error occurred
+     **/
+    @Wrapper
+    public void blacklistDevice(Device device) throws SQLException {
+        blacklistDevice(device.getToken(), device.getName(), device.getIpAddress());
+    }
+
+    /**
+     * Method to blacklist a {@link Device} to avoid its reconnection or its possibility to use the same
+     * {@link Session}
+     *
+     * @param token: token of the session linked to the device to blacklist
+     * @param name:         name of the device
+     * @param ipAddress:    ip address of the device
+     * @throws SQLException when an error occurred
+     **/
+    public void blacklistDevice(String token, String name, String ipAddress) throws SQLException {
+        changeDeviceAuthorization(token, name, ipAddress, true);
+    }
+
+    /**
+     * Method to unblacklist a {@link Device} to allow its reconnection or its possibility to use the same
+     * {@link Session}
+     *
+     * @param device: device to unblacklist
+     * @throws SQLException when an error occurred
+     **/
+    @Wrapper
+    public void unblacklistDevice(Device device) throws SQLException {
+        unblacklistDevice(device.getToken(), device.getName(), device.getIpAddress());
+    }
+
+    /**
+     * Method to unblacklist a {@link Device} to allow its reconnection or its possibility to use the same
+     * {@link Session}
+     *
+     * @param token: token of the session linked to the device to unblacklist
+     * @param name:         name of the device
+     * @param ipAddress:    ip address of the device
+     * @throws SQLException when an error occurred
+     **/
+    public void unblacklistDevice(String token, String name, String ipAddress) throws SQLException {
+        changeDeviceAuthorization(token, name, ipAddress, false);
+    }
+
+    /**
+     * Method to blacklist or unblacklist a {@link Device}
+     *
+     * @param token: token of the session which the {@link Device} is connected
+     * @param name:         name of the device
+     * @param ipAddress:    ip address of the device
+     * @param blacklist: whether the device have to be blacklisted
+     * @throws SQLException when an error occurred
+     **/
+    private void changeDeviceAuthorization(String token, String name, String ipAddress,
+                                           boolean blacklist) throws SQLException {
+        connection.prepareStatement("UPDATE " + devices + " SET blacklisted='" + blacklist + "' WHERE token='"
+                + token + "' AND name='" + name + "' AND ip_address='" + ipAddress + "'").executeUpdate();
     }
 
     /**
