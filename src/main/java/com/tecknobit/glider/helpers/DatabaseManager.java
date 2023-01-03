@@ -5,6 +5,7 @@ import com.tecknobit.apimanager.formatters.TimeFormatter;
 import com.tecknobit.glider.records.Device;
 import com.tecknobit.glider.records.Device.DeviceKeys;
 import com.tecknobit.glider.records.Password;
+import com.tecknobit.glider.records.Password.PasswordKeys;
 import com.tecknobit.glider.records.Session;
 import org.json.JSONArray;
 
@@ -18,8 +19,11 @@ import java.util.ArrayList;
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.*;
 import static com.tecknobit.glider.records.Device.DeviceKeys.*;
 import static com.tecknobit.glider.records.Device.Type;
+import static com.tecknobit.glider.records.Password.*;
 import static com.tecknobit.glider.records.Password.PasswordKeys.*;
 import static com.tecknobit.glider.records.Password.Status.ACTIVE;
+import static com.tecknobit.glider.records.Password.Status.DELETED;
+import static com.tecknobit.glider.records.Password.fetchScopes;
 import static com.tecknobit.glider.records.Session.*;
 import static com.tecknobit.glider.records.Session.SessionKeys.*;
 
@@ -153,19 +157,39 @@ public class DatabaseManager {
     public Session getSession(String token) throws SQLException {
         ResultSet rSession = fetchRecord("SELECT * FROM " + sessions + " WHERE token='" + token + "'");
         if(rSession.next()) {
-            Session session = new Session(rSession.getString(SessionKeys.token.name()),
+            Session session = new Session(token,
                     rSession.getString(iv_spec.name()),
                     rSession.getString(secret_key.name()),
                     rSession.getString(password.name()),
                     rSession.getString(host_address.name()),
                     rSession.getInt(host_port.name()),
                     rSession.getBoolean(single_use_mode.name()),
-                    rSession.getBoolean(qr_code_login.name())
-            );
+                    rSession.getBoolean(qr_code_login.name()));
             rSession.close();
             return session;
         }
         return null;
+    }
+
+    /**
+     * Method to remove a session from the {@link Table#sessions} table
+     *
+     * @param session: session to delete
+     * @throws SQLException when an error occurred
+     **/
+    @Wrapper
+    public void deleteSession(Session session) throws SQLException {
+        deleteSession(session.getToken());
+    }
+
+    /**
+     * Method to remove a session from the {@link Table#sessions} table
+     *
+     * @param token: token of the session to delete
+     * @throws SQLException when an error occurred
+     **/
+    public void deleteSession(String token) throws SQLException {
+        connection.prepareStatement("DELETE FROM " + sessions + " WHERE token='" + token + "'").executeUpdate();
     }
 
     /**
@@ -208,14 +232,13 @@ public class DatabaseManager {
         ResultSet rDevice = fetchRecord("SELECT * FROM " + devices + " WHERE token='" + token + "' AND name='"
                 + name + "' AND ip_address='" + ipAddress + "'");
         if(rDevice.next()) {
-            Device device = new Device(rDevice.getString(SessionKeys.token.name()),
+            Device device = new Device(token,
                     rDevice.getString(DeviceKeys.name.name()),
                     rDevice.getString(ip_address.name()),
                     TimeFormatter.getStringDate(rDevice.getLong(login_date.name())),
                     TimeFormatter.getStringDate(rDevice.getLong(last_activity.name())),
                     Type.valueOf(rDevice.getString(type.name())),
-                    Boolean.parseBoolean(rDevice.getString(blacklisted.name()))
-            );
+                    Boolean.parseBoolean(rDevice.getString(blacklisted.name())));
             rDevice.close();
             return device;
         }
@@ -251,6 +274,30 @@ public class DatabaseManager {
     }
 
     /**
+     * Method to remove a device from the {@link Table#devices} table
+     *
+     * @param device: device to delete
+     * @throws SQLException when an error occurred
+     **/
+    @Wrapper
+    public void deleteDevice(Device device) throws SQLException {
+        deleteDevice(device.getToken(), device.getName(), device.getIpAddress());
+    }
+
+    /**
+     * Method to remove a device from the {@link Table#devices} table
+     *
+     * @param token: token of the session which the {@link Device} is connected to delete
+     * @param name: name of the {@link Device} to delete
+     * @param ipAddress: ip address of the {@link Device} to delete
+     * @throws SQLException when an error occurred
+     **/
+    public void deleteDevice(String token, String name, String ipAddress) throws SQLException {
+        connection.prepareStatement("DELETE FROM " + devices + " WHERE token='" + token + "' AND name='"
+                + name + "' AND ip_address='" + ipAddress + "'").executeUpdate();
+    }
+
+    /**
      * Method to insert a new password in the {@link Table#passwords} table
      * @param password: device to insert
      * @apiNote the password will link with a one {@link Session} inserted in the {@link Table#sessions} table
@@ -281,6 +328,28 @@ public class DatabaseManager {
     }
 
     /**
+     * Method to get a {@link Password} from the database
+     * @param token: token of the session linked to the password to fetch
+     *
+     * @return password as {@link Password}
+     * @throws SQLException when an error occurred
+     **/
+    public Password getPassword(String token, String tail) throws SQLException {
+        ResultSet rPassword = fetchRecord("SELECT * FROM " + passwords + " WHERE token='" + token + "' AND tail='"
+                + tail + "'");
+        if(rPassword.next()) {
+            Password password = new Password(token,
+                    rPassword.getString(PasswordKeys.tail.name()),
+                    fetchScopes(new JSONArray(rPassword.getString(scopes.name()))),
+                    rPassword.getString(PasswordKeys.password.name()),
+                    Status.valueOf(rPassword.getString(status.name())));
+            rPassword.close();
+            return password;
+        }
+        return null;
+    }
+
+    /**
      * Method to get a list of {@link Password} from the database
      * @param token: token of the session linked to the passwords to fetch
      * @param insertSessionToken: whether insert the session token, if {@code "false"} the session token will be set as null
@@ -292,18 +361,14 @@ public class DatabaseManager {
         ResultSet rPasswords = fetchRecord("SELECT * FROM " + passwords + " WHERE token='" + token + "'");
         ArrayList<Password> passwords = new ArrayList<>();
         while (rPasswords.next()) {
-            ArrayList<String> lScopes = new ArrayList<>();
-            JSONArray jScopes = new JSONArray(rPasswords.getString(scopes.name()));
-                for (int j = 0; j < jScopes.length(); j++)
-                    lScopes.add(jScopes.getString(j));
             String sToken = null;
             if(insertSessionToken)
                 sToken = rPasswords.getString(SessionKeys.token.name());
             passwords.add(new Password(sToken,
                     rPasswords.getString(tail.name()),
-                    lScopes,
+                    fetchScopes(new JSONArray(rPasswords.getString(scopes.name()))),
                     rPasswords.getString(password.name()),
-                    Password.Status.valueOf(rPasswords.getString(status.name()))
+                    Status.valueOf(rPasswords.getString(status.name()))
             ));
         }
         rPasswords.close();
@@ -311,54 +376,9 @@ public class DatabaseManager {
     }
 
     /**
-     * Method to remove a session from the {@link Table#sessions} table
+     * Method to set the password status as {@link Status#DELETED}, so it can be also recoverable
      *
-     * @param session: session to delete
-     * @throws SQLException when an error occurred
-     **/
-    @Wrapper
-    public void deleteSession(Session session) throws SQLException {
-        deleteSession(session.getToken());
-    }
-
-    /**
-     * Method to remove a session from the {@link Table#sessions} table
-     *
-     * @param token: token of the session to delete
-     * @throws SQLException when an error occurred
-     **/
-    public void deleteSession(String token) throws SQLException {
-        connection.prepareStatement("DELETE FROM " + sessions + " WHERE token='" + token + "'").executeUpdate();
-    }
-
-    /**
-     * Method to remove a device from the {@link Table#devices} table
-     *
-     * @param device: device to delete
-     * @throws SQLException when an error occurred
-     **/
-    @Wrapper
-    public void deleteDevice(Device device) throws SQLException {
-        deleteDevice(device.getToken(), device.getName(), device.getIpAddress());
-    }
-
-    /**
-     * Method to remove a device from the {@link Table#devices} table
-     *
-     * @param token: token of the session which the {@link Device} is connected to delete
-     * @param name: name of the {@link Device} to delete
-     * @param ipAddress: ip address of the {@link Device} to delete
-     * @throws SQLException when an error occurred
-     **/
-    public void deleteDevice(String token, String name, String ipAddress) throws SQLException {
-        connection.prepareStatement("DELETE FROM " + devices + " WHERE token='" + token + "' AND name='"
-                + name + "' AND ip_address='" + ipAddress + "'").executeUpdate();
-    }
-
-    /**
-     * Method to remove a password from the {@link Table#passwords} table
-     *
-     * @param password: password to delete
+     * @param password: password to set as {@link Status#DELETED}
      * @throws SQLException when an error occurred
      **/
     @Wrapper
@@ -367,13 +387,70 @@ public class DatabaseManager {
     }
 
     /**
-     * Method to remove a password from the {@link Table#passwords} table
+     * Method to set the password status as {@link Status#DELETED}, so it can be also recoverable
+     *
+     * @param token: token of the session which the {@link Password} is connected to set as {@link Status#DELETED}
+     * @param tail: tail of the {@link Password} to set as {@link Status#DELETED}
+     * @throws SQLException when an error occurred
+     **/
+    public void deletePassword(String token, String tail) throws SQLException {
+        changePasswordStatus(token, tail, DELETED);
+    }
+
+    /**
+     * Method to set the password status as {@link Status#ACTIVE}, so it can be usable again
+     *
+     * @param password: password to set as {@link Status#ACTIVE}
+     * @throws SQLException when an error occurred
+     **/
+    @Wrapper
+    public void recoverPassword(Password password) throws SQLException {
+        deletePassword(password.getToken(), password.getTail());
+    }
+
+    /**
+     * Method to set the password status as {@link Status#ACTIVE}, so it can be usable again
+     *
+     * @param token: token of the session which the {@link Password} is connected to set as {@link Status#DELETED}
+     * @param tail: tail of the {@link Password} to set as {@link Status#ACTIVE}
+     * @throws SQLException when an error occurred
+     **/
+    public void recoverPassword(String token, String tail) throws SQLException {
+        changePasswordStatus(token, tail, ACTIVE);
+    }
+
+    /**
+     * Method to change the password status
+     *
+     * @param token: token of the session which the {@link Password} is connected
+     * @param tail: tail of the {@link Password}
+     * @param status: status to set
+     * @throws SQLException when an error occurred
+     **/
+    private void changePasswordStatus(String token, String tail, Status status) throws SQLException {
+        connection.prepareStatement("UPDATE " + passwords + " SET status='" + status + "' WHERE token='" + token
+                + "' AND tail='" + tail + "'").executeUpdate();
+    }
+
+    /**
+     * Method to remove permanently a password from the {@link Table#passwords} table
+     *
+     * @param password: password to delete
+     * @throws SQLException when an error occurred
+     **/
+    @Wrapper
+    public void permanentlyDeletePassword(Password password) throws SQLException {
+        permanentlyDeletePassword(password.getToken(), password.getTail());
+    }
+
+    /**
+     * Method to remove permanently a password from the {@link Table#passwords} table
      *
      * @param token: token of the session which the {@link Password} is connected to delete
      * @param tail: tail of the {@link Password} to delete
      * @throws SQLException when an error occurred
      **/
-    public void deletePassword(String token, String tail) throws SQLException {
+    public void permanentlyDeletePassword(String token, String tail) throws SQLException {
         connection.prepareStatement("DELETE FROM " + passwords + " WHERE token='" + token
                 + "' AND tail='" + tail + "'").executeUpdate();
     }

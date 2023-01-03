@@ -1,5 +1,8 @@
 package com.tecknobit.glider.records;
 
+import com.tecknobit.apimanager.annotations.Returner;
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -191,6 +194,20 @@ public class Password extends GliderRecord {
      */
     public void deletePassword() {
         status = Status.DELETED;
+    }
+
+    /**
+     * Method to fetch a scopes list from a {@link JSONArray}
+     * @param jScopes: JSON from fetch the list
+     *
+     * @return scopes list as {@link ArrayList} of {@link String}
+     **/
+    @Returner
+    public static ArrayList<String> fetchScopes(JSONArray jScopes) {
+        ArrayList<String> scopes = new ArrayList<>();
+        for (int j = 0; j < jScopes.length(); j++)
+            scopes.add(jScopes.getString(j));
+        return scopes;
     }
 
     /**

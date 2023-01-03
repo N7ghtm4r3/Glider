@@ -40,6 +40,11 @@ public class Session extends GliderRecord {
         secret_key,
 
         /**
+         * {@code session_password} password key of the session
+         **/
+        session_password,
+
+        /**
          * {@code host_address} key of the session
          **/
         host_address,

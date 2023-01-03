@@ -1,14 +1,14 @@
 package com.tecknobit.glider.helpers;
 
+import com.tecknobit.apimanager.annotations.Wrapper;
 import com.tecknobit.apimanager.apis.SocketManager;
 import com.tecknobit.apimanager.apis.encryption.aes.serverside.CBCServerCipher;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.records.Device;
 import com.tecknobit.glider.records.Device.Type;
-import com.tecknobit.glider.records.Password.PasswordKeys;
+import com.tecknobit.glider.records.Password;
 import com.tecknobit.glider.records.Session;
 import com.tecknobit.glider.records.Session.SessionKeys;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -26,9 +26,11 @@ import static com.tecknobit.glider.helpers.DatabaseManager.Table.passwords;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.ope;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.status_code;
 import static com.tecknobit.glider.records.Device.DeviceKeys.*;
-import static com.tecknobit.glider.records.Password.PASSWORD_MAX_LENGTH;
-import static com.tecknobit.glider.records.Password.PASSWORD_MIN_LENGTH;
+import static com.tecknobit.glider.records.Password.*;
 import static com.tecknobit.glider.records.Password.PasswordKeys.*;
+import static com.tecknobit.glider.records.Password.Status.ACTIVE;
+import static com.tecknobit.glider.records.Password.Status.DELETED;
+import static com.tecknobit.glider.records.Session.SessionKeys.session_password;
 import static java.lang.System.currentTimeMillis;
 
 /**
@@ -74,14 +76,29 @@ public class GliderLauncher {
     public enum Operation {
 
         /**
-         * {@code CONNECT_OPE} connect operation
+         * {@code CONNECT} connect operation
          */
-        CONNECT_OPE,
+        CONNECT,
 
         /**
-         * {@code CREATE_PASSWORD_OPE} creation password operation
+         * {@code CREATE_PASSWORD} create password operation
          */
-        CREATE_PASSWORD_OPE,
+        CREATE_PASSWORD,
+
+        /**
+         * {@code INSERT_PASSWORD} insert password operation
+         */
+        INSERT_PASSWORD,
+
+        /**
+         * {@code DELETE_PASSWORD} delete password operation
+         */
+        DELETE_PASSWORD,
+
+        /**
+         * {@code RECOVER_PASSWORD} recovery password operation
+         */
+        RECOVER_PASSWORD,
 
     }
 
@@ -229,44 +246,43 @@ public class GliderLauncher {
                     System.out.println(request);
                     request.put(ip_address.name(), ((InetSocketAddress)sRequest.getRemoteSocketAddress()).getAddress()
                             .getHostAddress());
-                    if(session.getPassword().equals(JsonHelper.getString(request, password.name()))) {
-                        switch (Operation.valueOf(request.getString(ope.name()))) {
-                            case CONNECT_OPE -> {
-                                // TODO: 03/01/2023 payload:
-                                //  device name
-                                //  ip
-                                //  type
-                                //  password
-                                String deviceName = request.getString(name.name());
-                                String ipAddress = request.getString(ip_address.name());
-                                device = databaseManager.getDevice(sessionToken, deviceName, ipAddress);
-                                if (device == null || !device.isBlacklisted()) {
-                                    databaseManager.insertNewDevice(sessionToken, deviceName, ipAddress, currentTimeMillis(),
-                                            Type.valueOf(request.getString(type.name())));
-                                    // TODO: 03/01/2023 response
-                                    // status code
-                                    //  session - less the password
-                                    //  passwords
-                                    //  devices
-                                    JSONObject jSession = session.toJSON();
-                                    jSession.remove(password.name());
-                                    sendSuccessfulResponse(response.put(SessionKeys.session.name(), jSession)
-                                            .put(passwords.name(), databaseManager.getPasswords(sessionToken, false))
-                                            .put(devices.name(), databaseManager.getDevices(sessionToken, false)));
-                                } else
-                                    sendErrorResponse();
-                            }
-                            case CREATE_PASSWORD_OPE -> {
-                                // TODO: 03/01/2023 payload:
-                                //  device name
-                                //  ip
-                                //  password
-                                //  tail
-                                //  scopes
-                                //  length
-                                device = databaseManager.getDevice(sessionToken, request.getString(name.name()),
-                                        request.getString(ip_address.name()));
-                                if(device == null || !device.isBlacklisted()) {
+                    if(session.getPassword().equals(JsonHelper.getString(request, session_password.name()))) {
+                        String deviceName = request.getString(name.name());
+                        String ipAddress = request.getString(ip_address.name());
+                        device = databaseManager.getDevice(sessionToken, deviceName, ipAddress);
+                        if(device == null || !device.isBlacklisted()) {
+                            switch (Operation.valueOf(request.getString(ope.name()))) {
+                                case CONNECT -> {
+                                    // TODO: 03/01/2023 payload:
+                                    //  device name
+                                    //  ip
+                                    //  type
+                                    //  sPassword
+                                    device = databaseManager.getDevice(sessionToken, deviceName, ipAddress);
+                                    if (device == null || !device.isBlacklisted()) {
+                                        databaseManager.insertNewDevice(sessionToken, deviceName, ipAddress, currentTimeMillis(),
+                                                Type.valueOf(request.getString(type.name())));
+                                        // TODO: 03/01/2023 response
+                                        // status code
+                                        //  session - less the password
+                                        //  passwords
+                                        //  devices
+                                        JSONObject jSession = session.toJSON();
+                                        jSession.remove(password.name());
+                                        sendSuccessfulResponse(response.put(SessionKeys.session.name(), jSession)
+                                                .put(passwords.name(), databaseManager.getPasswords(sessionToken, false))
+                                                .put(devices.name(), databaseManager.getDevices(sessionToken, false)));
+                                    } else
+                                        sendErrorResponse();
+                                }
+                                case CREATE_PASSWORD -> {
+                                    // TODO: 03/01/2023 payload:
+                                    //  device name
+                                    //  ip
+                                    //  sPassword
+                                    //  tail
+                                    //  scopes
+                                    //  length
                                     int length = request.getInt(PasswordKeys.length.name());
                                     if(length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH) {
                                         ArrayList<Integer> letters = new ArrayList<>();
@@ -281,28 +297,85 @@ public class GliderLauncher {
                                             letters.add(index);
                                             password.append(((char) index));
                                         }
-                                        JSONArray jScopes = request.getJSONArray(scopes.name());
-                                        ArrayList<String> scopes = new ArrayList<>();
-                                        for (int j = 0; j < jScopes.length(); j++)
-                                            scopes.add(jScopes.getString(j));
                                         databaseManager.insertNewPassword(sessionToken, request.getString(tail.name()),
-                                                scopes, password.toString());
+                                                fetchScopes(request.getJSONArray(scopes.name())), password.toString());
                                         // TODO: 03/01/2023 response
                                         // status code
                                         //  password
                                         sendSuccessfulResponse(response.put(PasswordKeys.password.name(), password));
                                     } else
                                         sendErrorResponse();
-                                } else
-                                    sendErrorResponse();
+                                }
+                                case INSERT_PASSWORD -> {
+                                    // TODO: 03/01/2023 payload:
+                                    //  device name
+                                    //  ip
+                                    //  sPassword
+                                    //  tail
+                                    //  scopes
+                                    //  password
+                                    String tail = request.getString(PasswordKeys.tail.name());
+                                    int length = tail.length();
+                                    if(length > 0 && length < 30) {
+                                        String password  = request.getString(PasswordKeys.password.name());
+                                        length = password.length();
+                                        if(length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH) {
+                                            databaseManager.insertNewPassword(sessionToken, tail,
+                                                    fetchScopes(request.getJSONArray(scopes.name())), password);
+                                            // TODO: 03/01/2023 response
+                                            // status code
+                                            sendSuccessfulResponse(response);
+                                        } else
+                                            sendErrorResponse();
+                                    } else
+                                        sendErrorResponse();
+                                }
+                                case DELETE_PASSWORD -> {
+                                    // TODO: 03/01/2023 payload:
+                                    //  device name
+                                    //  ip
+                                    //  sPassword
+                                    //  tail
+                                    String tail = request.getString(PasswordKeys.tail.name());
+                                    Password password = databaseManager.getPassword(sessionToken, tail);
+                                    if(password != null) {
+                                        if(password.getStatus().equals(ACTIVE))
+                                            databaseManager.deletePassword(sessionToken, tail);
+                                        else
+                                            databaseManager.permanentlyDeletePassword(sessionToken, tail);
+                                        // TODO: 03/01/2023 response
+                                        // status code
+                                        sendSuccessfulResponse(response);
+                                    } else
+                                        sendErrorResponse();
+                                }
+                                case RECOVER_PASSWORD -> {
+                                    // TODO: 03/01/2023 payload:
+                                    //  device name
+                                    //  ip
+                                    //  sPassword
+                                    //  tail
+                                    String tail = request.getString(PasswordKeys.tail.name());
+                                    Password password = databaseManager.getPassword(sessionToken, tail);
+                                    if(password != null && password.getStatus().equals(DELETED)) {
+                                        databaseManager.recoverPassword(sessionToken, tail);
+                                        // TODO: 03/01/2023 response
+                                        // status code
+                                        sendSuccessfulResponse(response);
+                                    } else
+                                        sendErrorResponse();
+                                }
+                                default -> sendErrorResponse();
                             }
-                            default -> sendErrorResponse();
-                        }
+                        } else
+                            sendErrorResponse();
                     } else
                         sendErrorResponse();
                 } catch (Exception e) {
                     e.printStackTrace();
                     sendErrorResponse();
+                } finally {
+                    response.clear();
                 }
             }
         });
@@ -314,6 +387,7 @@ public class GliderLauncher {
      *
      * @throws Exception when an error occurred
      **/
+    @Wrapper
     private void sendSuccessfulResponse(JSONObject message) throws Exception {
         sendResponse(message.put(status_code.name(), SUCCESSFUL_STATUS));
     }
@@ -321,7 +395,8 @@ public class GliderLauncher {
     /**
      * Method to send an error response to the client <br>
      * Any params required
-     *  **/
+     * **/
+    @Wrapper
     private void sendErrorResponse() {
         try {
             sendResponse(new JSONObject().put(status_code.name(), ERROR_STATUS));
