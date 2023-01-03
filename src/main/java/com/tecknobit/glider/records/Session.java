@@ -15,39 +15,51 @@ import javax.crypto.spec.IvParameterSpec;
 public class Session extends GliderRecord {
 
     /**
-     * {@code TOKEN_KEY} host address key
-     */
-    public static final String TOKEN_KEY = "token";
+     * {@code SessionKeys} list of available keys for the session
+     **/
+    public enum SessionKeys {
 
-    /**
-     * {@code IV_SPEC_KEY} iv parameters spec key
-     */
-    public static final String IV_SPEC_KEY = "iv_spec";
+        /**
+         * {@code session} key of the session
+         **/
+        session,
 
-    /**
-     * {@code SECRET_KEY} secret key
-     */
-    public static final String SECRET_KEY = "secret_key";
+        /**
+         * {@code token} key of the session
+         **/
+        token,
 
-    /**
-     * {@code HOST_ADDRESS_KEY} host address key
-     */
-    public static final String HOST_ADDRESS_KEY = "host_address";
+        /**
+         * {@code iv_spec} key of the session
+         **/
+        iv_spec,
 
-    /**
-     * {@code HOST_PORT_KEY} host port key
-     */
-    public static final String HOST_PORT_KEY = "host_port";
+        /**
+         * {@code secret_key} key of the session
+         **/
+        secret_key,
 
-    /**
-     * {@code SINGLE_USE_MODE_KEY} single use mode key
-     */
-    public static final String SINGLE_USE_MODE_KEY = "single_use_mode";
+        /**
+         * {@code host_address} key of the session
+         **/
+        host_address,
 
-    /**
-     * {@code QR_CODE_LOGIN_KEY} qr code login key
-     */
-    public static final String QR_CODE_LOGIN_KEY = "qr_code_login";
+        /**
+         * {@code host_port} key of the session
+         **/
+        host_port,
+
+        /**
+         * {@code single_use_mode} key of the session
+         **/
+        single_use_mode,
+
+        /**
+         * {@code qr_code_login} key of the session
+         **/
+        qr_code_login
+
+    }
 
     /**
      * {@code ivSpec} {@link IvParameterSpec} of the session

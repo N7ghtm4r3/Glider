@@ -38,6 +38,16 @@ public class GliderRecord {
      * Returns a string representation of the object <br>
      * Any params required
      *
+     * @return a string representation of the object as {@link JSONObject}
+     */
+    public JSONObject toJSON() {
+        return new JSONObject(this);
+    }
+
+    /**
+     * Returns a string representation of the object <br>
+     * Any params required
+     *
      * @return a string representation of the object as {@link String}
      */
     @Override

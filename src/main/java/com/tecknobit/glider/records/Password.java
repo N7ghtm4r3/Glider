@@ -14,14 +14,36 @@ import java.util.Collections;
 public class Password extends GliderRecord {
 
     /**
-     * {@code TAIL_KEY} tail key
-     */
-    public static final String TAIL_KEY = "tail";
+     * {@code PasswordKeys} list of available keys for the password
+     **/
+    public enum PasswordKeys {
 
-    /**
-     * {@code SCOPES_KEY} scopes key
-     */
-    public static final String SCOPES_KEY = "scopes";
+        /**
+         * {@code tail} key of the password
+         **/
+        tail,
+
+        /**
+         * {@code scopes} key of the password
+         **/
+        scopes,
+
+        /**
+         * {@code password} key of the password
+         **/
+        password,
+
+        /**
+         * {@code status} key of the password
+         **/
+        status,
+
+        /**
+         * {@code length} key of the password
+         **/
+        length,
+
+    }
 
     /**
      * {@code PASSWORD_MAX_LENGTH} password max length
@@ -32,16 +54,6 @@ public class Password extends GliderRecord {
      * {@code PASSWORD_MIN_LENGTH} password min length
      */
     public static final int PASSWORD_MIN_LENGTH = 8;
-
-    /**
-     * {@code PASSWORD_LENGTH_KEY} length key
-     */
-    public static final String PASSWORD_LENGTH_KEY = "length";
-
-    /**
-     * {@code PASSWORD_KEY} password key
-     */
-    public static final String PASSWORD_KEY = "password";
 
     /**
      * {@code tail} tail of the {@link #password}

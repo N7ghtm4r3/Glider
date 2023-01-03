@@ -1,9 +1,12 @@
 package com.tecknobit.glider.helpers;
 
 import com.tecknobit.apimanager.annotations.Wrapper;
+import com.tecknobit.apimanager.formatters.TimeFormatter;
 import com.tecknobit.glider.records.Device;
+import com.tecknobit.glider.records.Device.DeviceKeys;
 import com.tecknobit.glider.records.Password;
 import com.tecknobit.glider.records.Session;
+import org.json.JSONArray;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
@@ -13,10 +16,12 @@ import java.sql.*;
 import java.util.ArrayList;
 
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.*;
+import static com.tecknobit.glider.records.Device.DeviceKeys.*;
 import static com.tecknobit.glider.records.Device.Type;
-import static com.tecknobit.glider.records.Password.PASSWORD_KEY;
+import static com.tecknobit.glider.records.Password.PasswordKeys.*;
 import static com.tecknobit.glider.records.Password.Status.ACTIVE;
 import static com.tecknobit.glider.records.Session.*;
+import static com.tecknobit.glider.records.Session.SessionKeys.*;
 
 /**
  * The {@link DatabaseManager} is class useful to manage the {@code SQL} database where are stored all the
@@ -148,14 +153,14 @@ public class DatabaseManager {
     public Session getSession(String token) throws SQLException {
         ResultSet rSession = fetchRecord("SELECT * FROM " + sessions + " WHERE token='" + token + "'");
         if(rSession.next()) {
-            Session session = new Session(rSession.getString(TOKEN_KEY),
-                    rSession.getString(IV_SPEC_KEY),
-                    rSession.getString(SECRET_KEY),
-                    rSession.getString(PASSWORD_KEY),
-                    rSession.getString(HOST_ADDRESS_KEY),
-                    rSession.getInt(HOST_PORT_KEY),
-                    rSession.getBoolean(SINGLE_USE_MODE_KEY),
-                    rSession.getBoolean(QR_CODE_LOGIN_KEY)
+            Session session = new Session(rSession.getString(SessionKeys.token.name()),
+                    rSession.getString(iv_spec.name()),
+                    rSession.getString(secret_key.name()),
+                    rSession.getString(password.name()),
+                    rSession.getString(host_address.name()),
+                    rSession.getInt(host_port.name()),
+                    rSession.getBoolean(single_use_mode.name()),
+                    rSession.getBoolean(qr_code_login.name())
             );
             rSession.close();
             return session;
@@ -166,7 +171,7 @@ public class DatabaseManager {
     /**
      * Method to insert a new device in the {@link Table#devices} table
      * @param device: device to insert
-     * @apiNote the device will with a one {@link Session} inserted in the {@link Table#sessions} table
+     * @apiNote the device will link a one {@link Session} inserted in the {@link Table#sessions} table
      * @throws SQLException when an error occurred
      **/
     @Wrapper
@@ -193,6 +198,59 @@ public class DatabaseManager {
     }
 
     /**
+     * Method to get a {@link Device} from the database
+     * @param token: token of the session linked to the device to fetch
+     *
+     * @return device as {@link Device}
+     * @throws SQLException when an error occurred
+     **/
+    public Device getDevice(String token, String name, String ipAddress) throws SQLException {
+        ResultSet rDevice = fetchRecord("SELECT * FROM " + devices + " WHERE token='" + token + "' AND name='"
+                + name + "' AND ip_address='" + ipAddress + "'");
+        if(rDevice.next()) {
+            Device device = new Device(rDevice.getString(SessionKeys.token.name()),
+                    rDevice.getString(DeviceKeys.name.name()),
+                    rDevice.getString(ip_address.name()),
+                    TimeFormatter.getStringDate(rDevice.getLong(login_date.name())),
+                    TimeFormatter.getStringDate(rDevice.getLong(last_activity.name())),
+                    Type.valueOf(rDevice.getString(type.name())),
+                    Boolean.parseBoolean(rDevice.getString(blacklisted.name()))
+            );
+            rDevice.close();
+            return device;
+        }
+        return null;
+    }
+
+    /**
+     * Method to get a list of {@link Device} from the database
+     * @param token: token of the session linked to the devices to fetch
+     * @param insertSessionToken: whether insert the session token, if {@code "false"} the session token will be set as null
+     *
+     * @return devices list as {@link ArrayList} of {@link Device}
+     * @throws SQLException when an error occurred
+     **/
+    public ArrayList<Device> getDevices(String token, boolean insertSessionToken) throws SQLException {
+        ResultSet rDevices = fetchRecord("SELECT * FROM " + devices + " WHERE token='" + token + "'");
+        ArrayList<Device> devices = new ArrayList<>();
+        while (rDevices.next()) {
+            String sToken = null;
+            if(insertSessionToken)
+                sToken = rDevices.getString(SessionKeys.token.name());
+            devices.add(new Device(sToken,
+                    rDevices.getString(DeviceKeys.name.name()),
+                    rDevices.getString(ip_address.name()),
+                    TimeFormatter.getStringDate(rDevices.getLong(login_date.name())),
+                    TimeFormatter.getStringDate(rDevices.getLong(last_activity.name())),
+                    Type.valueOf(rDevices.getString(type.name())),
+                    Boolean.parseBoolean(rDevices.getString(blacklisted.name()))
+            ));
+        }
+        rDevices.close();
+        return devices;
+    }
+
+    /**
      * Method to insert a new password in the {@link Table#passwords} table
      * @param password: device to insert
      * @apiNote the password will link with a one {@link Session} inserted in the {@link Table#sessions} table
@@ -215,9 +273,41 @@ public class DatabaseManager {
      * @throws SQLException when an error occurred
      **/
     public void insertNewPassword(String token, String tail, ArrayList<String> scopes, String password) throws SQLException {
+        if (scopes == null)
+            scopes = new ArrayList<>();
         connection.prepareStatement("INSERT INTO " + passwords + "(token, tail, scopes, password, status) "
                 + "VALUES ('" + token + "','" + tail + "','" + scopes + "','" + password + "','" + ACTIVE + "')")
                 .executeUpdate();
+    }
+
+    /**
+     * Method to get a list of {@link Password} from the database
+     * @param token: token of the session linked to the passwords to fetch
+     * @param insertSessionToken: whether insert the session token, if {@code "false"} the session token will be set as null
+     *
+     * @return passwords list as {@link ArrayList} of {@link Password}
+     * @throws SQLException when an error occurred
+     **/
+    public ArrayList<Password> getPasswords(String token, boolean insertSessionToken) throws SQLException {
+        ResultSet rPasswords = fetchRecord("SELECT * FROM " + passwords + " WHERE token='" + token + "'");
+        ArrayList<Password> passwords = new ArrayList<>();
+        while (rPasswords.next()) {
+            ArrayList<String> lScopes = new ArrayList<>();
+            JSONArray jScopes = new JSONArray(rPasswords.getString(scopes.name()));
+                for (int j = 0; j < jScopes.length(); j++)
+                    lScopes.add(jScopes.getString(j));
+            String sToken = null;
+            if(insertSessionToken)
+                sToken = rPasswords.getString(SessionKeys.token.name());
+            passwords.add(new Password(sToken,
+                    rPasswords.getString(tail.name()),
+                    lScopes,
+                    rPasswords.getString(password.name()),
+                    Password.Status.valueOf(rPasswords.getString(status.name()))
+            ));
+        }
+        rPasswords.close();
+        return passwords;
     }
 
     /**

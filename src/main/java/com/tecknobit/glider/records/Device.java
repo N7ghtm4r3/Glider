@@ -12,6 +12,43 @@ import com.tecknobit.apimanager.formatters.TimeFormatter;
 public class Device extends GliderRecord {
 
     /**
+     * {@code DeviceKeys} list of available keys for the device
+     **/
+    public enum DeviceKeys {
+
+        /**
+         * {@code name} key of the device
+         **/
+        name,
+
+        /**
+         * {@code ip_address} key of the device
+         **/
+        ip_address,
+
+        /**
+         * {@code login_date} key of the device
+         **/
+        login_date,
+
+        /**
+         * {@code last_activity} key of the device
+         **/
+        last_activity,
+
+        /**
+         * {@code type} key of the device
+         **/
+        type,
+
+        /**
+         * {@code blacklisted} key of the device
+         **/
+        blacklisted
+
+    }
+
+    /**
      * {@code name} of the device
      **/
     private final String name;
