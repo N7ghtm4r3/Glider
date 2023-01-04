@@ -46,6 +46,16 @@ public class Password extends GliderRecord {
          **/
         length,
 
+        /**
+         * {@code scope} key of the password
+         **/
+        scope,
+
+        /**
+         * {@code old_scope} key of the password
+         **/
+        old_scope,
+
     }
 
     /**

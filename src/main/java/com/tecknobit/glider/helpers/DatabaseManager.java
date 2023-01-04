@@ -1,7 +1,6 @@
 package com.tecknobit.glider.helpers;
 
 import com.tecknobit.apimanager.annotations.Wrapper;
-import com.tecknobit.apimanager.formatters.TimeFormatter;
 import com.tecknobit.glider.records.Device;
 import com.tecknobit.glider.records.Device.DeviceKeys;
 import com.tecknobit.glider.records.Password;
@@ -16,16 +15,18 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 
+import static com.tecknobit.apimanager.formatters.TimeFormatter.getStringDate;
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.*;
 import static com.tecknobit.glider.records.Device.DeviceKeys.*;
 import static com.tecknobit.glider.records.Device.Type;
-import static com.tecknobit.glider.records.Password.*;
 import static com.tecknobit.glider.records.Password.PasswordKeys.*;
+import static com.tecknobit.glider.records.Password.Status;
 import static com.tecknobit.glider.records.Password.Status.ACTIVE;
 import static com.tecknobit.glider.records.Password.Status.DELETED;
 import static com.tecknobit.glider.records.Password.fetchScopes;
-import static com.tecknobit.glider.records.Session.*;
+import static com.tecknobit.glider.records.Session.SessionKeys;
 import static com.tecknobit.glider.records.Session.SessionKeys.*;
+import static java.lang.Boolean.parseBoolean;
 
 /**
  * The {@link DatabaseManager} is class useful to manage the {@code SQL} database where are stored all the
@@ -163,8 +164,8 @@ public class DatabaseManager {
                     rSession.getString(password.name()),
                     rSession.getString(host_address.name()),
                     rSession.getInt(host_port.name()),
-                    rSession.getBoolean(single_use_mode.name()),
-                    rSession.getBoolean(qr_code_login.name()));
+                    parseBoolean(rSession.getString(single_use_mode.name())),
+                    parseBoolean(rSession.getString(qr_code_login.name())));
             rSession.close();
             return session;
         }
@@ -237,10 +238,10 @@ public class DatabaseManager {
             Device device = new Device(token,
                     rDevice.getString(DeviceKeys.name.name()),
                     rDevice.getString(ip_address.name()),
-                    TimeFormatter.getStringDate(rDevice.getLong(login_date.name())),
-                    TimeFormatter.getStringDate(rDevice.getLong(last_activity.name())),
+                    getStringDate(rDevice.getLong(login_date.name())),
+                    getStringDate(rDevice.getLong(last_activity.name())),
                     Type.valueOf(rDevice.getString(type.name())),
-                    Boolean.parseBoolean(rDevice.getString(blacklisted.name())));
+                    parseBoolean(rDevice.getString(blacklisted.name())));
             rDevice.close();
             return device;
         }
@@ -265,10 +266,10 @@ public class DatabaseManager {
             devices.add(new Device(sToken,
                     rDevices.getString(DeviceKeys.name.name()),
                     rDevices.getString(ip_address.name()),
-                    TimeFormatter.getStringDate(rDevices.getLong(login_date.name())),
-                    TimeFormatter.getStringDate(rDevices.getLong(last_activity.name())),
+                    getStringDate(rDevices.getLong(login_date.name())),
+                    getStringDate(rDevices.getLong(last_activity.name())),
                     Type.valueOf(rDevices.getString(type.name())),
-                    Boolean.parseBoolean(rDevices.getString(blacklisted.name()))
+                    parseBoolean(rDevices.getString(blacklisted.name()))
             ));
         }
         rDevices.close();
@@ -389,9 +390,73 @@ public class DatabaseManager {
     public void insertNewPassword(String token, String tail, ArrayList<String> scopes, String password) throws SQLException {
         if (scopes == null)
             scopes = new ArrayList<>();
-        connection.prepareStatement("INSERT INTO " + passwords + "(token, tail, scopes, password, status) "
+        connection.prepareStatement("INSERT INTO " + passwords + " (token, tail, scopes, password, status) "
                 + "VALUES ('" + token + "','" + tail + "','" + scopes + "','" + password + "','" + ACTIVE + "')")
                 .executeUpdate();
+    }
+
+    /**
+     * Method to add a scope to scopes list for the {@link Password}
+     *
+     * @param token: token of the session which the {@link Password} is connected
+     * @param password: password from edit the scope
+     * @param addScope: scope to add
+     * @throws SQLException when an error occurred
+     **/
+    public void addPasswordScope(String token, Password password, String addScope) throws SQLException {
+        ArrayList<String> currentScopes = new ArrayList<>(password.getScopes());
+        if(!currentScopes.contains(addScope)) {
+            currentScopes.add(addScope);
+            modifyPasswordScopes(token, password.getTail(), currentScopes);
+        } else
+            throw new SQLException();
+    }
+
+    /**
+     * Method to edit a scope of scopes list for the {@link Password}
+     *
+     * @param token: token of the session which the {@link Password} is connected
+     * @param password: password from edit the scope
+     * @param oldScope: old scope to edit
+     * @param editScope: scope edited
+     * @throws SQLException when an error occurred
+     **/
+    public void editPasswordScope(String token, Password password, String oldScope, String editScope) throws SQLException {
+        ArrayList<String> currentScopes = new ArrayList<>(password.getScopes());
+        if(currentScopes.remove(oldScope) && !currentScopes.contains(editScope)) {
+            currentScopes.add(editScope);
+            modifyPasswordScopes(token, password.getTail(), currentScopes);
+        } else
+            throw new SQLException();
+    }
+
+    /**
+     * Method to remove a scope from scopes list for the {@link Password}
+     *
+     * @param token: token of the session which the {@link Password} is connected
+     * @param password: password from remove the scope
+     * @param removeScope: scope to remove
+     * @throws SQLException when an error occurred
+     **/
+    public void removePasswordScope(String token, Password password, String removeScope) throws SQLException {
+        ArrayList<String> currentScopes = new ArrayList<>(password.getScopes());
+        if(currentScopes.remove(removeScope))
+            modifyPasswordScopes(token, password.getTail(), currentScopes);
+        else
+            throw new SQLException();
+    }
+
+    /**
+     * Method to set a new scopes list for the {@link Password}
+     *
+     * @param token: token of the session which the {@link Password} is connected
+     * @param tail: tail of the {@link Password}
+     * @param scopes: new list of scopes to set for the {@link Password}
+     * @throws SQLException when an error occurred
+     **/
+    private void modifyPasswordScopes(String token, String tail, ArrayList<String> scopes) throws SQLException {
+        connection.prepareStatement("UPDATE " + passwords + " SET scopes='" + scopes + "' WHERE token='"
+                + token + "' AND tail='" + tail + "'").executeUpdate();
     }
 
     /**

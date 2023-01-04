@@ -5,10 +5,8 @@ import com.tecknobit.apimanager.apis.SocketManager;
 import com.tecknobit.apimanager.apis.encryption.aes.serverside.CBCServerCipher;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.records.Device;
-import com.tecknobit.glider.records.Device.Type;
 import com.tecknobit.glider.records.Password;
 import com.tecknobit.glider.records.Session;
-import com.tecknobit.glider.records.Session.SessionKeys;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -25,6 +23,7 @@ import static com.tecknobit.glider.helpers.DatabaseManager.Table.devices;
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.passwords;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.ope;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.status_code;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.CONNECT;
 import static com.tecknobit.glider.records.Device.DeviceKeys.*;
 import static com.tecknobit.glider.records.Password.*;
 import static com.tecknobit.glider.records.Password.PasswordKeys.*;
@@ -68,6 +67,7 @@ import static java.lang.System.currentTimeMillis;
  *
  * @author Tecknobit - N7ghtm4r3
  **/
+// TODO: 04/01/2023 PASS A CONFIG JSON TO INIT SERVER DIRECTLY FROM A JAR FILE, THINK ABOUT IT
 public class GliderLauncher {
 
     /**
@@ -99,6 +99,21 @@ public class GliderLauncher {
          * {@code RECOVER_PASSWORD} recovery password operation
          */
         RECOVER_PASSWORD,
+
+        /**
+         * {@code ADD_SCOPE} add scope operation
+         */
+        ADD_SCOPE,
+
+        /**
+         * {@code EDIT_SCOPE} edit scope operation
+         */
+        EDIT_SCOPE,
+
+        /**
+         * {@code REMOVE_SCOPE} remove scope operation
+         */
+        REMOVE_SCOPE,
 
         /**
          * {@code DISCONNECT} disconnect operation
@@ -205,7 +220,6 @@ public class GliderLauncher {
         socketManager = new SocketManager(false);
         serverCipher = new CBCServerCipher(session.getIvSpec(), session.getSecretKey(), k256);
         this.hostPort = session.getHostPort();
-        // TODO: 03/01/2023 QR-CODE LOGIN IF ENABLED
     }
 
     /**
@@ -264,184 +278,247 @@ public class GliderLauncher {
                     if(session.getPassword().equals(JsonHelper.getString(request, session_password.name()))) {
                         String deviceName = request.getString(name.name());
                         String ipAddress = request.getString(ip_address.name());
+                        Operation vOpe = Operation.valueOf(request.getString(ope.name()));
                         device = databaseManager.getDevice(sessionToken, deviceName, ipAddress);
-                        if(device == null || !device.isBlacklisted()) {
-                            switch (Operation.valueOf(request.getString(ope.name()))) {
-                                case CONNECT -> {
-                                    // TODO: 03/01/2023 payload:
-                                    //  device name
-                                    //  ip
-                                    //  type
-                                    //  sPassword
-                                    device = databaseManager.getDevice(sessionToken, deviceName, ipAddress);
-                                    if (device == null || !device.isBlacklisted()) {
-                                        databaseManager.insertNewDevice(sessionToken, deviceName, ipAddress, currentTimeMillis(),
-                                                Type.valueOf(request.getString(type.name())));
-                                        // TODO: 03/01/2023 response
-                                        // status code
-                                        //  session - less the password
-                                        //  passwords
-                                        //  devices
-                                        JSONObject jSession = session.toJSON();
-                                        jSession.remove(password.name());
-                                        sendSuccessfulResponse(response.put(SessionKeys.session.name(), jSession)
-                                                .put(passwords.name(), databaseManager.getPasswords(sessionToken, false))
-                                                .put(devices.name(), databaseManager.getDevices(sessionToken, false)));
-                                    } else
-                                        sendErrorResponse();
-                                }
-                                case CREATE_PASSWORD -> {
-                                    // TODO: 03/01/2023 payload:
-                                    //  device name
-                                    //  ip
-                                    //  sPassword
-                                    //  tail
-                                    //  scopes
-                                    //  length
-                                    int length = request.getInt(PasswordKeys.length.name());
-                                    if(length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH) {
-                                        ArrayList<Integer> letters = new ArrayList<>();
-                                        StringBuilder password = new StringBuilder();
-                                        for (int j = 0; j < length; j++) {
-                                            int index;
-                                            do {
-                                                index = new Random().nextInt(122);
-                                                if(index < 33)
-                                                    index = 33;
-                                            } while (letters.contains(index) || index == 44);
-                                            letters.add(index);
-                                            password.append(((char) index));
-                                        }
-                                        databaseManager.insertNewPassword(sessionToken, request.getString(tail.name()),
-                                                fetchScopes(request.getJSONArray(scopes.name())), password.toString());
-                                        // TODO: 03/01/2023 response
-                                        // status code
-                                        //  password
-                                        sendSuccessfulResponse(response.put(PasswordKeys.password.name(), password));
-                                    } else
-                                        sendErrorResponse();
-                                }
-                                case INSERT_PASSWORD -> {
-                                    // TODO: 03/01/2023 payload:
-                                    //  device name
-                                    //  ip
-                                    //  sPassword
-                                    //  tail
-                                    //  scopes
-                                    //  password
-                                    String tail = request.getString(PasswordKeys.tail.name());
-                                    int length = tail.length();
-                                    if(length > 0 && length < 30) {
-                                        String password  = request.getString(PasswordKeys.password.name());
-                                        length = password.length();
+                        if(vOpe.equals(CONNECT)) {
+                            boolean connect = false;
+                            if(session.isSingleUseMode()) {
+                                if(databaseManager.getDevices(sessionToken, false).size() < 1)
+                                    connect = true;
+                                else
+                                    sendErrorResponse();
+                            } else
+                                connect = true;
+                            if((connect && (device == null || !device.isBlacklisted()))) {
+                                // TODO: 03/01/2023 payload:
+                                //  device name
+                                //  ip
+                                //  type
+                                //  sPassword
+                                databaseManager.insertNewDevice(sessionToken, deviceName, ipAddress,
+                                        currentTimeMillis(), Device.Type.valueOf(request.getString(type.name())));
+                                // TODO: 03/01/2023 response
+                                // status code
+                                //  session - less the password
+                                //  passwords
+                                //  devices
+                                JSONObject jSession = session.toJSON();
+                                jSession.remove(password.name());
+                                sendSuccessfulResponse(response.put(Session.SessionKeys.session.name(), jSession)
+                                        .put(passwords.name(), databaseManager.getPasswords(sessionToken, false))
+                                        .put(devices.name(), databaseManager.getDevices(sessionToken, false)));
+                            } else
+                                sendErrorResponse();
+                        } else {
+                            if(!device.isBlacklisted()) {
+                                switch (vOpe) {
+                                    case CREATE_PASSWORD -> {
+                                        // TODO: 03/01/2023 payload:
+                                        //  device name
+                                        //  ip
+                                        //  sPassword
+                                        //  tail
+                                        //  scopes
+                                        //  length
+                                        int length = request.getInt(PasswordKeys.length.name());
                                         if(length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH) {
-                                            databaseManager.insertNewPassword(sessionToken, tail,
-                                                    fetchScopes(request.getJSONArray(scopes.name())), password);
+                                            ArrayList<Integer> letters = new ArrayList<>();
+                                            StringBuilder password = new StringBuilder();
+                                            for (int j = 0; j < length; j++) {
+                                                int index;
+                                                do {
+                                                    index = new Random().nextInt(122);
+                                                    if(index < 33)
+                                                        index = 33;
+                                                } while (letters.contains(index) || index == 44);
+                                                letters.add(index);
+                                                password.append(((char) index));
+                                            }
+                                            databaseManager.insertNewPassword(sessionToken, request.getString(tail.name()),
+                                                    fetchScopes(request.getJSONArray(scopes.name())), password.toString());
+                                            // TODO: 03/01/2023 response
+                                            // status code
+                                            //  password
+                                            sendSuccessfulResponse(response.put(PasswordKeys.password.name(), password));
+                                        } else
+                                            sendErrorResponse();
+                                    }
+                                    case INSERT_PASSWORD -> {
+                                        // TODO: 03/01/2023 payload:
+                                        //  device name
+                                        //  ip
+                                        //  sPassword
+                                        //  tail
+                                        //  scopes
+                                        //  password
+                                        String tail = request.getString(PasswordKeys.tail.name());
+                                        int length = tail.length();
+                                        if(length > 0 && length < 30) {
+                                            String password  = request.getString(PasswordKeys.password.name());
+                                            length = password.length();
+                                            if(length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH) {
+                                                databaseManager.insertNewPassword(sessionToken, tail,
+                                                        fetchScopes(request.getJSONArray(scopes.name())), password);
+                                                // TODO: 03/01/2023 response
+                                                // status code
+                                                sendSuccessfulResponse(response);
+                                            } else
+                                                sendErrorResponse();
+                                        } else
+                                            sendErrorResponse();
+                                    }
+                                    case DELETE_PASSWORD -> {
+                                        // TODO: 03/01/2023 payload:
+                                        //  device name
+                                        //  ip
+                                        //  sPassword
+                                        //  tail
+                                        String tail = request.getString(PasswordKeys.tail.name());
+                                        Password password = databaseManager.getPassword(sessionToken, tail);
+                                        if(password != null) {
+                                            if(password.getStatus().equals(ACTIVE))
+                                                databaseManager.deletePassword(sessionToken, tail);
+                                            else
+                                                databaseManager.permanentlyDeletePassword(sessionToken, tail);
                                             // TODO: 03/01/2023 response
                                             // status code
                                             sendSuccessfulResponse(response);
                                         } else
                                             sendErrorResponse();
-                                    } else
-                                        sendErrorResponse();
-                                }
-                                case DELETE_PASSWORD -> {
-                                    // TODO: 03/01/2023 payload:
-                                    //  device name
-                                    //  ip
-                                    //  sPassword
-                                    //  tail
-                                    String tail = request.getString(PasswordKeys.tail.name());
-                                    Password password = databaseManager.getPassword(sessionToken, tail);
-                                    if(password != null) {
-                                        if(password.getStatus().equals(ACTIVE))
-                                            databaseManager.deletePassword(sessionToken, tail);
-                                        else
-                                            databaseManager.permanentlyDeletePassword(sessionToken, tail);
-                                        // TODO: 03/01/2023 response
-                                        // status code
-                                        sendSuccessfulResponse(response);
-                                    } else
-                                        sendErrorResponse();
-                                }
-                                case RECOVER_PASSWORD -> {
-                                    // TODO: 03/01/2023 payload:
-                                    //  device name
-                                    //  ip
-                                    //  sPassword
-                                    //  tail
-                                    String tail = request.getString(PasswordKeys.tail.name());
-                                    Password password = databaseManager.getPassword(sessionToken, tail);
-                                    if(password != null && password.getStatus().equals(DELETED)) {
-                                        databaseManager.recoverPassword(sessionToken, tail);
-                                        // TODO: 03/01/2023 response
-                                        // status code
-                                        sendSuccessfulResponse(response);
-                                    } else
-                                        sendErrorResponse();
-                                }
-                                case DISCONNECT -> {
-                                    // TODO: 03/01/2023 payload:
-                                    //  device name
-                                    //  ip
-                                    //  type
-                                    // target_device:
-                                    //  - device name
-                                    //  - ip
-                                    if(JsonHelper.getJSONObject(request, target_device.name()) != null) {
+                                    }
+                                    case RECOVER_PASSWORD -> {
+                                        // TODO: 03/01/2023 payload:
+                                        //  device name
+                                        //  ip
+                                        //  sPassword
+                                        //  tail
+                                        String tail = request.getString(PasswordKeys.tail.name());
+                                        Password password = databaseManager.getPassword(sessionToken, tail);
+                                        if(password != null && password.getStatus().equals(DELETED)) {
+                                            databaseManager.recoverPassword(sessionToken, tail);
+                                            // TODO: 03/01/2023 response
+                                            // status code
+                                            sendSuccessfulResponse(response);
+                                        } else
+                                            sendErrorResponse();
+                                    }
+                                    case ADD_SCOPE -> {
+                                        // TODO: 03/01/2023 payload:
+                                        //  device name
+                                        //  ip
+                                        //  sPassword
+                                        //  tail
+                                        // add_scope
+                                        String tail = request.getString(PasswordKeys.tail.name());
+                                        Password password = databaseManager.getPassword(sessionToken, tail);
+                                        if(password != null) {
+                                            databaseManager.addPasswordScope(sessionToken, password,
+                                                    request.getString(scope.name()));
+                                            // TODO: 03/01/2023 response
+                                            // status code
+                                            sendSuccessfulResponse(response);
+                                        } else
+                                            sendErrorResponse();
+                                    }
+                                    case EDIT_SCOPE -> {
+                                        // TODO: 03/01/2023 payload:
+                                        //  device name
+                                        //  ip
+                                        //  sPassword
+                                        //  tail
+                                        // edit_scope
+                                        // old_scope
+                                        String tail = request.getString(PasswordKeys.tail.name());
+                                        Password password = databaseManager.getPassword(sessionToken, tail);
+                                        if(password != null) {
+                                            databaseManager.editPasswordScope(sessionToken, password,
+                                                    request.getString(old_scope.name()), request.getString(scope.name()));
+                                            // TODO: 03/01/2023 response
+                                            // status code
+                                            sendSuccessfulResponse(response);
+                                        } else
+                                            sendErrorResponse();
+                                    }
+                                    case REMOVE_SCOPE -> {
+                                        // TODO: 03/01/2023 payload:
+                                        //  device name
+                                        //  ip
+                                        //  sPassword
+                                        //  tail
+                                        // remove_scope
+                                        String tail = request.getString(PasswordKeys.tail.name());
+                                        Password password = databaseManager.getPassword(sessionToken, tail);
+                                        if(password != null) {
+                                            databaseManager.removePasswordScope(sessionToken, password,
+                                                    request.getString(scope.name()));
+                                            // TODO: 03/01/2023 response
+                                            // status code
+                                            sendSuccessfulResponse(response);
+                                        } else
+                                            sendErrorResponse();
+                                    }
+                                    case DISCONNECT -> {
+                                        // TODO: 03/01/2023 payload:
+                                        //  device name
+                                        //  ip
+                                        //  type
+                                        // target_device:
+                                        //  - device name
+                                        //  - ip
+                                        if(JsonHelper.getJSONObject(request, target_device.name()) != null) {
+                                            request = request.getJSONObject(target_device.name());
+                                            device = databaseManager.getDevice(sessionToken, request.getString(name.name()),
+                                                    request.getString(ip_address.name()));
+                                        }
+                                        if(device != null) {
+                                            databaseManager.deleteDevice(sessionToken, device.getName(), device.getIpAddress());
+                                            // TODO: 03/01/2023 response
+                                            // status code
+                                            sendSuccessfulResponse(response);
+                                        } else
+                                            sendErrorResponse();
+                                    }
+                                    case MANAGE_DEVICE_AUTHORIZATION -> {
+                                        // TODO: 03/01/2023 payload:
+                                        //  device name
+                                        //  ip
+                                        //  type
+                                        // target_device:
+                                        //  - device name
+                                        //  - ip
                                         request = request.getJSONObject(target_device.name());
-                                        System.out.println(request);
                                         device = databaseManager.getDevice(sessionToken, request.getString(name.name()),
                                                 request.getString(ip_address.name()));
+                                        if(device != null) {
+                                            if(device.isBlacklisted()) {
+                                                databaseManager.unblacklistDevice(sessionToken, device.getName(),
+                                                        device.getIpAddress());
+                                            } else {
+                                                databaseManager.blacklistDevice(sessionToken, device.getName(),
+                                                        device.getIpAddress());
+                                            }
+                                            // TODO: 03/01/2023 response
+                                            // status code
+                                            sendSuccessfulResponse(response);
+                                        } else
+                                            sendErrorResponse();
                                     }
-                                    if(device != null) {
-                                        databaseManager.deleteDevice(sessionToken, device.getName(), device.getIpAddress());
-                                        // TODO: 03/01/2023 response
+                                    case DELETE_ACCOUNT -> {
+                                        // TODO: 03/01/2023 payload:
+                                        //  device name
+                                        //  ip
+                                        //  type
+                                        databaseManager.deleteSession(session);
+                                        session = null;
+                                        // TODO: 03/01/2023 response AND CLOSE SOCKETMANAGER ALL LISTENERS WITH THE SPECIFIC METHOD
                                         // status code
                                         sendSuccessfulResponse(response);
-                                    } else
-                                        sendErrorResponse();
+                                    }
+                                    default -> sendErrorResponse();
                                 }
-                                case MANAGE_DEVICE_AUTHORIZATION -> {
-                                    // TODO: 03/01/2023 payload:
-                                    //  device name
-                                    //  ip
-                                    //  type
-                                    // target_device:
-                                    //  - device name
-                                    //  - ip
-                                    request = request.getJSONObject(target_device.name());
-                                    device = databaseManager.getDevice(sessionToken, request.getString(name.name()),
-                                            request.getString(ip_address.name()));
-                                    if(device != null) {
-                                        if(device.isBlacklisted()) {
-                                            databaseManager.unblacklistDevice(sessionToken, device.getName(),
-                                                    device.getIpAddress());
-                                        } else {
-                                            databaseManager.blacklistDevice(sessionToken, device.getName(),
-                                                    device.getIpAddress());
-                                        }
-                                        // TODO: 03/01/2023 response
-                                        // status code
-                                        sendSuccessfulResponse(response);
-                                    } else
-                                        sendErrorResponse();
-                                }
-                                case DELETE_ACCOUNT -> {
-                                    // TODO: 03/01/2023 payload:
-                                    //  device name
-                                    //  ip
-                                    //  type
-                                    databaseManager.deleteSession(session);
-                                    session = null;
-                                    // TODO: 03/01/2023 response AND CLOSE SOCKETMANAGER ALL LISTENERS WITH THE SPECIFIC METHOD
-                                    // status code
-                                    sendSuccessfulResponse(response);
-                                }
-                                default -> sendErrorResponse();
-                            }
-                        } else
-                            sendErrorResponse();
+                            } else
+                                sendErrorResponse();
+                        }
                     } else
                         sendErrorResponse();
                 } catch (Exception e) {
