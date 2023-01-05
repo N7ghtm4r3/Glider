@@ -1,14 +1,14 @@
 package com.tecknobit.glider.helpers;
 
-import com.tecknobit.apimanager.annotations.Wrapper;
+import com.tecknobit.apimanager.apis.QRCodeHelper;
 import com.tecknobit.apimanager.apis.SocketManager;
-import com.tecknobit.apimanager.apis.encryption.aes.serverside.CBCServerCipher;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.records.Device;
 import com.tecknobit.glider.records.Password;
 import com.tecknobit.glider.records.Session;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
 
+import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.FAILED;
+import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.SUCCESSFUL;
+import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
 import static com.tecknobit.apimanager.apis.encryption.aes.serverside.CBCServerCipher.createCBCIvParameterSpecString;
 import static com.tecknobit.apimanager.apis.encryption.aes.serverside.CBCServerCipher.createCBCSecretKeyString;
 import static com.tecknobit.apimanager.apis.encryption.aes.serverside.GenericServerCipher.KeySize.k256;
@@ -29,8 +32,9 @@ import static com.tecknobit.glider.records.Password.*;
 import static com.tecknobit.glider.records.Password.PasswordKeys.*;
 import static com.tecknobit.glider.records.Password.Status.ACTIVE;
 import static com.tecknobit.glider.records.Password.Status.DELETED;
-import static com.tecknobit.glider.records.Session.SessionKeys.session_password;
+import static com.tecknobit.glider.records.Session.SessionKeys.*;
 import static java.lang.System.currentTimeMillis;
+import static java.net.InetAddress.getLoopbackAddress;
 
 /**
  * The {@link GliderLauncher} is class useful to start the {@code Glider}'s service <br>
@@ -155,21 +159,6 @@ public class GliderLauncher {
     }
 
     /**
-     * {@code ERROR_STATUS} error status code
-     */
-    public static final int ERROR_STATUS = 500;
-
-    /**
-     * {@code SUCCESSFUL_STATUS} successful status code
-     */
-    public static final int SUCCESSFUL_STATUS = 200;
-
-    /**
-     * {@code GENERIC_STATUS} generic status code
-     */
-    public static final int GENERIC_STATUS = 300;
-
-    /**
      * {@code COLOR_PRIMARY_HEX} the primary color value as hex {@link String}
      */
     public static final String COLOR_PRIMARY_HEX = "#1E1E8D";
@@ -180,14 +169,14 @@ public class GliderLauncher {
     public static final String COLOR_RED_HEX = "#A81515";
 
     /**
+     * {@code BACKGROUND_COLOR_HEX} the background color value as hex {@link String}
+     */
+    public static final String BACKGROUND_COLOR_HEX = "#FAEDE1E1";
+
+    /**
      * {@code databaseManager} manager of the database
      */
     private final DatabaseManager databaseManager;
-
-    /**
-     * {@code serverCipher} useful to encrypt all the {@link Session}'s data 
-     */
-    private final CBCServerCipher serverCipher;
 
     /**
      * {@code socketManager} manager of the socket communication
@@ -197,12 +186,17 @@ public class GliderLauncher {
     /**
      * {@code session} of the {@code Glider}'s service
      */
-    private Session session;
+    private final Session session;
     
     /**
      * {@code hostPort} host port for {@link #session} of the {@code Glider}'s service
      */
     private final int hostPort;
+
+    /**
+     * {@code qrCodeHelper} instance to manage the QRCode login procedure
+     */
+    private final QRCodeHelper qrCodeHelper;
 
     /**
      * Constructor to init {@link GliderLauncher} object
@@ -217,9 +211,16 @@ public class GliderLauncher {
         session = databaseManager.getSession(token);
         if(session == null)
             throw new Exception("No-any sessions found with that token, retry");
-        socketManager = new SocketManager(false);
-        serverCipher = new CBCServerCipher(session.getIvSpec(), session.getSecretKey(), k256);
+        socketManager = new SocketManager(false, session.getIvSpec(), session.getSecretKey(), CBC_ALGORITHM);
         this.hostPort = session.getHostPort();
+        if(session.isQRCodeLoginEnabled()) {
+            qrCodeHelper = new QRCodeHelper();
+            qrCodeHelper.hostQRCode(session.getHostPort() + 1, new JSONObject()
+                    .put(host_address.name(), session.getHostAddress())
+                    .put(host_port.name(), hostPort), "Glider.png", 250, true,
+                    new File("src/main/resources/qrcode.html"));
+        } else
+            qrCodeHelper = null;
     }
 
     /**
@@ -229,20 +230,24 @@ public class GliderLauncher {
      * @param password: password to protect the {@link Session}
      * @param singleUseMode:   whether the session allows multiple connections, so multiple devices
      * @param QRCodeLoginEnabled:   whether the session allows login by QR-CODE method
+     *                          (if enabled will be shown on {@code "host_address:(host_port + 1)"})
      * @param hostPort: host port of the session
+     * @param runInLocalhost: whether the session can accept requests outside localhost
      * @apiNote this constructor is to use to create a new {@link Session} if you need to start the {@code Glider}'s
      * service for the first time
      **/
     public GliderLauncher(String databasePath, String password, boolean singleUseMode, boolean QRCodeLoginEnabled,
-                          int hostPort) throws Exception {
+                          int hostPort, boolean runInLocalhost) throws Exception {
         databaseManager = new DatabaseManager(databasePath);
-        socketManager = new SocketManager(false);
-        session = new Session(createToken(), createCBCIvParameterSpecString(), createCBCSecretKeyString(k256), password,
-                "localhost", hostPort, singleUseMode, QRCodeLoginEnabled); // TODO: 02/01/2023 USE socketManager.getHost() INSTEAD "localhost"
+        String ivSpec = createCBCIvParameterSpecString();
+        String secretKey = createCBCSecretKeyString(k256);
+        socketManager = new SocketManager(false, ivSpec, secretKey, CBC_ALGORITHM);
+        session = new Session(createToken(), ivSpec, secretKey, password, socketManager.getHost(!runInLocalhost), hostPort,
+                singleUseMode, QRCodeLoginEnabled, runInLocalhost);
         databaseManager.insertNewSession(session);
-        serverCipher = new CBCServerCipher(session.getIvSpec(), session.getSecretKey(), k256);
+        // TODO: 03/01/2023 THROWS SAVE DATA EXCEPTION TO PROCEED LIKE TRADERBOT
         this.hostPort = hostPort;
-        // TODO: 03/01/2023 QR-CODE LOGIN IF ENABLED
+        qrCodeHelper = null;
     }
 
     /**
@@ -265,19 +270,21 @@ public class GliderLauncher {
     public void startService() throws IOException {
         String sessionToken = session.getToken();
         JSONObject response = new JSONObject();
+        socketManager.setDefaultErrorResponse(new JSONObject().put(status_code.name(), FAILED));
         socketManager.startListener(hostPort, () -> {
             Device device;
-            while (session != null) {
+            while (socketManager.continueListening()) {
                 System.out.println("Waiting...");
                 try {
                     Socket sRequest = socketManager.acceptRequest();
-                    JSONObject request = new JSONObject(serverCipher.decryptRequest(socketManager.readContent()));
+                    JSONObject request = new JSONObject(socketManager.readContent());
+                    String ipAddress = ((InetSocketAddress)sRequest.getRemoteSocketAddress()).getAddress().getHostAddress();
                     System.out.println(request);
-                    request.put(ip_address.name(), ((InetSocketAddress)sRequest.getRemoteSocketAddress()).getAddress()
-                            .getHostAddress());
-                    if(session.getPassword().equals(JsonHelper.getString(request, session_password.name()))) {
+                    boolean check = true;
+                    if(session.runInLocalhost())
+                        check = getLoopbackAddress().getHostAddress().endsWith(ipAddress);
+                    if(check && session.getSessionPassword().equals(JsonHelper.getString(request, session_password.name()))) {
                         String deviceName = request.getString(name.name());
-                        String ipAddress = request.getString(ip_address.name());
                         Operation vOpe = Operation.valueOf(request.getString(ope.name()));
                         device = databaseManager.getDevice(sessionToken, deviceName, ipAddress);
                         if(vOpe.equals(CONNECT)) {
@@ -286,13 +293,12 @@ public class GliderLauncher {
                                 if(databaseManager.getDevices(sessionToken, false).size() < 1)
                                     connect = true;
                                 else
-                                    sendErrorResponse();
+                                    socketManager.sendDefaultErrorResponse();
                             } else
                                 connect = true;
                             if((connect && (device == null || !device.isBlacklisted()))) {
                                 // TODO: 03/01/2023 payload:
                                 //  device name
-                                //  ip
                                 //  type
                                 //  sPassword
                                 databaseManager.insertNewDevice(sessionToken, deviceName, ipAddress,
@@ -308,14 +314,13 @@ public class GliderLauncher {
                                         .put(passwords.name(), databaseManager.getPasswords(sessionToken, false))
                                         .put(devices.name(), databaseManager.getDevices(sessionToken, false)));
                             } else
-                                sendErrorResponse();
+                                socketManager.sendDefaultErrorResponse();
                         } else {
                             if(!device.isBlacklisted()) {
                                 switch (vOpe) {
                                     case CREATE_PASSWORD -> {
                                         // TODO: 03/01/2023 payload:
                                         //  device name
-                                        //  ip
                                         //  sPassword
                                         //  tail
                                         //  scopes
@@ -341,12 +346,11 @@ public class GliderLauncher {
                                             //  password
                                             sendSuccessfulResponse(response.put(PasswordKeys.password.name(), password));
                                         } else
-                                            sendErrorResponse();
+                                            socketManager.sendDefaultErrorResponse();
                                     }
                                     case INSERT_PASSWORD -> {
                                         // TODO: 03/01/2023 payload:
                                         //  device name
-                                        //  ip
                                         //  sPassword
                                         //  tail
                                         //  scopes
@@ -363,14 +367,13 @@ public class GliderLauncher {
                                                 // status code
                                                 sendSuccessfulResponse(response);
                                             } else
-                                                sendErrorResponse();
+                                                socketManager.sendDefaultErrorResponse();
                                         } else
-                                            sendErrorResponse();
+                                            socketManager.sendDefaultErrorResponse();
                                     }
                                     case DELETE_PASSWORD -> {
                                         // TODO: 03/01/2023 payload:
                                         //  device name
-                                        //  ip
                                         //  sPassword
                                         //  tail
                                         String tail = request.getString(PasswordKeys.tail.name());
@@ -384,12 +387,11 @@ public class GliderLauncher {
                                             // status code
                                             sendSuccessfulResponse(response);
                                         } else
-                                            sendErrorResponse();
+                                            socketManager.sendDefaultErrorResponse();
                                     }
                                     case RECOVER_PASSWORD -> {
                                         // TODO: 03/01/2023 payload:
                                         //  device name
-                                        //  ip
                                         //  sPassword
                                         //  tail
                                         String tail = request.getString(PasswordKeys.tail.name());
@@ -400,12 +402,11 @@ public class GliderLauncher {
                                             // status code
                                             sendSuccessfulResponse(response);
                                         } else
-                                            sendErrorResponse();
+                                            socketManager.sendDefaultErrorResponse();
                                     }
                                     case ADD_SCOPE -> {
                                         // TODO: 03/01/2023 payload:
                                         //  device name
-                                        //  ip
                                         //  sPassword
                                         //  tail
                                         // add_scope
@@ -418,12 +419,11 @@ public class GliderLauncher {
                                             // status code
                                             sendSuccessfulResponse(response);
                                         } else
-                                            sendErrorResponse();
+                                            socketManager.sendDefaultErrorResponse();
                                     }
                                     case EDIT_SCOPE -> {
                                         // TODO: 03/01/2023 payload:
                                         //  device name
-                                        //  ip
                                         //  sPassword
                                         //  tail
                                         // edit_scope
@@ -437,12 +437,11 @@ public class GliderLauncher {
                                             // status code
                                             sendSuccessfulResponse(response);
                                         } else
-                                            sendErrorResponse();
+                                            socketManager.sendDefaultErrorResponse();
                                     }
                                     case REMOVE_SCOPE -> {
                                         // TODO: 03/01/2023 payload:
                                         //  device name
-                                        //  ip
                                         //  sPassword
                                         //  tail
                                         // remove_scope
@@ -455,12 +454,11 @@ public class GliderLauncher {
                                             // status code
                                             sendSuccessfulResponse(response);
                                         } else
-                                            sendErrorResponse();
+                                            socketManager.sendDefaultErrorResponse();
                                     }
                                     case DISCONNECT -> {
                                         // TODO: 03/01/2023 payload:
                                         //  device name
-                                        //  ip
                                         //  type
                                         // target_device:
                                         //  - device name
@@ -468,7 +466,7 @@ public class GliderLauncher {
                                         if(JsonHelper.getJSONObject(request, target_device.name()) != null) {
                                             request = request.getJSONObject(target_device.name());
                                             device = databaseManager.getDevice(sessionToken, request.getString(name.name()),
-                                                    request.getString(ip_address.name()));
+                                                    ipAddress);
                                         }
                                         if(device != null) {
                                             databaseManager.deleteDevice(sessionToken, device.getName(), device.getIpAddress());
@@ -476,19 +474,18 @@ public class GliderLauncher {
                                             // status code
                                             sendSuccessfulResponse(response);
                                         } else
-                                            sendErrorResponse();
+                                            socketManager.sendDefaultErrorResponse();
                                     }
                                     case MANAGE_DEVICE_AUTHORIZATION -> {
                                         // TODO: 03/01/2023 payload:
                                         //  device name
-                                        //  ip
                                         //  type
                                         // target_device:
                                         //  - device name
                                         //  - ip
                                         request = request.getJSONObject(target_device.name());
                                         device = databaseManager.getDevice(sessionToken, request.getString(name.name()),
-                                                request.getString(ip_address.name()));
+                                                ipAddress);
                                         if(device != null) {
                                             if(device.isBlacklisted()) {
                                                 databaseManager.unblacklistDevice(sessionToken, device.getName(),
@@ -501,29 +498,32 @@ public class GliderLauncher {
                                             // status code
                                             sendSuccessfulResponse(response);
                                         } else
-                                            sendErrorResponse();
+                                            socketManager.sendDefaultErrorResponse();
                                     }
                                     case DELETE_ACCOUNT -> {
                                         // TODO: 03/01/2023 payload:
                                         //  device name
-                                        //  ip
                                         //  type
                                         databaseManager.deleteSession(session);
-                                        session = null;
-                                        // TODO: 03/01/2023 response AND CLOSE SOCKETMANAGER ALL LISTENERS WITH THE SPECIFIC METHOD
                                         // status code
                                         sendSuccessfulResponse(response);
+                                        socketManager.stopListener();
+                                        // TODO: 05/01/2023 STOP QRCODEHELPER LISTENER
                                     }
-                                    default -> sendErrorResponse();
+                                    default -> socketManager.sendDefaultErrorResponse();
                                 }
                             } else
-                                sendErrorResponse();
+                                socketManager.sendDefaultErrorResponse();
                         }
                     } else
-                        sendErrorResponse();
+                        socketManager.sendDefaultErrorResponse();
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    sendErrorResponse();
+                    e.printStackTrace(); // TODO: 05/01/2023 TO REMOVE PRINTSTACKTRACE 
+                    try {
+                        socketManager.sendDefaultErrorResponse();
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
                 } finally {
                     response.clear();
                 }
@@ -538,32 +538,8 @@ public class GliderLauncher {
      *
      * @throws Exception when an error occurred
      **/
-    @Wrapper
     private void sendSuccessfulResponse(JSONObject message) throws Exception {
-        sendResponse(message.put(status_code.name(), SUCCESSFUL_STATUS));
-    }
-
-    /**
-     * Method to send an error response to the client <br>
-     * Any params required
-     * **/
-    @Wrapper
-    private void sendErrorResponse() {
-        try {
-            sendResponse(new JSONObject().put(status_code.name(), ERROR_STATUS));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Method to send a response to the client
-     * @param message: message to send
-     *
-     * @throws Exception when an error occurred
-     **/
-    private void sendResponse(JSONObject message) throws Exception {
-        socketManager.writeContent(serverCipher.encryptResponse(message.toString()));
+        socketManager.writeContent(message.put(status_code.name(), SUCCESSFUL));
     }
 
     /**

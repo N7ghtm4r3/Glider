@@ -2,6 +2,7 @@ package com.tecknobit.glider.records;
 
 import com.tecknobit.apimanager.annotations.Returner;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -138,6 +139,22 @@ public class Password extends GliderRecord {
         this.scopes = scopes;
         this.password = password;
         this.status = status;
+    }
+
+    /**
+     * Constructor to init {@link Password} object
+     *
+     * @param jPassword : password details as {@link JSONObject}
+     **/
+    public Password(JSONObject jPassword) {
+        super(jPassword);
+        tail = hRecord.getString(PasswordKeys.tail.name());
+        scopes = new ArrayList<>();
+        JSONArray jScopes = hRecord.getJSONArray(PasswordKeys.scopes.name(), new JSONArray());
+        for (int j = 0; j < jScopes.length(); j++)
+            scopes.add(jScopes.getString(j));
+        password = hRecord.getString(PasswordKeys.password.name());
+        status = Status.valueOf(hRecord.getString(PasswordKeys.status.name(), Status.ACTIVE.name()));
     }
 
     /**

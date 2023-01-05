@@ -1,5 +1,7 @@
 package com.tecknobit.glider.records;
 
+import com.tecknobit.apimanager.formatters.JsonHelper;
+import com.tecknobit.glider.records.Session.SessionKeys;
 import org.json.JSONObject;
 
 /**
@@ -16,12 +18,28 @@ public class GliderRecord {
     protected final String token;
 
     /**
+     * {@code hRecord} instance to manage JSON details
+     **/
+    protected final JsonHelper hRecord;
+
+    /**
      * Constructor to init {@link GliderRecord} object
      *
      * @param token: session token value
      **/
     public GliderRecord(String token) {
         this.token = token;
+        hRecord = null;
+    }
+
+    /**
+     * Constructor to init {@link GliderRecord} object
+     *
+     * @param jRecord: record details as {@link JSONObject}
+     **/
+    public GliderRecord(JSONObject jRecord) {
+        hRecord = new JsonHelper(jRecord);
+        token = hRecord.getString(SessionKeys.token.name());
     }
 
     /**

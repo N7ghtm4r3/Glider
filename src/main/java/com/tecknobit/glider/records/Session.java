@@ -1,9 +1,12 @@
 package com.tecknobit.glider.records;
 
 import com.tecknobit.apimanager.apis.encryption.aes.ClientCipher;
+import org.json.JSONObject;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+
+import static com.tecknobit.glider.records.Session.SessionKeys.*;
 
 /**
  * The {@link Session} is class useful to store all the information for a {@code Glider}'s session
@@ -40,7 +43,7 @@ public class Session extends GliderRecord {
         secret_key,
 
         /**
-         * {@code session_password} password key of the session
+         * {@code session_password} sessionPassword key of the session
          **/
         session_password,
 
@@ -62,7 +65,12 @@ public class Session extends GliderRecord {
         /**
          * {@code qr_code_login} key of the session
          **/
-        qr_code_login
+        qr_code_login,
+
+        /**
+         * {@code run_in_localhost} key of the session
+         **/
+        run_in_localhost
 
     }
 
@@ -77,9 +85,9 @@ public class Session extends GliderRecord {
     private final String secretKey;
 
     /**
-     * {@code password} of the sessions
+     * {@code sessionPassword} password of the sessions
      **/
-    private final String password;
+    private final String sessionPassword;
 
     /**
      * {@code hostAddress} host address of the session
@@ -102,27 +110,51 @@ public class Session extends GliderRecord {
     private final boolean QRCodeLoginEnabled;
 
     /**
+     * {@code runInLocalhost} whether the session run only in localhost
+     **/
+    private final boolean runInLocalhost;
+
+    /**
      * Constructor to init {@link Session} object
      *
-     * @param token: session token value
-     * @param ivSpec:     {@link IvParameterSpec} of the session
-     * @param secretKey:    {@link SecretKey} of the session
-     * @param password: password of the session
-     * @param hostAddress:   host address of the session
-     * @param hostPort: host port of the session
-     * @param singleUseMode:   whether the session allows multiple connections, so multiple devices
-     * @param QRCodeLoginEnabled:   whether the session allows login by QR-CODE method
+     * @param token              : session token value
+     * @param ivSpec             :     {@link IvParameterSpec} of the session
+     * @param secretKey          :    {@link SecretKey} of the session
+     * @param sessionPassword    : session password of the session
+     * @param hostAddress        :   host address of the session
+     * @param hostPort           : host port of the session
+     * @param singleUseMode      :   whether the session allows multiple connections, so multiple devices
+     * @param QRCodeLoginEnabled :   whether the session allows login by QR-CODE method
+     * @param runInLocalhost: whether the session run only in localhost
      **/
-    public Session(String token, String ivSpec, String secretKey, String password, String hostAddress, int hostPort,
-                   boolean singleUseMode, boolean QRCodeLoginEnabled) {
+    public Session(String token, String ivSpec, String secretKey, String sessionPassword, String hostAddress, int hostPort,
+                   boolean singleUseMode, boolean QRCodeLoginEnabled, boolean runInLocalhost) {
         super(token);
         this.ivSpec = ivSpec;
         this.secretKey = secretKey;
-        this.password = password;
+        this.sessionPassword = sessionPassword;
         this.hostAddress = hostAddress;
         this.hostPort = hostPort;
         this.singleUseMode = singleUseMode;
         this.QRCodeLoginEnabled = QRCodeLoginEnabled;
+        this.runInLocalhost = runInLocalhost;
+    }
+
+    /**
+     * Constructor to init {@link Session} object
+     *
+     * @param jSession : session details as {@link JSONObject}
+     **/
+    public Session(JSONObject jSession) {
+        super(jSession);
+        ivSpec = hRecord.getString(iv_spec.name());
+        secretKey = hRecord.getString(secret_key.name());
+        sessionPassword = hRecord.getString(session_password.name());
+        hostAddress = hRecord.getString(host_address.name());
+        hostPort = hRecord.getInt(host_port.name());
+        singleUseMode = hRecord.getBoolean(single_use_mode.name());
+        QRCodeLoginEnabled = hRecord.getBoolean(qr_code_login.name());
+        runInLocalhost = hRecord.getBoolean(run_in_localhost.name());
     }
 
     /**
@@ -166,13 +198,13 @@ public class Session extends GliderRecord {
     }
 
     /**
-     * Method to get {@link #password} instance <br>
+     * Method to get {@link #sessionPassword} instance <br>
      * Any params required
      *
-     * @return {@link #password} instance as {@link String}
+     * @return {@link #sessionPassword} instance as {@link String}
      **/
-    public String getPassword() {
-        return password;
+    public String getSessionPassword() {
+        return sessionPassword;
     }
 
     /**
@@ -213,6 +245,16 @@ public class Session extends GliderRecord {
      **/
     public boolean isQRCodeLoginEnabled() {
         return QRCodeLoginEnabled;
+    }
+
+    /**
+     * Method to get {@link #runInLocalhost} instance <br>
+     * Any params required
+     *
+     * @return {@link #runInLocalhost} instance as boolean
+     **/
+    public boolean runInLocalhost() {
+        return runInLocalhost;
     }
 
 }

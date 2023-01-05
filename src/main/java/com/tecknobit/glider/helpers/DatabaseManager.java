@@ -90,7 +90,8 @@ public class DatabaseManager {
                     "host_address TEXT NOT NULL, \n" +
                     "host_port INTEGER UNIQUE NOT NULL, \n" +
                     "single_use_mode BOOLEAN NOT NULL, \n" +
-                    "qr_code_login BOOLEAN NOT NULL);"
+                    "qr_code_login BOOLEAN NOT NULL, \n" +
+                    "run_in_localhost BOOLEAN NOT NULL);"
             );
             statement.execute("CREATE TABLE IF NOT EXISTS " + devices + "(\n" +
                     "token VARCHAR(32) NOT NULL, \n" +
@@ -123,8 +124,9 @@ public class DatabaseManager {
      **/
     @Wrapper
     public void insertNewSession(Session session) throws SQLException {
-        insertNewSession(session.getToken(), session.getIvSpec(), session.getSecretKey(), session.getPassword(),
-                session.getHostAddress(), session.getHostPort(), session.isSingleUseMode(), session.isQRCodeLoginEnabled());
+        insertNewSession(session.getToken(), session.getIvSpec(), session.getSecretKey(), session.getSessionPassword(),
+                session.getHostAddress(), session.getHostPort(), session.isSingleUseMode(),
+                session.isQRCodeLoginEnabled(), session.runInLocalhost());
     }
 
     /**
@@ -138,14 +140,16 @@ public class DatabaseManager {
      * @param hostPort: hostAddress hostPort of the session
      * @param singleUseMode:   whether the session allows multiple connections, so multiple devices
      * @param QRCodeLoginEnabled:   whether the session allows login by QR-CODE method
+     * @param runInLocalhost: whether the session run only in localhost
      * @throws SQLException when an error occurred
      **/
     public void insertNewSession(String token, String ivSpec, String secretKey, String password, String hostAddress,
-                                 int hostPort, boolean singleUseMode, boolean QRCodeLoginEnabled) throws SQLException {
+                                 int hostPort, boolean singleUseMode, boolean QRCodeLoginEnabled,
+                                 boolean runInLocalhost) throws SQLException {
         connection.prepareStatement("INSERT INTO " + sessions + "(token, iv_spec, secret_key, password, host_address,"
-                + " host_port, single_use_mode, qr_code_login)" + " VALUES('"+ token + "','" + ivSpec + "','" + secretKey
-                + "','" + password + "','" + hostAddress + "','" + hostPort + "','" + singleUseMode + "','" +
-                QRCodeLoginEnabled + "')").executeUpdate();
+                + " host_port, single_use_mode, qr_code_login, run_in_localhost)" + " VALUES('"+ token + "','" + ivSpec
+                + "','" + secretKey + "','" + password + "','" + hostAddress + "','" + hostPort + "','" + singleUseMode +
+                "','" + QRCodeLoginEnabled + "','" + runInLocalhost + "')").executeUpdate();
     }
 
     /**
@@ -165,7 +169,8 @@ public class DatabaseManager {
                     rSession.getString(host_address.name()),
                     rSession.getInt(host_port.name()),
                     parseBoolean(rSession.getString(single_use_mode.name())),
-                    parseBoolean(rSession.getString(qr_code_login.name())));
+                    parseBoolean(rSession.getString(qr_code_login.name())),
+                    parseBoolean(rSession.getString(run_in_localhost.name())));
             rSession.close();
             return session;
         }

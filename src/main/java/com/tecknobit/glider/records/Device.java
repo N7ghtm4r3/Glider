@@ -1,6 +1,9 @@
 package com.tecknobit.glider.records;
 
 import com.tecknobit.apimanager.formatters.TimeFormatter;
+import org.json.JSONObject;
+
+import static com.tecknobit.glider.records.Device.DeviceKeys.*;
 
 /**
  * The {@link Device} is class useful to store all the information for a {@code Glider}'s device
@@ -145,6 +148,21 @@ public class Device extends GliderRecord {
         this.lastActivity = lastActivity;
         this.type = type;
         this.blacklisted = blacklisted;
+    }
+
+    /**
+     * Constructor to init {@link Device} object
+     *
+     * @param jDevice : device details as {@link JSONObject}
+     **/
+    public Device(JSONObject jDevice) {
+        super(jDevice);
+        name = hRecord.getString(DeviceKeys.name.name());
+        ipAddress = hRecord.getString(ip_address.name());
+        loginDate = hRecord.getString(login_date.name());
+        lastActivity = hRecord.getString(last_activity.name());
+        type = Type.valueOf(hRecord.getString(DeviceKeys.type.name(), Type.MOBILE.name()));
+        blacklisted = hRecord.getBoolean(DeviceKeys.blacklisted.name());
     }
 
     /**
