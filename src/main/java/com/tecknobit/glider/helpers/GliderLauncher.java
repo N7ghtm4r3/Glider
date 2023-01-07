@@ -2,18 +2,20 @@ package com.tecknobit.glider.helpers;
 
 import com.tecknobit.apimanager.apis.QRCodeHelper;
 import com.tecknobit.apimanager.apis.SocketManager;
+import com.tecknobit.apimanager.exceptions.SaveData;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.records.Device;
 import com.tecknobit.glider.records.Password;
 import com.tecknobit.glider.records.Session;
+import com.tecknobit.glider.records.Session.SessionKeys;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.UUID;
 
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.FAILED;
@@ -24,8 +26,7 @@ import static com.tecknobit.apimanager.apis.encryption.aes.serverside.CBCServerC
 import static com.tecknobit.apimanager.apis.encryption.aes.serverside.GenericServerCipher.KeySize.k256;
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.devices;
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.passwords;
-import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.ope;
-import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.status_code;
+import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.*;
 import static com.tecknobit.glider.helpers.GliderLauncher.Operation.CONNECT;
 import static com.tecknobit.glider.records.Device.DeviceKeys.*;
 import static com.tecknobit.glider.records.Password.*;
@@ -71,7 +72,6 @@ import static java.net.InetAddress.getLoopbackAddress;
  *
  * @author Tecknobit - N7ghtm4r3
  **/
-// TODO: 04/01/2023 PASS A CONFIG JSON TO INIT SERVER DIRECTLY FROM A JAR FILE, THINK ABOUT IT
 public class GliderLauncher {
 
     /**
@@ -83,6 +83,11 @@ public class GliderLauncher {
          * {@code CONNECT} connect operation
          */
         CONNECT,
+
+        /**
+         * {@code REFRESH_DATA} refresh data operation
+         */
+        REFRESH_DATA,
 
         /**
          * {@code CREATE_PASSWORD} create password operation
@@ -154,7 +159,12 @@ public class GliderLauncher {
         /**
          * {@code "server_status"} key
          */
-        server_status
+        server_status,
+
+        /**
+         * {@code "database_path"} key
+         */
+        database_path
 
     }
 
@@ -201,12 +211,61 @@ public class GliderLauncher {
     /**
      * Constructor to init {@link GliderLauncher} object
      *
+     * @param configs: configuration details as <b>JSON<b> {@link File}
+     * @implSpec the <b>JSON<b> {@link File} must be formatted as:
+     * <pre>
+     *     {@code
+     *          {
+     *              "secret_key": "your_secret_key",
+     *              "database_path": "your_database_path.db",
+     *              "iv_spec": "your_iv_spec",
+     *              "token": "your_token"
+     *          }
+     *     }
+     * </pre>
+     * @apiNote this constructor is used to recreate an old {@link Session} if you need to restart the {@code Glider}'s
+     * service
+     * @throws Exception when an error occurred
+     **/
+    public GliderLauncher(File configs) throws Exception {
+        this(new JSONObject(new Scanner(configs).useDelimiter("\\Z").next()));
+    }
+
+    /**
+     * Constructor to init {@link GliderLauncher} object
+     *
+     * @param configs: configuration details as {@link JSONObject}
+     * @implSpec the {@link JSONObject} must be formatted as:
+     * <pre>
+     *     {@code 
+     *          {
+     *              "secret_key": "your_secret_key",
+     *              "database_path": "your_database_path.db",
+     *              "iv_spec": "your_iv_spec",
+     *              "token": "your_token"
+     *          }
+     *     }
+     * </pre>
+     * @apiNote this constructor is used to recreate an old {@link Session} if you need to restart the {@code Glider}'s
+     * service
+     * @throws Exception when an error occurred
+     **/
+    public GliderLauncher(JSONObject configs) throws Exception {
+        this(configs.getString(database_path.name()), configs.getString(token.name()), configs.getString(iv_spec.name()),
+                configs.getString(secret_key.name()));
+    }
+
+    /**
+     * Constructor to init {@link GliderLauncher} object
+     *
      * @param databasePath: path where the database has been created
      * @param token: session token value
-     * @apiNote this constructor is to use to recreate an old {@link Session} if you need to restart the {@code Glider}'s
+     * @param ivSpec             :     {@link IvParameterSpec} of the session
+     * @param secretKey          :    {@link SecretKey} of the session
+     * @apiNote this constructor is used to recreate an old {@link Session} if you need to restart the {@code Glider}'s
      * service
      **/
-    public GliderLauncher(String databasePath, String token) throws Exception {
+    public GliderLauncher(String databasePath, String token, String ivSpec, String secretKey) throws Exception {
         databaseManager = new DatabaseManager(databasePath);
         session = databaseManager.getSession(token);
         if(session == null)
@@ -216,9 +275,10 @@ public class GliderLauncher {
         if(session.isQRCodeLoginEnabled()) {
             qrCodeHelper = new QRCodeHelper();
             qrCodeHelper.hostQRCode(session.getHostPort() + 1, new JSONObject()
-                    .put(host_address.name(), session.getHostAddress())
-                    .put(host_port.name(), hostPort), "Glider.png", 250, true,
-                    new File("src/main/resources/qrcode.html"));
+                            .put(host_address.name(), session.getHostAddress())
+                            .put(host_port.name(), hostPort)
+                            .put(SessionKeys.token.name(), "Glider"), "Glider.png", 250,
+                    true, new File("src/main/resources/qrcode.html"));
         } else
             qrCodeHelper = null;
     }
@@ -233,31 +293,25 @@ public class GliderLauncher {
      *                          (if enabled will be shown on {@code "host_address:(host_port + 1)"})
      * @param hostPort: host port of the session
      * @param runInLocalhost: whether the session can accept requests outside localhost
-     * @apiNote this constructor is to use to create a new {@link Session} if you need to start the {@code Glider}'s
+     * @apiNote this constructor is used to create a new {@link Session} if you need to start the {@code Glider}'s
      * service for the first time
+     * @throws SaveData to safe the {@link Session}'s data
      **/
     public GliderLauncher(String databasePath, String password, boolean singleUseMode, boolean QRCodeLoginEnabled,
                           int hostPort, boolean runInLocalhost) throws Exception {
+        if(!databasePath.endsWith(".db"))
+            databasePath += ".db";
         databaseManager = new DatabaseManager(databasePath);
         String ivSpec = createCBCIvParameterSpecString();
         String secretKey = createCBCSecretKeyString(k256);
-        socketManager = new SocketManager(false, ivSpec, secretKey, CBC_ALGORITHM);
-        session = new Session(createToken(), ivSpec, secretKey, password, socketManager.getHost(!runInLocalhost), hostPort,
-                singleUseMode, QRCodeLoginEnabled, runInLocalhost);
-        databaseManager.insertNewSession(session);
-        // TODO: 03/01/2023 THROWS SAVE DATA EXCEPTION TO PROCEED LIKE TRADERBOT
-        this.hostPort = hostPort;
-        qrCodeHelper = null;
-    }
-
-    /**
-     * Method to create a new {@link Session}'s token <br>
-     * Any params required
-     *
-     * @return new {@link Session}'s token as {@link String}
-     **/
-    private String createToken() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
+        String token = UUID.randomUUID().toString().replaceAll("-", "");
+        databaseManager.insertNewSession(token, ivSpec, secretKey, password, new SocketManager(false)
+                        .getHost(!runInLocalhost), hostPort, singleUseMode, QRCodeLoginEnabled, runInLocalhost);
+        throw new SaveData("\n" + new JSONObject().put(iv_spec.name(), ivSpec)
+                .put(secret_key.name(), secretKey)
+                .put(SessionKeys.token.name(), token)
+                .put(database_path.name(), databasePath)
+                .toString(4));
     }
 
     /**
@@ -276,9 +330,8 @@ public class GliderLauncher {
             while (socketManager.continueListening()) {
                 System.out.println("Waiting...");
                 try {
-                    Socket sRequest = socketManager.acceptRequest();
+                    String ipAddress = SocketManager.getIpAddress(socketManager.acceptRequest());
                     JSONObject request = new JSONObject(socketManager.readContent());
-                    String ipAddress = ((InetSocketAddress)sRequest.getRemoteSocketAddress()).getAddress().getHostAddress();
                     System.out.println(request);
                     boolean check = true;
                     if(session.runInLocalhost())
@@ -310,7 +363,7 @@ public class GliderLauncher {
                                 //  devices
                                 JSONObject jSession = session.toJSON();
                                 jSession.remove(password.name());
-                                sendSuccessfulResponse(response.put(Session.SessionKeys.session.name(), jSession)
+                                sendSuccessfulResponse(response.put(SessionKeys.session.name(), jSession)
                                         .put(passwords.name(), databaseManager.getPasswords(sessionToken, false))
                                         .put(devices.name(), databaseManager.getDevices(sessionToken, false)));
                             } else
@@ -318,6 +371,9 @@ public class GliderLauncher {
                         } else {
                             if(!device.isBlacklisted()) {
                                 switch (vOpe) {
+                                    case REFRESH_DATA -> {
+                                        // TODO: 07/01/2023 TO DEVELOP
+                                    }
                                     case CREATE_PASSWORD -> {
                                         // TODO: 03/01/2023 payload:
                                         //  device name
@@ -508,7 +564,7 @@ public class GliderLauncher {
                                         // status code
                                         sendSuccessfulResponse(response);
                                         socketManager.stopListener();
-                                        // TODO: 05/01/2023 STOP QRCODEHELPER LISTENER
+                                        qrCodeHelper.stopHosting();
                                     }
                                     default -> socketManager.sendDefaultErrorResponse();
                                 }
