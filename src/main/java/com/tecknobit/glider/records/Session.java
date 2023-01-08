@@ -1,6 +1,7 @@
 package com.tecknobit.glider.records;
 
 import com.tecknobit.apimanager.apis.encryption.aes.ClientCipher;
+import com.tecknobit.apimanager.formatters.JsonHelper;
 import org.json.JSONObject;
 
 import javax.crypto.SecretKey;
@@ -15,7 +16,7 @@ import static com.tecknobit.glider.records.Session.SessionKeys.*;
  * @author Tecknobit - N7ghtm4r3
  * @see GliderRecord
  **/
-public class Session extends GliderRecord {
+public class Session {
 
     /**
      * {@code SessionKeys} list of available keys for the session
@@ -75,6 +76,11 @@ public class Session extends GliderRecord {
     }
 
     /**
+     * {@code token} of the session
+     **/
+    private final String token;
+
+    /**
      * {@code ivSpec} {@link IvParameterSpec} of the session
      **/
     private final String ivSpec;
@@ -125,11 +131,11 @@ public class Session extends GliderRecord {
      * @param hostPort           : host port of the session
      * @param singleUseMode      :   whether the session allows multiple connections, so multiple devices
      * @param QRCodeLoginEnabled :   whether the session allows login by QR-CODE method
-     * @param runInLocalhost: whether the session run only in localhost
+     * @param runInLocalhost     : whether the session run only in localhost
      **/
-    public Session(String token, String ivSpec, String secretKey, String sessionPassword, String hostAddress, int hostPort,
-                   boolean singleUseMode, boolean QRCodeLoginEnabled, boolean runInLocalhost) {
-        super(token);
+    public Session(String token, String ivSpec, String secretKey, String sessionPassword, String hostAddress,
+                   int hostPort, boolean singleUseMode, boolean QRCodeLoginEnabled, boolean runInLocalhost) {
+        this.token = token;
         this.ivSpec = ivSpec;
         this.secretKey = secretKey;
         this.sessionPassword = sessionPassword;
@@ -146,15 +152,26 @@ public class Session extends GliderRecord {
      * @param jSession : session details as {@link JSONObject}
      **/
     public Session(JSONObject jSession) {
-        super(jSession);
-        ivSpec = hRecord.getString(iv_spec.name());
-        secretKey = hRecord.getString(secret_key.name());
-        sessionPassword = hRecord.getString(session_password.name());
-        hostAddress = hRecord.getString(host_address.name());
-        hostPort = hRecord.getInt(host_port.name());
-        singleUseMode = hRecord.getBoolean(single_use_mode.name());
-        QRCodeLoginEnabled = hRecord.getBoolean(qr_code_login.name());
-        runInLocalhost = hRecord.getBoolean(run_in_localhost.name());
+        JsonHelper hSession = new JsonHelper(jSession);
+        token = hSession.getString(SessionKeys.token.name());
+        ivSpec = hSession.getString(iv_spec.name());
+        secretKey = hSession.getString(secret_key.name());
+        sessionPassword = hSession.getString(session_password.name());
+        hostAddress = hSession.getString(host_address.name());
+        hostPort = hSession.getInt(host_port.name());
+        singleUseMode = hSession.getBoolean(single_use_mode.name());
+        QRCodeLoginEnabled = hSession.getBoolean(qr_code_login.name());
+        runInLocalhost = hSession.getBoolean(run_in_localhost.name());
+    }
+
+    /**
+     * Method to get {@link #token} instance <br>
+     * Any params required
+     *
+     * @return {@link #token} instance as {@link String}
+     **/
+    public String getToken() {
+        return token;
     }
 
     /**
@@ -255,6 +272,27 @@ public class Session extends GliderRecord {
      **/
     public boolean runInLocalhost() {
         return runInLocalhost;
+    }
+
+    /**
+     * Returns a string representation of the object <br>
+     * Any params required
+     *
+     * @return a string representation of the object as {@link JSONObject}
+     */
+    public JSONObject toJSON() {
+        return new JSONObject(this);
+    }
+
+    /**
+     * Returns a string representation of the object <br>
+     * Any params required
+     *
+     * @return a string representation of the object as {@link String}
+     */
+    @Override
+    public String toString() {
+        return new JSONObject(this).toString();
     }
 
 }

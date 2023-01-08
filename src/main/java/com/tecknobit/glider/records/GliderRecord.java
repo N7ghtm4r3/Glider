@@ -13,9 +13,9 @@ import org.json.JSONObject;
 public class GliderRecord {
 
     /**
-     * {@code token} session token value
+     * {@code token} session value
      **/
-    protected final String token;
+    protected final Session session;
 
     /**
      * {@code hRecord} instance to manage JSON details
@@ -25,10 +25,10 @@ public class GliderRecord {
     /**
      * Constructor to init {@link GliderRecord} object
      *
-     * @param token: session token value
+     * @param session: session value
      **/
-    public GliderRecord(String token) {
-        this.token = token;
+    public GliderRecord(Session session) {
+        this.session = session;
         hRecord = null;
     }
 
@@ -39,17 +39,17 @@ public class GliderRecord {
      **/
     public GliderRecord(JSONObject jRecord) {
         hRecord = new JsonHelper(jRecord);
-        token = hRecord.getString(SessionKeys.token.name());
+        session = new Session(hRecord.getJSONObject(SessionKeys.token.name(), new JSONObject()));
     }
 
     /**
-     * Method to get {@link #token} instance <br>
+     * Method to get {@link #session} instance <br>
      * Any params required
      *
-     * @return {@link #token} instance as {@link String}
+     * @return {@link #session} instance as {@link Session}
      **/
-    public String getToken() {
-        return token;
+    public Session getSession() {
+        return session;
     }
 
     /**

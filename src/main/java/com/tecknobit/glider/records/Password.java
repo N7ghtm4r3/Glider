@@ -115,26 +115,26 @@ public class Password extends GliderRecord {
     /**
      * Constructor to init {@link Password} object
      *
-     * @param token: session token value
+     * @param session: session value
      * @param tail:     tail of the password
      * @param password: password value
      * @param status:   status value
      **/
-    public Password(String token, String tail, String password, Status status) {
-        this(token, tail, new ArrayList<>(), password, status);
+    public Password(Session session, String tail, String password, Status status) {
+        this(session, tail, new ArrayList<>(), password, status);
     }
 
     /**
      * Constructor to init {@link Password} object
      *
-     * @param token: session token value
+     * @param session: session value
      * @param tail:     tail of the password
      * @param scopes:   list of scopes where the password can be used
      * @param password: password value
      * @param status:   status value
      **/
-    public Password(String token, String tail, ArrayList<String> scopes, String password, Status status) {
-        super(token);
+    public Password(Session session, String tail, ArrayList<String> scopes, String password, Status status) {
+        super(session);
         this.tail = tail;
         this.scopes = scopes;
         this.password = password;

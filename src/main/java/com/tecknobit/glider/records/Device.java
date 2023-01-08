@@ -117,21 +117,21 @@ public class Device extends GliderRecord {
     /**
      * Constructor to init {@link Device} object
      *
-     * @param token: session token value
+     * @param session: session value
      * @param name:         name of the device
      * @param ipAddress:    ip address of the device
      * @param loginDate:    loginDate date of the device
      * @param lastActivity: last activity of the device
      * @param type:         type of the devices
      **/
-    public Device(String token, String name, String ipAddress, String loginDate, String lastActivity, Type type) {
-        this(token, name, ipAddress, loginDate, lastActivity, type, false);
+    public Device(Session session, String name, String ipAddress, String loginDate, String lastActivity, Type type) {
+        this(session, name, ipAddress, loginDate, lastActivity, type, false);
     }
 
     /**
      * Constructor to init {@link Device} object
      *
-     * @param token: session token value
+     * @param session: session value
      * @param name:         name of the device
      * @param ipAddress:    ip address of the device
      * @param loginDate:    loginDate date of the device
@@ -139,9 +139,9 @@ public class Device extends GliderRecord {
      * @param type:         type of the devices
      * @param blacklisted:  whether the device has been blacklisted
      **/
-    public Device(String token, String name, String ipAddress, String loginDate, String lastActivity, Type type,
+    public Device(Session session, String name, String ipAddress, String loginDate, String lastActivity, Type type,
                   boolean blacklisted) {
-        super(token);
+        super(session);
         this.name = name;
         this.ipAddress = ipAddress;
         this.loginDate = loginDate;

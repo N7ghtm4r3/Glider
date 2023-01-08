@@ -12,7 +12,9 @@ import org.json.JSONObject;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.BindException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -267,18 +269,24 @@ public class GliderLauncher {
      **/
     public GliderLauncher(String databasePath, String token, String ivSpec, String secretKey) throws Exception {
         databaseManager = new DatabaseManager(databasePath);
-        session = databaseManager.getSession(token);
+        session = databaseManager.getSession(token, ivSpec, secretKey);
         if(session == null)
             throw new Exception("No-any sessions found with that token, retry");
         socketManager = new SocketManager(false, session.getIvSpec(), session.getSecretKey(), CBC_ALGORITHM);
         this.hostPort = session.getHostPort();
         if(session.isQRCodeLoginEnabled()) {
             qrCodeHelper = new QRCodeHelper();
-            qrCodeHelper.hostQRCode(session.getHostPort() + 1, new JSONObject()
-                            .put(host_address.name(), session.getHostAddress())
-                            .put(host_port.name(), hostPort)
-                            .put(SessionKeys.token.name(), "Glider"), "Glider.png", 250,
-                    true, new File("src/main/resources/qrcode.html"));
+            try {
+                qrCodeHelper.hostQRCode(session.getHostPort() + 1, new JSONObject()
+                                .put(host_address.name(), session.getHostAddress())
+                                .put(host_port.name(), hostPort)
+                                .put(SessionKeys.token.name(), "Glider"), "Glider.png", 250,
+                        true, new File("src/main/resources/qrcode.html"));
+            } catch (BindException e) {
+                System.err.println("You cannot have multiple sessions on the same port at the same time");
+                e.printStackTrace();
+                System.exit(1);
+            }
         } else
             qrCodeHelper = null;
     }
@@ -322,7 +330,6 @@ public class GliderLauncher {
      * @throws IOException when an error occurred during {@link #socketManager}'s workflow
      **/
     public void startService() throws IOException {
-        String sessionToken = session.getToken();
         JSONObject response = new JSONObject();
         socketManager.setDefaultErrorResponse(new JSONObject().put(status_code.name(), FAILED));
         socketManager.startListener(hostPort, () -> {
@@ -339,11 +346,11 @@ public class GliderLauncher {
                     if(check && session.getSessionPassword().equals(JsonHelper.getString(request, session_password.name()))) {
                         String deviceName = request.getString(name.name());
                         Operation vOpe = Operation.valueOf(request.getString(ope.name()));
-                        device = databaseManager.getDevice(sessionToken, deviceName, ipAddress);
+                        device = databaseManager.getDevice(session, deviceName, ipAddress);
                         if(vOpe.equals(CONNECT)) {
                             boolean connect = false;
                             if(session.isSingleUseMode()) {
-                                if(databaseManager.getDevices(sessionToken, false).size() < 1)
+                                if(databaseManager.getDevices(session, false).size() < 1)
                                     connect = true;
                                 else
                                     socketManager.sendDefaultErrorResponse();
@@ -354,25 +361,25 @@ public class GliderLauncher {
                                 //  device name
                                 //  type
                                 //  sPassword
-                                databaseManager.insertNewDevice(sessionToken, deviceName, ipAddress,
+                                databaseManager.insertNewDevice(session, deviceName, ipAddress,
                                         currentTimeMillis(), Device.Type.valueOf(request.getString(type.name())));
                                 // TODO: 03/01/2023 response
                                 // status code
                                 //  session - less the password
                                 //  passwords
                                 //  devices
-                                JSONObject jSession = session.toJSON();
-                                jSession.remove(password.name());
-                                sendSuccessfulResponse(response.put(SessionKeys.session.name(), jSession)
-                                        .put(passwords.name(), databaseManager.getPasswords(sessionToken, false))
-                                        .put(devices.name(), databaseManager.getDevices(sessionToken, false)));
+                                sendAllData(response, true);
                             } else
                                 socketManager.sendDefaultErrorResponse();
                         } else {
                             if(!device.isBlacklisted()) {
+                                databaseManager.updateLastActivity(device);
                                 switch (vOpe) {
                                     case REFRESH_DATA -> {
-                                        // TODO: 07/01/2023 TO DEVELOP
+                                        // TODO: 03/01/2023 payload:
+                                        //  device name
+                                        //  sPassword
+                                        sendAllData(response, false);
                                     }
                                     case CREATE_PASSWORD -> {
                                         // TODO: 03/01/2023 payload:
@@ -395,7 +402,7 @@ public class GliderLauncher {
                                                 letters.add(index);
                                                 password.append(((char) index));
                                             }
-                                            databaseManager.insertNewPassword(sessionToken, request.getString(tail.name()),
+                                            databaseManager.insertNewPassword(session, request.getString(tail.name()),
                                                     fetchScopes(request.getJSONArray(scopes.name())), password.toString());
                                             // TODO: 03/01/2023 response
                                             // status code
@@ -417,7 +424,7 @@ public class GliderLauncher {
                                             String password  = request.getString(PasswordKeys.password.name());
                                             length = password.length();
                                             if(length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH) {
-                                                databaseManager.insertNewPassword(sessionToken, tail,
+                                                databaseManager.insertNewPassword(session, tail,
                                                         fetchScopes(request.getJSONArray(scopes.name())), password);
                                                 // TODO: 03/01/2023 response
                                                 // status code
@@ -433,12 +440,12 @@ public class GliderLauncher {
                                         //  sPassword
                                         //  tail
                                         String tail = request.getString(PasswordKeys.tail.name());
-                                        Password password = databaseManager.getPassword(sessionToken, tail);
+                                        Password password = databaseManager.getPassword(session, tail);
                                         if(password != null) {
                                             if(password.getStatus().equals(ACTIVE))
-                                                databaseManager.deletePassword(sessionToken, tail);
+                                                databaseManager.deletePassword(session, tail);
                                             else
-                                                databaseManager.permanentlyDeletePassword(sessionToken, tail);
+                                                databaseManager.permanentlyDeletePassword(session, tail);
                                             // TODO: 03/01/2023 response
                                             // status code
                                             sendSuccessfulResponse(response);
@@ -451,9 +458,9 @@ public class GliderLauncher {
                                         //  sPassword
                                         //  tail
                                         String tail = request.getString(PasswordKeys.tail.name());
-                                        Password password = databaseManager.getPassword(sessionToken, tail);
+                                        Password password = databaseManager.getPassword(session, tail);
                                         if(password != null && password.getStatus().equals(DELETED)) {
-                                            databaseManager.recoverPassword(sessionToken, tail);
+                                            databaseManager.recoverPassword(session, tail);
                                             // TODO: 03/01/2023 response
                                             // status code
                                             sendSuccessfulResponse(response);
@@ -467,9 +474,9 @@ public class GliderLauncher {
                                         //  tail
                                         // add_scope
                                         String tail = request.getString(PasswordKeys.tail.name());
-                                        Password password = databaseManager.getPassword(sessionToken, tail);
+                                        Password password = databaseManager.getPassword(session, tail);
                                         if(password != null) {
-                                            databaseManager.addPasswordScope(sessionToken, password,
+                                            databaseManager.addPasswordScope(session, password,
                                                     request.getString(scope.name()));
                                             // TODO: 03/01/2023 response
                                             // status code
@@ -485,9 +492,9 @@ public class GliderLauncher {
                                         // edit_scope
                                         // old_scope
                                         String tail = request.getString(PasswordKeys.tail.name());
-                                        Password password = databaseManager.getPassword(sessionToken, tail);
+                                        Password password = databaseManager.getPassword(session, tail);
                                         if(password != null) {
-                                            databaseManager.editPasswordScope(sessionToken, password,
+                                            databaseManager.editPasswordScope(session, password,
                                                     request.getString(old_scope.name()), request.getString(scope.name()));
                                             // TODO: 03/01/2023 response
                                             // status code
@@ -502,9 +509,9 @@ public class GliderLauncher {
                                         //  tail
                                         // remove_scope
                                         String tail = request.getString(PasswordKeys.tail.name());
-                                        Password password = databaseManager.getPassword(sessionToken, tail);
+                                        Password password = databaseManager.getPassword(session, tail);
                                         if(password != null) {
-                                            databaseManager.removePasswordScope(sessionToken, password,
+                                            databaseManager.removePasswordScope(session, password,
                                                     request.getString(scope.name()));
                                             // TODO: 03/01/2023 response
                                             // status code
@@ -521,11 +528,11 @@ public class GliderLauncher {
                                         //  - ip
                                         if(JsonHelper.getJSONObject(request, target_device.name()) != null) {
                                             request = request.getJSONObject(target_device.name());
-                                            device = databaseManager.getDevice(sessionToken, request.getString(name.name()),
+                                            device = databaseManager.getDevice(session, request.getString(name.name()),
                                                     ipAddress);
                                         }
                                         if(device != null) {
-                                            databaseManager.deleteDevice(sessionToken, device.getName(), device.getIpAddress());
+                                            databaseManager.deleteDevice(session, device.getName(), device.getIpAddress());
                                             // TODO: 03/01/2023 response
                                             // status code
                                             sendSuccessfulResponse(response);
@@ -540,14 +547,14 @@ public class GliderLauncher {
                                         //  - device name
                                         //  - ip
                                         request = request.getJSONObject(target_device.name());
-                                        device = databaseManager.getDevice(sessionToken, request.getString(name.name()),
+                                        device = databaseManager.getDevice(session, request.getString(name.name()),
                                                 ipAddress);
                                         if(device != null) {
                                             if(device.isBlacklisted()) {
-                                                databaseManager.unblacklistDevice(sessionToken, device.getName(),
+                                                databaseManager.unblacklistDevice(session, device.getName(),
                                                         device.getIpAddress());
                                             } else {
-                                                databaseManager.blacklistDevice(sessionToken, device.getName(),
+                                                databaseManager.blacklistDevice(session, device.getName(),
                                                         device.getIpAddress());
                                             }
                                             // TODO: 03/01/2023 response
@@ -586,6 +593,22 @@ public class GliderLauncher {
             }
             System.out.println("This session has been deleted");
         });
+    }
+
+    /**
+     * Method to send all data of a {@link Session}
+     *
+     * @param response      : response where link {@link Session}
+     * @param insertSession : whether insert the {@link #session} details
+     **/
+    private void sendAllData(JSONObject response, boolean insertSession) throws Exception {
+        if(insertSession) {
+            JSONObject jSession = session.toJSON();
+            jSession.remove(password.name());
+            response.put(SessionKeys.session.name(), jSession);
+        }
+        sendSuccessfulResponse(response.put(passwords.name(), databaseManager.getPasswords(session, false))
+                .put(devices.name(), databaseManager.getDevices(session, false)));
     }
 
     /**
