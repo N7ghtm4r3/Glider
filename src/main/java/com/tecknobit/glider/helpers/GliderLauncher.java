@@ -10,12 +10,12 @@ import com.tecknobit.glider.records.Session;
 import com.tecknobit.glider.records.Session.SessionKeys;
 import org.json.JSONObject;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -81,6 +81,11 @@ public class GliderLauncher {
      * {@code Operation} list of available operations
      */
     public enum Operation {
+
+        /**
+         * {@code GET_PUBLIC_KEYS} get public keys operation
+         */
+        GET_PUBLIC_KEYS,
 
         /**
          * {@code CONNECT} connect operation
@@ -210,8 +215,15 @@ public class GliderLauncher {
      * {@code qrCodeHelper} instance to manage the QRCode login procedure
      */
     private final QRCodeHelper qrCodeHelper;
+
+    /**
+     * {@code publicIvSpec} the public instantiation vector
+     */
     private String publicIvSpec;
 
+    /**
+     * {@code publicCipherKey} the public secret key for the cipher
+     */
     private String publicCipherKey;
 
     /**
@@ -278,12 +290,12 @@ public class GliderLauncher {
             throw new Exception("No-any sessions found with that token, retry");
         socketManager = new SocketManager(false, session.getIvSpec(), session.getSecretKey(), CBC_ALGORITHM);
         this.hostPort = session.getHostPort();
-        refreshPublicKeys();
         if(session.isQRCodeLoginEnabled()) {
             qrCodeHelper = new QRCodeHelper();
             createQRCodeCredentials();
         } else
             qrCodeHelper = null;
+        refreshPublicKeys();
     }
 
     /**
@@ -317,6 +329,8 @@ public class GliderLauncher {
                 .toString(4));
     }
 
+    // TODO: 17/01/2023 REPLACE ENUM KEYS WITH CAMELCASE
+
     /**
      * Method to start the {@code Glider}'s service with the details 
      * fetched from the database if already exist or with that inserted at the 
@@ -328,17 +342,33 @@ public class GliderLauncher {
         JSONObject response = new JSONObject();
         socketManager.setDefaultErrorResponse(new JSONObject().put(status_code.name(), FAILED));
         socketManager.startListener(hostPort, () -> {
+            JSONObject request;
             Device device;
             while (socketManager.continueListening()) {
                 System.out.println("Waiting...");
                 try {
                     String ipAddress = SocketManager.getIpAddress(socketManager.acceptRequest());
-                    JSONObject request = new JSONObject(socketManager.readContent());
-                    System.out.println(request);
+                    try {
+                        request = new JSONObject(socketManager.readContent());
+                    } catch (IllegalArgumentException | BadPaddingException e) {
+                        String privateSecretKey = session.getSecretKey();
+                        if(socketManager.getCipherKey().equals(privateSecretKey)) {
+                            socketManager.changeCipherKeys(publicIvSpec, publicCipherKey);
+                        } else
+                            socketManager.changeCipherKeys(session.getIvSpec(), privateSecretKey);
+                        try {
+                            request = new JSONObject(socketManager.readLastContent());
+                        } catch (IllegalArgumentException eP) {
+                            socketManager.writePlainContent(new JSONObject().put(iv_spec.name(), publicIvSpec)
+                                    .put(secret_key.name(), publicCipherKey));
+                            request = null;
+                        }
+                    }
                     boolean check = true;
                     if(session.runInLocalhost())
                         check = getLoopbackAddress().getHostAddress().endsWith(ipAddress);
-                    if(check && session.getSessionPassword().equals(JsonHelper.getString(request, session_password.name()))) {
+                    if(request != null && check && session.getSessionPassword().equals(JsonHelper.getString(request,
+                            session_password.name()))) {
                         String deviceName = request.getString(name.name());
                         Operation vOpe = Operation.valueOf(request.getString(ope.name()));
                         device = databaseManager.getDevice(session, deviceName, ipAddress);
@@ -364,11 +394,7 @@ public class GliderLauncher {
                                 //  passwords
                                 //  devices
                                 sendAllData(response, true);
-                                refreshPublicKeys();
-                                if(session.isQRCodeLoginEnabled()) {
-                                    qrCodeHelper.stopHosting();
-                                    createQRCodeCredentials();
-                                }
+                                socketManager.changeCipherKeys(session.getIvSpec(), session.getSecretKey());
                             } else
                                 socketManager.sendDefaultErrorResponse();
                         } else {
@@ -596,6 +622,36 @@ public class GliderLauncher {
     }
 
     /**
+     * Method to refresh the public keys to cipher the communication <br>
+     * Any params required
+     **/
+    private void refreshPublicKeys() {
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                while (true) {
+                    try {
+                        if(session.isSingleUseMode() && databaseManager.getDevices(session, false).size() == 1)
+                            break;
+                        else {
+                            publicIvSpec = createCBCIvParameterSpecString();
+                            publicCipherKey = createCBCSecretKeyString(k256);
+                            if(session.isQRCodeLoginEnabled()) {
+                                qrCodeHelper.stopHosting();
+                                createQRCodeCredentials();
+                            }
+                        }
+                        sleep(5000);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }.start();
+    }
+
+    /**
      * Method to create and host a QRCode with connection credentials <br>
      * Any params required
      * @throws IOException when an error occurred
@@ -614,16 +670,6 @@ public class GliderLauncher {
             e.printStackTrace();
             System.exit(1);
         }
-    }
-
-    /**
-     * Method to refresh the public keys to cipher the communication <br>
-     * Any params required
-     * @throws NoSuchAlgorithmException when an error occurred
-     **/
-    private void refreshPublicKeys() throws NoSuchAlgorithmException {
-        publicIvSpec = createCBCIvParameterSpecString();
-        publicCipherKey = createCBCSecretKeyString(k256);
     }
 
     /**
