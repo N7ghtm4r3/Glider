@@ -15,6 +15,7 @@ import javax.crypto.spec.IvParameterSpec;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -209,6 +210,9 @@ public class GliderLauncher {
      * {@code qrCodeHelper} instance to manage the QRCode login procedure
      */
     private final QRCodeHelper qrCodeHelper;
+    private String publicIvSpec;
+
+    private String publicCipherKey;
 
     /**
      * Constructor to init {@link GliderLauncher} object
@@ -274,19 +278,10 @@ public class GliderLauncher {
             throw new Exception("No-any sessions found with that token, retry");
         socketManager = new SocketManager(false, session.getIvSpec(), session.getSecretKey(), CBC_ALGORITHM);
         this.hostPort = session.getHostPort();
+        refreshPublicKeys();
         if(session.isQRCodeLoginEnabled()) {
             qrCodeHelper = new QRCodeHelper();
-            try {
-                qrCodeHelper.hostQRCode(session.getHostPort() + 1, new JSONObject()
-                                .put(host_address.name(), session.getHostAddress())
-                                .put(host_port.name(), hostPort)
-                                .put(SessionKeys.token.name(), "Glider"), "Glider.png", 250,
-                        true, new File("src/main/resources/qrcode.html"));
-            } catch (BindException e) {
-                System.err.println("You cannot have multiple sessions on the same port at the same time");
-                e.printStackTrace();
-                System.exit(1);
-            }
+            createQRCodeCredentials();
         } else
             qrCodeHelper = null;
     }
@@ -369,6 +364,11 @@ public class GliderLauncher {
                                 //  passwords
                                 //  devices
                                 sendAllData(response, true);
+                                refreshPublicKeys();
+                                if(session.isQRCodeLoginEnabled()) {
+                                    qrCodeHelper.stopHosting();
+                                    createQRCodeCredentials();
+                                }
                             } else
                                 socketManager.sendDefaultErrorResponse();
                         } else {
@@ -593,6 +593,37 @@ public class GliderLauncher {
             }
             System.out.println("This session has been deleted");
         });
+    }
+
+    /**
+     * Method to create and host a QRCode with connection credentials <br>
+     * Any params required
+     * @throws IOException when an error occurred
+     **/
+    private void createQRCodeCredentials() throws IOException {
+        try {
+            qrCodeHelper.hostQRCode(session.getHostPort() + 1, new JSONObject()
+                            .put(host_address.name(), session.getHostAddress())
+                            .put(host_port.name(), hostPort)
+                            .put(iv_spec.name(), publicIvSpec)
+                            .put(secret_key.name(), publicCipherKey)
+                            .put(SessionKeys.token.name(), "Glider"), "Glider.png", 250,
+                    !session.isSingleUseMode(), new File("src/main/resources/qrcode.html"));
+        } catch (BindException e) {
+            System.err.println("You cannot have multiple sessions on the same port at the same time");
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Method to refresh the public keys to cipher the communication <br>
+     * Any params required
+     * @throws NoSuchAlgorithmException when an error occurred
+     **/
+    private void refreshPublicKeys() throws NoSuchAlgorithmException {
+        publicIvSpec = createCBCIvParameterSpecString();
+        publicCipherKey = createCBCSecretKeyString(k256);
     }
 
     /**

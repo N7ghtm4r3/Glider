@@ -701,9 +701,9 @@ public class DatabaseManager {
     private <T> String doAES(String ivSpec, String secretKey, boolean encrypt, T value) throws Exception {
         ClientCipher cipher = new ClientCipher(ivSpec, secretKey, CBC_ALGORITHM);
         if(encrypt)
-            return cipher.encryptRequest(value.toString());
+            return cipher.encrypt(value.toString());
         else
-            return cipher.decryptResponse(value.toString());
+            return cipher.decrypt(value.toString());
     }
 
     /**
