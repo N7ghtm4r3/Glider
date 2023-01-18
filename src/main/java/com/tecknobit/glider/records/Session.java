@@ -34,91 +34,91 @@ public class Session {
         token,
 
         /**
-         * {@code iv_spec} key of the session
+         * {@code ivSpec} key of the session
          **/
-        iv_spec,
+        ivSpec,
 
         /**
-         * {@code secret_key} key of the session
+         * {@code secretKey} key of the session
          **/
-        secret_key,
+        secretKey,
 
         /**
-         * {@code session_password} sessionPassword key of the session
+         * {@code sessionPassword} sessionPassword key of the session
          **/
-        session_password,
+        sessionPassword,
 
         /**
-         * {@code host_address} key of the session
+         * {@code hostAddress} key of the session
          **/
-        host_address,
+        hostAddress,
 
         /**
-         * {@code host_port} key of the session
+         * {@code hostPort} key of the session
          **/
-        host_port,
+        hostPort,
 
         /**
-         * {@code single_use_mode} key of the session
+         * {@code singleUseMode} key of the session
          **/
-        single_use_mode,
+        singleUseMode,
 
         /**
-         * {@code qr_code_login} key of the session
+         * {@code qrCodeLogin} key of the session
          **/
-        qr_code_login,
+        qrCodeLogin,
 
         /**
-         * {@code run_in_localhost} key of the session
+         * {@code runInLocalhost} key of the session
          **/
-        run_in_localhost
+        runInLocalhost
 
     }
 
     /**
      * {@code token} of the session
      **/
-    private final String token;
+    protected final String token;
 
     /**
      * {@code ivSpec} {@link IvParameterSpec} of the session
      **/
-    private final String ivSpec;
+    protected final String ivSpec;
 
     /**
      * {@code secretKey} {@link SecretKey} of the session
      **/
-    private final String secretKey;
+    protected final String secretKey;
 
     /**
      * {@code sessionPassword} password of the sessions
      **/
-    private final String sessionPassword;
+    protected final String sessionPassword;
 
     /**
      * {@code hostAddress} host address of the session
      **/
-    private final String hostAddress;
+    protected final String hostAddress;
 
     /**
      * {@code hostPort} host port of the session
      **/
-    private final int hostPort;
+    protected final int hostPort;
 
     /**
      * {@code singleUseMode} whether the session allows multiple connections, so multiple devices
      **/
-    private final boolean singleUseMode;
+    protected final boolean singleUseMode;
 
     /**
      * {@code QRCodeLoginEnabled} whether the session allows login by QR-CODE method
      **/
-    private final boolean QRCodeLoginEnabled;
+    protected final boolean QRCodeLoginEnabled;
 
     /**
      * {@code runInLocalhost} whether the session run only in localhost
      **/
-    private final boolean runInLocalhost;
+    protected final boolean runInLocalhost;
 
     /**
      * Constructor to init {@link Session} object
@@ -154,14 +154,14 @@ public class Session {
     public Session(JSONObject jSession) {
         JsonHelper hSession = new JsonHelper(jSession);
         token = hSession.getString(SessionKeys.token.name());
-        ivSpec = hSession.getString(iv_spec.name());
-        secretKey = hSession.getString(secret_key.name());
-        sessionPassword = hSession.getString(session_password.name());
-        hostAddress = hSession.getString(host_address.name());
-        hostPort = hSession.getInt(host_port.name());
-        singleUseMode = hSession.getBoolean(single_use_mode.name());
-        QRCodeLoginEnabled = hSession.getBoolean(qr_code_login.name());
-        runInLocalhost = hSession.getBoolean(run_in_localhost.name());
+        ivSpec = hSession.getString(SessionKeys.ivSpec.name());
+        secretKey = hSession.getString(SessionKeys.secretKey.name());
+        sessionPassword = hSession.getString(SessionKeys.sessionPassword.name());
+        hostAddress = hSession.getString(SessionKeys.hostAddress.name());
+        hostPort = hSession.getInt(SessionKeys.hostPort.name());
+        singleUseMode = hSession.getBoolean(SessionKeys.singleUseMode.name());
+        QRCodeLoginEnabled = hSession.getBoolean(qrCodeLogin.name());
+        runInLocalhost = hSession.getBoolean(SessionKeys.runInLocalhost.name());
     }
 
     /**

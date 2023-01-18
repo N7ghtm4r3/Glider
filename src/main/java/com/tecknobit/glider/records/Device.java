@@ -3,8 +3,6 @@ package com.tecknobit.glider.records;
 import com.tecknobit.apimanager.formatters.TimeFormatter;
 import org.json.JSONObject;
 
-import static com.tecknobit.glider.records.Device.DeviceKeys.*;
-
 /**
  * The {@link Device} is class useful to store all the information for a {@code Glider}'s device
  * allowing the correct workflow
@@ -25,19 +23,19 @@ public class Device extends GliderRecord {
         name,
 
         /**
-         * {@code ip_address} key of the device
+         * {@code ipAddress} key of the device
          **/
-        ip_address,
+        ipAddress,
 
         /**
-         * {@code login_date} key of the device
+         * {@code loginDate} key of the device
          **/
-        login_date,
+        loginDate,
 
         /**
-         * {@code last_activity} key of the device
+         * {@code lastActivity} key of the device
          **/
-        last_activity,
+        lastActivity,
 
         /**
          * {@code type} key of the device
@@ -50,9 +48,9 @@ public class Device extends GliderRecord {
         blacklisted,
 
         /**
-         * {@code target_device} target device key
+         * {@code targetDevice} target device key
          **/
-        target_device
+        targetDevice
 
     }
 
@@ -158,9 +156,9 @@ public class Device extends GliderRecord {
     public Device(JSONObject jDevice) {
         super(jDevice);
         name = hRecord.getString(DeviceKeys.name.name());
-        ipAddress = hRecord.getString(ip_address.name());
-        loginDate = hRecord.getString(login_date.name());
-        lastActivity = hRecord.getString(last_activity.name());
+        ipAddress = hRecord.getString(DeviceKeys.ipAddress.name());
+        loginDate = hRecord.getString(DeviceKeys.loginDate.name());
+        lastActivity = hRecord.getString(DeviceKeys.lastActivity.name());
         type = Type.valueOf(hRecord.getString(DeviceKeys.type.name(), Type.MOBILE.name()));
         blacklisted = hRecord.getBoolean(DeviceKeys.blacklisted.name());
     }

@@ -7,6 +7,7 @@ import com.tecknobit.glider.records.Device.DeviceKeys;
 import com.tecknobit.glider.records.Password;
 import com.tecknobit.glider.records.Password.PasswordKeys;
 import com.tecknobit.glider.records.Session;
+import com.tecknobit.glider.records.Session.SessionKeys;
 import org.json.JSONArray;
 
 import javax.crypto.SecretKey;
@@ -88,24 +89,24 @@ public class DatabaseManager {
             statement.execute("PRAGMA foreign_keys = ON");
             statement.execute("CREATE TABLE IF NOT EXISTS " + sessions + " (\n" +
                     "token VARCHAR(64) PRIMARY KEY, \n" +
-                    "iv_spec VARCHAR(44) NOT NULL, \n" +
-                    "secret_key VARCHAR(64) NOT NULL, \n" +
+                    "ivSpec VARCHAR(44) NOT NULL, \n" +
+                    "secretKey VARCHAR(64) NOT NULL, \n" +
                     "password VARCHAR(24) NOT NULL, \n" +
-                    "host_address VARCHAR(24) NOT NULL, \n" +
-                    "host_port VARCHAR(24) NOT NULL, \n" +
-                    "single_use_mode VARCHAR(24) NOT NULL, \n" +
-                    "qr_code_login VARCHAR(24) NOT NULL, \n" +
-                    "run_in_localhost VARCHAR(24) NOT NULL);"
+                    "hostAddress VARCHAR(24) NOT NULL, \n" +
+                    "hostPort VARCHAR(24) NOT NULL, \n" +
+                    "singleUseMode VARCHAR(24) NOT NULL, \n" +
+                    "qrCodeLogin VARCHAR(24) NOT NULL, \n" +
+                    "runInLocalhost VARCHAR(24) NOT NULL);"
             );
             statement.execute("CREATE TABLE IF NOT EXISTS " + devices + "(\n" +
                     "token VARCHAR(64) NOT NULL, \n" +
                     "name VARCHAR(24) NOT NULL, \n" +
-                    "ip_address VARCHAR(24) NOT NULL, \n" +
-                    "login_date VARCHAR(24) NOT NULL, \n" +
-                    "last_activity VARCHAR(24) NOT NULL, \n" +
+                    "ipAddress VARCHAR(24) NOT NULL, \n" +
+                    "loginDate VARCHAR(24) NOT NULL, \n" +
+                    "lastActivity VARCHAR(24) NOT NULL, \n" +
                     "type VARCHAR(24) NOT NULL, \n" +
                     "blacklisted VARCHAR(24) NOT NULL, \n" +
-                    "PRIMARY KEY(token, name, ip_address), \n" +
+                    "PRIMARY KEY(token, name, ipAddress), \n" +
                     "FOREIGN KEY(token) REFERENCES " + sessions + "(token) ON DELETE CASCADE);"
             );
             statement.execute("CREATE TABLE IF NOT EXISTS " + passwords + "(\n" +
@@ -150,8 +151,8 @@ public class DatabaseManager {
     public void insertNewSession(String token, String ivSpec, String secretKey, String password, String hostAddress,
                                  int hostPort, boolean singleUseMode, boolean QRCodeLoginEnabled,
                                  boolean runInLocalhost) throws Exception {
-        connection.prepareStatement("INSERT INTO " + sessions + "(token, iv_spec, secret_key, password, host_address,"
-                + " host_port, single_use_mode, qr_code_login, run_in_localhost)" + " VALUES('" + encrypt(ivSpec,
+        connection.prepareStatement("INSERT INTO " + sessions + "(token, ivSpec, secretKey, password, hostAddress,"
+                + " hostPort, singleUseMode, qrCodeLogin, runInLocalhost)" + " VALUES('" + encrypt(ivSpec,
                 secretKey, token) + "','" + encrypt(ivSpec, secretKey, ivSpec) + "','" + encrypt(ivSpec, secretKey,
                 secretKey) + "','" + encrypt(ivSpec, secretKey, password) + "','" + encrypt(ivSpec, secretKey,
                 hostAddress) + "','" + encrypt(ivSpec, secretKey, hostPort) + "','" + encrypt(ivSpec, secretKey,
@@ -172,14 +173,14 @@ public class DatabaseManager {
         ResultSet rSession = fetchRecord("SELECT * FROM " + sessions + " WHERE token='" + encrypt(ivSpec, secretKey,
                 token) + "'");
         if(rSession.next()) {
-            Session session = new Session(token, decrypt(ivSpec, secretKey, rSession.getString(iv_spec.name())),
-                    decrypt(ivSpec, secretKey, rSession.getString(secret_key.name())),
+            Session session = new Session(token, decrypt(ivSpec, secretKey, rSession.getString(SessionKeys.ivSpec.name())),
+                    decrypt(ivSpec, secretKey, rSession.getString(SessionKeys.secretKey.name())),
                     decrypt(ivSpec, secretKey, rSession.getString(password.name())),
-                    decrypt(ivSpec, secretKey, rSession.getString(host_address.name())),
-                    parseInt(decrypt(ivSpec, secretKey, rSession.getString(host_port.name()))),
-                    parseBoolean(decrypt(ivSpec, secretKey, rSession.getString(single_use_mode.name()))),
-                    parseBoolean(decrypt(ivSpec, secretKey, rSession.getString(qr_code_login.name()))),
-                    parseBoolean(decrypt(ivSpec, secretKey, rSession.getString(run_in_localhost.name()))));
+                    decrypt(ivSpec, secretKey, rSession.getString(hostAddress.name())),
+                    parseInt(decrypt(ivSpec, secretKey, rSession.getString(hostPort.name()))),
+                    parseBoolean(decrypt(ivSpec, secretKey, rSession.getString(singleUseMode.name()))),
+                    parseBoolean(decrypt(ivSpec, secretKey, rSession.getString(qrCodeLogin.name()))),
+                    parseBoolean(decrypt(ivSpec, secretKey, rSession.getString(runInLocalhost.name()))));
             rSession.close();
             return session;
         }
@@ -235,7 +236,7 @@ public class DatabaseManager {
      **/
     public void insertNewDevice(Session session, String name, String ipAddress, long loginDate, Type type) throws Exception {
         String sLoginDate = encrypt(session, loginDate);
-        connection.prepareStatement("INSERT INTO " + devices + "(token, name, ip_address, login_date, last_activity,"
+        connection.prepareStatement("INSERT INTO " + devices + "(token, name, ipAddress, loginDate, lastActivity,"
                 + "type, blacklisted) VALUES('" + encrypt(session, session.getToken()) + "','" + encrypt(session, name)
                 + "','" + encrypt(session, ipAddress) + "','" + sLoginDate + "','" + sLoginDate + "','"
                 + encrypt(session, type) + "','" + encrypt(session, false) + "')").executeUpdate();
@@ -252,14 +253,14 @@ public class DatabaseManager {
      **/
     public Device getDevice(Session session, String name, String ipAddress) throws Exception {
         ResultSet rDevice = fetchRecord("SELECT * FROM " + devices + " WHERE token='" + encrypt(session,
-                session.getToken()) + "' AND name='" + encrypt(session, name) + "' AND ip_address='"
+                session.getToken()) + "' AND name='" + encrypt(session, name) + "' AND ipAddress='"
                 + encrypt(session, ipAddress) + "'");
         if(rDevice.next()) {
             Device device = new Device(session,
                     decrypt(session, rDevice.getString(DeviceKeys.name.name())),
-                    decrypt(session, rDevice.getString(ip_address.name())),
-                    getStringDate(parseLong(decrypt(session, rDevice.getString(login_date.name())))),
-                    getStringDate(parseLong(decrypt(session, rDevice.getString(last_activity.name())))),
+                    decrypt(session, rDevice.getString(DeviceKeys.ipAddress.name())),
+                    getStringDate(parseLong(decrypt(session, rDevice.getString(loginDate.name())))),
+                    getStringDate(parseLong(decrypt(session, rDevice.getString(lastActivity.name())))),
                     Type.valueOf(decrypt(session, rDevice.getString(type.name()))),
                     parseBoolean(decrypt(session, rDevice.getString(blacklisted.name()))));
             rDevice.close();
@@ -286,9 +287,9 @@ public class DatabaseManager {
                 iSession = session;
             devices.add(new Device(iSession,
                     decrypt(session, rDevices.getString(DeviceKeys.name.name())),
-                    decrypt(session, rDevices.getString(ip_address.name())),
-                    getStringDate(parseLong(decrypt(session, rDevices.getString(login_date.name())))),
-                    getStringDate(parseLong(decrypt(session, rDevices.getString(last_activity.name())))),
+                    decrypt(session, rDevices.getString(ipAddress.name())),
+                    getStringDate(parseLong(decrypt(session, rDevices.getString(loginDate.name())))),
+                    getStringDate(parseLong(decrypt(session, rDevices.getString(lastActivity.name())))),
                     Type.valueOf(decrypt(session, rDevices.getString(type.name()))),
                     parseBoolean(decrypt(session, rDevices.getString(blacklisted.name())))
             ));
@@ -317,9 +318,9 @@ public class DatabaseManager {
      * @throws SQLException when an error occurred
      **/
     public void updateLastActivity(Session session, String name, String ipAddress) throws Exception {
-        connection.prepareStatement("UPDATE " + devices + " SET last_activity='" + encrypt(session,
+        connection.prepareStatement("UPDATE " + devices + " SET lastActivity='" + encrypt(session,
                 currentTimeMillis()) + "' WHERE token='" + encrypt(session, session.getToken()) + "' AND name='"
-                + encrypt(session, name) + "' AND ip_address='" + encrypt(session, ipAddress) + "'").executeUpdate();
+                + encrypt(session, name) + "' AND ipAddress='" + encrypt(session, ipAddress) + "'").executeUpdate();
     }
 
     /**
@@ -384,7 +385,7 @@ public class DatabaseManager {
     private void changeDeviceAuthorization(Session session, String name, String ipAddress, boolean blacklist) throws Exception {
         connection.prepareStatement("UPDATE " + devices + " SET blacklisted='" + encrypt(session, blacklist)
                 + "' WHERE token='" + encrypt(session, session.getToken()) + "' AND name='" + encrypt(session, name)
-                + "' AND ip_address='" + encrypt(session, ipAddress) + "'").executeUpdate();
+                + "' AND ipAddress='" + encrypt(session, ipAddress) + "'").executeUpdate();
     }
 
     /**
@@ -408,7 +409,7 @@ public class DatabaseManager {
      **/
     public void deleteDevice(Session session, String name, String ipAddress) throws Exception {
         connection.prepareStatement("DELETE FROM " + devices + " WHERE token='" + encrypt(session, session.getToken()) 
-                + "' AND name='" + encrypt(session, name) + "' AND ip_address='" + encrypt(session, ipAddress) + "'")
+                + "' AND name='" + encrypt(session, name) + "' AND ipAddress='" + encrypt(session, ipAddress) + "'")
                 .executeUpdate();
     }
 
