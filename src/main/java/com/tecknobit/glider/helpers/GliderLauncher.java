@@ -35,13 +35,10 @@ import static com.tecknobit.glider.helpers.GliderLauncher.Operation.GET_PUBLIC_K
 import static com.tecknobit.glider.records.Device.DeviceKeys.*;
 import static com.tecknobit.glider.records.Password.*;
 import static com.tecknobit.glider.records.Password.PasswordKeys.*;
-import static com.tecknobit.glider.records.Password.PasswordKeys.scope;
 import static com.tecknobit.glider.records.Password.Status.ACTIVE;
 import static com.tecknobit.glider.records.Password.Status.DELETED;
-import static com.tecknobit.glider.records.Password.fetchScopes;
 import static com.tecknobit.glider.records.Session.SessionKeys.*;
 import static java.lang.System.currentTimeMillis;
-import static java.net.InetAddress.getLoopbackAddress;
 
 /**
  * The {@link GliderLauncher} is class useful to start the {@code Glider}'s service <br>
@@ -293,12 +290,24 @@ public class GliderLauncher {
             throw new Exception("No-any sessions found with that token, retry");
         socketManager = new SocketManager(false, session.getIvSpec(), session.getSecretKey(), CBC_ALGORITHM);
         this.hostPort = session.getHostPort();
+        refreshPublicKeys();
         if(session.isQRCodeLoginEnabled()) {
             qrCodeHelper = new QRCodeHelper();
-            createQRCodeCredentials();
+            try {
+                qrCodeHelper.hostQRCode(session.getHostPort() + 1, new JSONObject()
+                                .put(hostAddress.name(), session.getHostAddress())
+                                .put(SessionKeys.hostPort.name(), hostPort)
+                                .put(SessionKeys.ivSpec.name(), publicIvSpec)
+                                .put(SessionKeys.secretKey.name(), publicCipherKey)
+                                .put(SessionKeys.token.name(), "Glider"), "Glider.png", 250,
+                        true, new File("src/main/resources/qrcode.html"));
+            } catch (BindException e) {
+                System.err.println("You cannot have multiple sessions on the same port at the same time");
+                e.printStackTrace();
+                System.exit(1);
+            }
         } else
             qrCodeHelper = null;
-        refreshPublicKeys();
     }
 
     /**
@@ -352,6 +361,7 @@ public class GliderLauncher {
                     try {
                         request = new JSONObject(socketManager.readContent());
                     } catch (IllegalArgumentException | BadPaddingException e) {
+                        e.printStackTrace();
                         String privateSecretKey = session.getSecretKey();
                         if(socketManager.getCipherKey().equals(privateSecretKey)) {
                             socketManager.changeCipherKeys(publicIvSpec, publicCipherKey);
@@ -365,20 +375,28 @@ public class GliderLauncher {
                             request = null;
                         }
                     }
+                    System.out.println(request);
                     if(request != null) {
-                        boolean check = true;
-                        if(session.runInLocalhost())
-                            check = getLoopbackAddress().getHostAddress().endsWith(ipAddress);
-                        if(check && session.getSessionPassword().equals(JsonHelper.getString(request,
+                        boolean check = false;
+                        if (session.runInLocalhost()) {
+                            StringBuilder address = new StringBuilder(ipAddress);
+                            address.reverse();
+                            int j = 0;
+                            for (; j < address.length(); j++)
+                                if (address.charAt(j) == '.')
+                                    break;
+                            address.replace(0, j, "").reverse();
+                            check = session.getHostAddress().startsWith(address.toString());
+                        }
+                        if (check && session.getSessionPassword().equals(JsonHelper.getString(request,
                                 sessionPassword.name()))) {
                             String deviceName = request.getString(name.name());
                             Operation vOpe = Operation.valueOf(request.getString(ope.name()));
-                            System.out.println(vOpe);
                             device = databaseManager.getDevice(session, deviceName, ipAddress);
-                            if(vOpe.equals(GET_PUBLIC_KEYS)) {
+                            if (vOpe.equals(GET_PUBLIC_KEYS)) {
                                 socketManager.writePlainContent(new JSONObject().put(ivSpec.name(), publicIvSpec)
                                         .put(secretKey.name(), publicCipherKey));
-                            } else if(vOpe.equals(CONNECT)) {
+                            } else if (vOpe.equals(CONNECT)) {
                                 boolean connect = false;
                                 if(session.isSingleUseMode()) {
                                     if(databaseManager.getDevices(session, false).size() < 1)
@@ -388,17 +406,8 @@ public class GliderLauncher {
                                 } else
                                     connect = true;
                                 if((connect && (device == null || !device.isBlacklisted()))) {
-                                    // TODO: 03/01/2023 payload:
-                                    //  device name
-                                    //  type
-                                    //  sPassword
                                     databaseManager.insertNewDevice(session, deviceName, ipAddress,
                                             currentTimeMillis(), Device.Type.valueOf(request.getString(type.name())));
-                                    // TODO: 03/01/2023 response
-                                    // status code
-                                    //  session - less the password
-                                    //  passwords
-                                    //  devices
                                     sendAllData(response, true);
                                     socketManager.changeCipherKeys(session.getIvSpec(), session.getSecretKey());
                                 } else
@@ -414,12 +423,6 @@ public class GliderLauncher {
                                             sendAllData(response, false);
                                         }
                                         case CREATE_PASSWORD -> {
-                                            // TODO: 03/01/2023 payload:
-                                            //  device name
-                                            //  sPassword
-                                            //  tail
-                                            //  scopes
-                                            //  length
                                             int length = request.getInt(Password.PasswordKeys.length.name());
                                             if(length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH) {
                                                 ArrayList<Integer> letters = new ArrayList<>();
@@ -436,20 +439,11 @@ public class GliderLauncher {
                                                 }
                                                 databaseManager.insertNewPassword(session, request.getString(tail.name()),
                                                         fetchScopes(request.getJSONArray(scopes.name())), password.toString());
-                                                // TODO: 03/01/2023 response
-                                                // status code
-                                                //  password
                                                 sendSuccessfulResponse(response.put(PasswordKeys.password.name(), password));
                                             } else
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case INSERT_PASSWORD -> {
-                                            // TODO: 03/01/2023 payload:
-                                            //  device name
-                                            //  sPassword
-                                            //  tail
-                                            //  scopes
-                                            //  password
                                             String tail = request.getString(PasswordKeys.tail.name());
                                             int length = tail.length();
                                             if(length > 0 && length < 30) {
@@ -458,8 +452,6 @@ public class GliderLauncher {
                                                 if(length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH) {
                                                     databaseManager.insertNewPassword(session, tail,
                                                             fetchScopes(request.getJSONArray(scopes.name())), password);
-                                                    // TODO: 03/01/2023 response
-                                                    // status code
                                                     sendSuccessfulResponse(response);
                                                 } else
                                                     socketManager.sendDefaultErrorResponse();
@@ -637,17 +629,16 @@ public class GliderLauncher {
             @Override
             public void run() {
                 super.run();
+                boolean insertKeys;
                 while (true) {
                     try {
-                        if(session.isSingleUseMode() && databaseManager.getDevices(session, false).size() == 1)
-                            break;
-                        else {
+                        if (!session.isSingleUseMode())
+                            insertKeys = true;
+                        else
+                            insertKeys = databaseManager.getDevices(session, false).size() < 1;
+                        if (insertKeys) {
                             publicIvSpec = createCBCIvParameterSpecString();
                             publicCipherKey = createCBCSecretKeyString(k256);
-                            if(session.isQRCodeLoginEnabled()) {
-                                qrCodeHelper.stopHosting();
-                                createQRCodeCredentials();
-                            }
                         }
                         sleep(5000);
                     } catch (Exception e) {
@@ -659,27 +650,6 @@ public class GliderLauncher {
     }
 
     /**
-     * Method to create and host a QRCode with connection credentials <br>
-     * Any params required
-     * @throws IOException when an error occurred
-     **/
-    private void createQRCodeCredentials() throws IOException {
-        try {
-            qrCodeHelper.hostQRCode(session.getHostPort() + 1, new JSONObject()
-                            .put(hostAddress.name(), session.getHostAddress())
-                            .put(SessionKeys.hostPort.name(), hostPort)
-                            .put(ivSpec.name(), publicIvSpec)
-                            .put(secretKey.name(), publicCipherKey)
-                            .put(SessionKeys.token.name(), "Glider"), "Glider.png", 250,
-                            true, new File("src/main/resources/qrcode.html"));
-        } catch (BindException e) {
-            System.err.println("You cannot have multiple sessions on the same port at the same time");
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
-
-    /**
      * Method to send all data of a {@link Session}
      *
      * @param response      : response where link {@link Session}
@@ -688,7 +658,6 @@ public class GliderLauncher {
     private void sendAllData(JSONObject response, boolean insertSession) throws Exception {
         if(insertSession) {
             JSONObject jSession = session.toJSON();
-            jSession.remove(sessionPassword.name());
             response.put(SessionKeys.session.name(), jSession);
         }
         sendSuccessfulResponse(response.put(passwords.name(), databaseManager.getPasswords(session, false))

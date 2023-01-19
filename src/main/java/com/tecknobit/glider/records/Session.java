@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
-import static com.tecknobit.glider.records.Session.SessionKeys.*;
+import static com.tecknobit.glider.records.Session.SessionKeys.qrCodeLogin;
 
 /**
  * The {@link Session} is class useful to store all the information for a {@code Glider}'s session
@@ -276,12 +276,14 @@ public class Session {
 
     /**
      * Returns a string representation of the object <br>
-     * Any params required
      *
      * @return a string representation of the object as {@link JSONObject}
      */
     public JSONObject toJSON() {
-        return new JSONObject(this);
+        JSONObject session = new JSONObject(this);
+        session.remove("OIvSpec");
+        session.remove("OSecretKey");
+        return session;
     }
 
     /**
