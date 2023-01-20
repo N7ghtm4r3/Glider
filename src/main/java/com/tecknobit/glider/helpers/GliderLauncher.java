@@ -408,7 +408,7 @@ public class GliderLauncher {
                                 if((connect && (device == null || !device.isBlacklisted()))) {
                                     databaseManager.insertNewDevice(session, deviceName, ipAddress,
                                             currentTimeMillis(), Device.Type.valueOf(request.getString(type.name())));
-                                    sendAllData(response, true);
+                                    sendAllData(response, true, ipAddress);
                                     socketManager.changeCipherKeys(session.getIvSpec(), session.getSecretKey());
                                 } else
                                     socketManager.sendDefaultErrorResponse();
@@ -416,22 +416,17 @@ public class GliderLauncher {
                                 if(!device.isBlacklisted()) {
                                     databaseManager.updateLastActivity(device);
                                     switch (vOpe) {
-                                        case REFRESH_DATA -> {
-                                            // TODO: 03/01/2023 payload:
-                                            //  device name
-                                            //  sPassword
-                                            sendAllData(response, false);
-                                        }
+                                        case REFRESH_DATA -> sendAllData(response, false, ipAddress);
                                         case CREATE_PASSWORD -> {
                                             int length = request.getInt(Password.PasswordKeys.length.name());
-                                            if(length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH) {
+                                            if (length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH) {
                                                 ArrayList<Integer> letters = new ArrayList<>();
                                                 StringBuilder password = new StringBuilder();
                                                 for (int j = 0; j < length; j++) {
                                                     int index;
                                                     do {
                                                         index = new Random().nextInt(122);
-                                                        if(index < 33)
+                                                        if (index < 33)
                                                             index = 33;
                                                     } while (letters.contains(index) || index == 44);
                                                     letters.add(index);
@@ -459,10 +454,6 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case DELETE_PASSWORD -> {
-                                            // TODO: 03/01/2023 payload:
-                                            //  device name
-                                            //  sPassword
-                                            //  tail
                                             String tail = request.getString(PasswordKeys.tail.name());
                                             Password password = databaseManager.getPassword(session, tail);
                                             if(password != null) {
@@ -470,75 +461,45 @@ public class GliderLauncher {
                                                     databaseManager.deletePassword(session, tail);
                                                 else
                                                     databaseManager.permanentlyDeletePassword(session, tail);
-                                                // TODO: 03/01/2023 response
-                                                // status code
                                                 sendSuccessfulResponse(response);
                                             } else
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case RECOVER_PASSWORD -> {
-                                            // TODO: 03/01/2023 payload:
-                                            //  device name
-                                            //  sPassword
-                                            //  tail
                                             String tail = request.getString(PasswordKeys.tail.name());
                                             Password password = databaseManager.getPassword(session, tail);
                                             if(password != null && password.getStatus().equals(DELETED)) {
                                                 databaseManager.recoverPassword(session, tail);
-                                                // TODO: 03/01/2023 response
-                                                // status code
                                                 sendSuccessfulResponse(response);
                                             } else
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case ADD_SCOPE -> {
-                                            // TODO: 03/01/2023 payload:
-                                            //  device name
-                                            //  sPassword
-                                            //  tail
-                                            // add_scope
                                             String tail = request.getString(PasswordKeys.tail.name());
                                             Password password = databaseManager.getPassword(session, tail);
                                             if(password != null) {
                                                 databaseManager.addPasswordScope(session, password,
                                                         request.getString(scope.name()));
-                                                // TODO: 03/01/2023 response
-                                                // status code
                                                 sendSuccessfulResponse(response);
                                             } else
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case EDIT_SCOPE -> {
-                                            // TODO: 03/01/2023 payload:
-                                            //  device name
-                                            //  sPassword
-                                            //  tail
-                                            // edit_scope
-                                            // oldScope
                                             String tail = request.getString(PasswordKeys.tail.name());
                                             Password password = databaseManager.getPassword(session, tail);
                                             if(password != null) {
                                                 databaseManager.editPasswordScope(session, password,
                                                         request.getString(oldScope.name()), request.getString(scope.name()));
-                                                // TODO: 03/01/2023 response
-                                                // status code
                                                 sendSuccessfulResponse(response);
                                             } else
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case REMOVE_SCOPE -> {
-                                            // TODO: 03/01/2023 payload:
-                                            //  device name
-                                            //  sPassword
-                                            //  tail
-                                            // remove_scope
                                             String tail = request.getString(PasswordKeys.tail.name());
                                             Password password = databaseManager.getPassword(session, tail);
                                             if(password != null) {
                                                 databaseManager.removePasswordScope(session, password,
                                                         request.getString(scope.name()));
-                                                // TODO: 03/01/2023 response
-                                                // status code
                                                 sendSuccessfulResponse(response);
                                             } else
                                                 socketManager.sendDefaultErrorResponse();
@@ -652,16 +613,17 @@ public class GliderLauncher {
     /**
      * Method to send all data of a {@link Session}
      *
-     * @param response      : response where link {@link Session}
-     * @param insertSession : whether insert the {@link #session} details
+     * @param response          : response where link {@link Session}
+     * @param insertSession     : whether insert the {@link #session} details
+     * @param excludeIpAddress: the ip address to exclude
      **/
-    private void sendAllData(JSONObject response, boolean insertSession) throws Exception {
-        if(insertSession) {
+    private void sendAllData(JSONObject response, boolean insertSession, String excludeIpAddress) throws Exception {
+        if (insertSession) {
             JSONObject jSession = session.toJSON();
             response.put(SessionKeys.session.name(), jSession);
         }
         sendSuccessfulResponse(response.put(passwords.name(), databaseManager.getPasswords(session, false))
-                .put(devices.name(), databaseManager.getDevices(session, false)));
+                .put(devices.name(), databaseManager.getDevices(session, false, excludeIpAddress)));
     }
 
     /**

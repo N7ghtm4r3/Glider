@@ -277,22 +277,39 @@ public class DatabaseManager {
      * @return devices list as {@link ArrayList} of {@link Device}
      * @throws Exception when an error occurred
      **/
+    @Wrapper
     public ArrayList<Device> getDevices(Session session, boolean insertSession) throws Exception {
+        return getDevices(session, insertSession, null);
+    }
+
+    /**
+     * Method to get a list of {@link Device} from the database
+     *
+     * @param session:          session linked to the device to fetch
+     * @param insertSession:    whether insert the session, if {@code "false"} the session will be set as null
+     * @param excludeIpAddress: the ip address to exclude
+     * @return devices list as {@link ArrayList} of {@link Device}
+     * @throws Exception when an error occurred
+     **/
+    public ArrayList<Device> getDevices(Session session, boolean insertSession, String excludeIpAddress) throws Exception {
         ResultSet rDevices = fetchRecord("SELECT * FROM " + devices + " WHERE token='" + encrypt(session,
                 session.getToken()) + "'");
         ArrayList<Device> devices = new ArrayList<>();
         while (rDevices.next()) {
             Session iSession = null;
-            if(insertSession)
+            if (insertSession)
                 iSession = session;
-            devices.add(new Device(iSession,
-                    decrypt(session, rDevices.getString(DeviceKeys.name.name())),
-                    decrypt(session, rDevices.getString(ipAddress.name())),
-                    getStringDate(parseLong(decrypt(session, rDevices.getString(loginDate.name())))),
-                    getStringDate(parseLong(decrypt(session, rDevices.getString(lastActivity.name())))),
-                    Type.valueOf(decrypt(session, rDevices.getString(type.name()))),
-                    parseBoolean(decrypt(session, rDevices.getString(blacklisted.name())))
-            ));
+            String vIpAddress = decrypt(session, rDevices.getString(ipAddress.name()));
+            if (!vIpAddress.equals(excludeIpAddress)) {
+                devices.add(new Device(iSession,
+                        decrypt(session, rDevices.getString(DeviceKeys.name.name())),
+                        vIpAddress,
+                        getStringDate(parseLong(decrypt(session, rDevices.getString(loginDate.name())))),
+                        getStringDate(parseLong(decrypt(session, rDevices.getString(lastActivity.name())))),
+                        Type.valueOf(decrypt(session, rDevices.getString(type.name()))),
+                        parseBoolean(decrypt(session, rDevices.getString(blacklisted.name())))
+                ));
+            }
         }
         rDevices.close();
         return devices;
