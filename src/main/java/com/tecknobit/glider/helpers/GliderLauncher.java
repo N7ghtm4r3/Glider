@@ -163,11 +163,6 @@ public class GliderLauncher {
         statusCode,
 
         /**
-         * {@code "serverStatus"} key
-         */
-        serverStatus,
-
-        /**
          * {@code "databasePath"} key
          */
         databasePath
