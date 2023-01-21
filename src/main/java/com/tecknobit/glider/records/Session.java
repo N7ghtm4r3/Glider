@@ -7,8 +7,6 @@ import org.json.JSONObject;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
-import static com.tecknobit.glider.records.Session.SessionKeys.qrCodeLogin;
-
 /**
  * The {@link Session} is class useful to store all the information for a {@code Glider}'s session
  * allowing the correct workflow
@@ -64,9 +62,9 @@ public class Session {
         singleUseMode,
 
         /**
-         * {@code qrCodeLogin} key of the session
+         * {@code QRCodeLoginEnabled} key of the session
          **/
-        qrCodeLogin,
+        QRCodeLoginEnabled,
 
         /**
          * {@code runInLocalhost} key of the session
@@ -160,7 +158,7 @@ public class Session {
         hostAddress = hSession.getString(SessionKeys.hostAddress.name());
         hostPort = hSession.getInt(SessionKeys.hostPort.name());
         singleUseMode = hSession.getBoolean(SessionKeys.singleUseMode.name());
-        QRCodeLoginEnabled = hSession.getBoolean(qrCodeLogin.name());
+        QRCodeLoginEnabled = hSession.getBoolean(SessionKeys.QRCodeLoginEnabled.name());
         runInLocalhost = hSession.getBoolean(SessionKeys.runInLocalhost.name());
     }
 

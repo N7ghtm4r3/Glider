@@ -95,7 +95,7 @@ public class DatabaseManager {
                     "hostAddress VARCHAR(24) NOT NULL, \n" +
                     "hostPort VARCHAR(24) NOT NULL, \n" +
                     "singleUseMode VARCHAR(24) NOT NULL, \n" +
-                    "qrCodeLogin VARCHAR(24) NOT NULL, \n" +
+                    "QRCodeLoginEnabled VARCHAR(24) NOT NULL, \n" +
                     "runInLocalhost VARCHAR(24) NOT NULL);"
             );
             statement.execute("CREATE TABLE IF NOT EXISTS " + devices + "(\n" +
@@ -152,7 +152,7 @@ public class DatabaseManager {
                                  int hostPort, boolean singleUseMode, boolean QRCodeLoginEnabled,
                                  boolean runInLocalhost) throws Exception {
         connection.prepareStatement("INSERT INTO " + sessions + "(token, ivSpec, secretKey, password, hostAddress,"
-                + " hostPort, singleUseMode, qrCodeLogin, runInLocalhost)" + " VALUES('" + encrypt(ivSpec,
+                + " hostPort, singleUseMode, QRCodeLoginEnabled, runInLocalhost)" + " VALUES('" + encrypt(ivSpec,
                 secretKey, token) + "','" + encrypt(ivSpec, secretKey, ivSpec) + "','" + encrypt(ivSpec, secretKey,
                 secretKey) + "','" + encrypt(ivSpec, secretKey, password) + "','" + encrypt(ivSpec, secretKey,
                 hostAddress) + "','" + encrypt(ivSpec, secretKey, hostPort) + "','" + encrypt(ivSpec, secretKey,
@@ -179,7 +179,7 @@ public class DatabaseManager {
                     decrypt(ivSpec, secretKey, rSession.getString(hostAddress.name())),
                     parseInt(decrypt(ivSpec, secretKey, rSession.getString(hostPort.name()))),
                     parseBoolean(decrypt(ivSpec, secretKey, rSession.getString(singleUseMode.name()))),
-                    parseBoolean(decrypt(ivSpec, secretKey, rSession.getString(qrCodeLogin.name()))),
+                    parseBoolean(decrypt(ivSpec, secretKey, rSession.getString(QRCodeLoginEnabled.name()))),
                     parseBoolean(decrypt(ivSpec, secretKey, rSession.getString(runInLocalhost.name()))));
             rSession.close();
             return session;
@@ -566,7 +566,7 @@ public class DatabaseManager {
                 iSession = session;
             passwords.add(new Password(iSession,
                     decrypt(session, rPasswords.getString(tail.name())),
-                    fetchScopes(new JSONArray(decrypt(session, rPasswords.getString(scopes.name())))),
+                    fetchScopes(new JSONArray(decrypt(session, rPasswords.getObject(scopes.name())))),
                     decrypt(session, rPasswords.getString(password.name())),
                     Status.valueOf(decrypt(session, rPasswords.getString(status.name())))
             ));

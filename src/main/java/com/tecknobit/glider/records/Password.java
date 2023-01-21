@@ -233,7 +233,7 @@ public class Password extends GliderRecord {
     public static ArrayList<String> fetchScopes(JSONArray jScopes) {
         ArrayList<String> scopes = new ArrayList<>();
         for (int j = 0; j < jScopes.length(); j++)
-            scopes.add(jScopes.getString(j));
+            scopes.add(jScopes.get(j).toString());
         return scopes;
     }
 

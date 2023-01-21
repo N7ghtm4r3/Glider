@@ -21,8 +21,7 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.UUID;
 
-import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.FAILED;
-import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.SUCCESSFUL;
+import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.*;
 import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
 import static com.tecknobit.apimanager.apis.encryption.aes.serverside.CBCServerCipher.createCBCIvParameterSpecString;
 import static com.tecknobit.apimanager.apis.encryption.aes.serverside.CBCServerCipher.createCBCSecretKeyString;
@@ -30,8 +29,7 @@ import static com.tecknobit.apimanager.apis.encryption.aes.serverside.GenericSer
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.devices;
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.passwords;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.*;
-import static com.tecknobit.glider.helpers.GliderLauncher.Operation.CONNECT;
-import static com.tecknobit.glider.helpers.GliderLauncher.Operation.GET_PUBLIC_KEYS;
+import static com.tecknobit.glider.helpers.GliderLauncher.Operation.*;
 import static com.tecknobit.glider.records.Device.DeviceKeys.*;
 import static com.tecknobit.glider.records.Password.*;
 import static com.tecknobit.glider.records.Password.PasswordKeys.*;
@@ -297,8 +295,6 @@ public class GliderLauncher {
                 qrCodeHelper.hostQRCode(session.getHostPort() + 1, new JSONObject()
                                 .put(hostAddress.name(), session.getHostAddress())
                                 .put(SessionKeys.hostPort.name(), hostPort)
-                                .put(SessionKeys.ivSpec.name(), publicIvSpec)
-                                .put(SessionKeys.secretKey.name(), publicCipherKey)
                                 .put(SessionKeys.token.name(), "Glider"), "Glider.png", 250,
                         true, new File("src/main/resources/qrcode.html"));
             } catch (BindException e) {
@@ -361,17 +357,17 @@ public class GliderLauncher {
                     try {
                         request = new JSONObject(socketManager.readContent());
                     } catch (IllegalArgumentException | BadPaddingException e) {
-                        e.printStackTrace();
                         String privateSecretKey = session.getSecretKey();
-                        if(socketManager.getCipherKey().equals(privateSecretKey)) {
+                        if (socketManager.getCipherKey().equals(privateSecretKey))
                             socketManager.changeCipherKeys(publicIvSpec, publicCipherKey);
-                        } else
+                        else
                             socketManager.changeCipherKeys(session.getIvSpec(), privateSecretKey);
                         try {
                             request = new JSONObject(socketManager.readLastContent());
-                        } catch (IllegalArgumentException eP) {
+                        } catch (IllegalArgumentException | BadPaddingException eP) {
                             socketManager.writePlainContent(new JSONObject().put(ivSpec.name(), publicIvSpec)
                                     .put(secretKey.name(), publicCipherKey));
+                            socketManager.changeCipherKeys(session.getIvSpec(), privateSecretKey);
                             request = null;
                         }
                     }
@@ -405,18 +401,27 @@ public class GliderLauncher {
                                         socketManager.sendDefaultErrorResponse();
                                 } else
                                     connect = true;
-                                if((connect && (device == null || !device.isBlacklisted()))) {
-                                    databaseManager.insertNewDevice(session, deviceName, ipAddress,
-                                            currentTimeMillis(), Device.Type.valueOf(request.getString(type.name())));
+                                if ((connect && (device == null || !device.isBlacklisted()))) {
+                                    if (device == null) {
+                                        databaseManager.insertNewDevice(session, deviceName, ipAddress,
+                                                currentTimeMillis(), Device.Type.valueOf(request.getString(type.name())));
+                                    }
                                     sendAllData(response, true, ipAddress);
                                     socketManager.changeCipherKeys(session.getIvSpec(), session.getSecretKey());
                                 } else
                                     socketManager.sendDefaultErrorResponse();
+                            } else if (vOpe.equals(REFRESH_DATA)) {
+                                if (device != null) {
+                                    if (!device.isBlacklisted())
+                                        sendAllData(response, false, ipAddress);
+                                    else
+                                        socketManager.sendDefaultErrorResponse();
+                                } else
+                                    socketManager.writeContent(response.put(statusCode.name(), GENERIC_RESPONSE));
                             } else {
-                                if(!device.isBlacklisted()) {
+                                if (!device.isBlacklisted()) {
                                     databaseManager.updateLastActivity(device);
                                     switch (vOpe) {
-                                        case REFRESH_DATA -> sendAllData(response, false, ipAddress);
                                         case CREATE_PASSWORD -> {
                                             int length = request.getInt(Password.PasswordKeys.length.name());
                                             if (length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH) {
@@ -505,35 +510,21 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case DISCONNECT -> {
-                                            // TODO: 03/01/2023 payload:
-                                            //  device name
-                                            //  type
-                                            // targetDevice:
-                                            //  - device name
-                                            //  - ip
                                             if(JsonHelper.getJSONObject(request, targetDevice.name()) != null) {
                                                 request = request.getJSONObject(targetDevice.name());
                                                 device = databaseManager.getDevice(session, request.getString(name.name()),
-                                                        ipAddress);
+                                                        request.getString(Device.DeviceKeys.ipAddress.name()));
                                             }
                                             if(device != null) {
                                                 databaseManager.deleteDevice(session, device.getName(), device.getIpAddress());
-                                                // TODO: 03/01/2023 response
-                                                // status code
                                                 sendSuccessfulResponse(response);
                                             } else
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case MANAGE_DEVICE_AUTHORIZATION -> {
-                                            // TODO: 03/01/2023 payload:
-                                            //  device name
-                                            //  type
-                                            // targetDevice:
-                                            //  - device name
-                                            //  - ip
                                             request = request.getJSONObject(targetDevice.name());
                                             device = databaseManager.getDevice(session, request.getString(name.name()),
-                                                    ipAddress);
+                                                    request.getString(Device.DeviceKeys.ipAddress.name()));
                                             if(device != null) {
                                                 if(device.isBlacklisted()) {
                                                     databaseManager.unblacklistDevice(session, device.getName(),
@@ -542,21 +533,15 @@ public class GliderLauncher {
                                                     databaseManager.blacklistDevice(session, device.getName(),
                                                             device.getIpAddress());
                                                 }
-                                                // TODO: 03/01/2023 response
-                                                // status code
                                                 sendSuccessfulResponse(response);
                                             } else
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case DELETE_ACCOUNT -> {
-                                            // TODO: 03/01/2023 payload:
-                                            //  device name
-                                            //  type
                                             databaseManager.deleteSession(session);
-                                            // status code
                                             sendSuccessfulResponse(response);
-                                            socketManager.stopListener();
                                             qrCodeHelper.stopHosting();
+                                            socketManager.stopListener();
                                         }
                                         default -> socketManager.sendDefaultErrorResponse();
                                     }
@@ -567,7 +552,6 @@ public class GliderLauncher {
                             socketManager.sendDefaultErrorResponse();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace(); // TODO: 05/01/2023 TO REMOVE PRINTSTACKTRACE 
                     try {
                         socketManager.sendDefaultErrorResponse();
                     } catch (Exception ex) {
@@ -577,7 +561,7 @@ public class GliderLauncher {
                     response.clear();
                 }
             }
-            System.out.println("This session has been deleted");
+            System.err.println("This session has been deleted");
         });
     }
 
@@ -590,14 +574,14 @@ public class GliderLauncher {
             @Override
             public void run() {
                 super.run();
-                boolean insertKeys;
+                boolean createKeys;
                 while (true) {
                     try {
                         if (!session.isSingleUseMode())
-                            insertKeys = true;
+                            createKeys = true;
                         else
-                            insertKeys = databaseManager.getDevices(session, false).size() < 1;
-                        if (insertKeys) {
+                            createKeys = databaseManager.getDevices(session, false).size() < 1;
+                        if (createKeys) {
                             publicIvSpec = createCBCIvParameterSpecString();
                             publicCipherKey = createCBCSecretKeyString(k256);
                         }
