@@ -116,26 +116,26 @@ public static void main(String[] args) {
 ### Normal workflow run
 
 ```java
-    public static void main(String[] args) throws Exception {
+public static void main(String[] args) throws Exception {
     
-        //Pass the credentials created at the first run with a file in JSON format
-        GliderLauncher launcher = new GliderLauncher(new File("path_to_credentials_file.json"));
-    
-        //Pass the credentials created at the first run in JSON format
-        GliderLauncher launcher = new GliderLauncher(new JSONObject("{\n" +
-                "    \"databasePath\": \"your_database_path.db\",\n" +
-                "    \"secretKey\": \"your_secret_key\",\n" +
-                "    \"ivSpec\": \"your_iv_spec\",\n" +
-                "    \"token\": \"your_token\"\n" +
-                "}"));
-    
-        //Pass the credentials created at the first run one by one
-        GliderLauncher launcher = new GliderLauncher("your_database_path", "your_token", "your_iv_spec",
-                "your_secret_key");
-    
-        //Starting of the service
-        launcher.startService();
-    }
+    //Pass the credentials created at the first run with a file in JSON format
+    GliderLauncher launcher = new GliderLauncher(new File("path_to_credentials_file.json"));
+
+    //Pass the credentials created at the first run in JSON format
+    GliderLauncher launcher = new GliderLauncher(new JSONObject("{\n" +
+            "    \"databasePath\": \"your_database_path.db\",\n" +
+            "    \"secretKey\": \"your_secret_key\",\n" +
+            "    \"ivSpec\": \"your_iv_spec\",\n" +
+            "    \"token\": \"your_token\"\n" +
+            "}"));
+
+    //Pass the credentials created at the first run one by one
+    GliderLauncher launcher = new GliderLauncher("your_database_path", "your_token", "your_iv_spec",
+            "your_secret_key");
+
+    //Starting of the service
+    launcher.startService();
+}
 ``` 
 
 ## Authors
@@ -147,7 +147,7 @@ public static void main(String[] args) {
 If you need help using the library or encounter any problems or bugs, please contact us via the following links:
 
 - Support via <a href="mailto:infotecknobitcompany@gmail.com">email</a>
-- Support via <a href="https://github.com/N7ghtm4r3/APIManager/issues/new">GitHub</a>
+- Support via <a href="https://github.com/N7ghtm4r3/Glider/issues/new">GitHub</a>
 
 Thank you for your help!
 
@@ -158,7 +158,7 @@ Thank you for your help!
 
 [![](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white)](https://www.oracle.com/java/)
 
-[![](https://jitpack.io/v/N7ghtm4r3/APIManager.svg)](https://jitpack.io/#N7ghtm4r3/APIManager)
+[![](https://jitpack.io/v/N7ghtm4r3/APIManager.svg)](https://jitpack.io/#N7ghtm4r3/Glider)
 
 ## Donations
 
