@@ -283,7 +283,6 @@ public class GliderLauncher {
             throw new Exception("No-any sessions found with that token, retry");
         socketManager = new SocketManager(false, session.getIvSpec(), session.getSecretKey(), CBC_ALGORITHM);
         this.hostPort = session.getHostPort();
-        refreshPublicKeys();
         if(session.isQRCodeLoginEnabled()) {
             qrCodeHelper = new QRCodeHelper();
             try {
@@ -317,14 +316,16 @@ public class GliderLauncher {
      **/
     public GliderLauncher(String databasePath, String password, boolean singleUseMode, boolean QRCodeLoginEnabled,
                           int hostPort, boolean runInLocalhost) throws Exception {
-        if(!databasePath.endsWith(".db"))
+        if (databasePath.isBlank() || password.isBlank())
+            throw new IllegalArgumentException("You must fill the required fields as the database path and the password");
+        if (!databasePath.endsWith(".db"))
             databasePath += ".db";
         databaseManager = new DatabaseManager(databasePath);
         String ivSpec = createCBCIvParameterSpecString();
         String secretKey = createCBCSecretKeyString(k256);
         String token = UUID.randomUUID().toString().replaceAll("-", "");
         databaseManager.insertNewSession(token, ivSpec, secretKey, password, new SocketManager(false)
-                        .getHost(!runInLocalhost), hostPort, singleUseMode, QRCodeLoginEnabled, runInLocalhost);
+                .getHost(!runInLocalhost), hostPort, singleUseMode, QRCodeLoginEnabled, runInLocalhost);
         throw new SaveData("\n" + new JSONObject().put(SessionKeys.ivSpec.name(), ivSpec)
                 .put(SessionKeys.secretKey.name(), secretKey)
                 .put(SessionKeys.token.name(), token)
@@ -558,6 +559,7 @@ public class GliderLauncher {
             }
             System.err.println("This session has been deleted");
         });
+        refreshPublicKeys();
     }
 
     /**
@@ -570,7 +572,7 @@ public class GliderLauncher {
             public void run() {
                 super.run();
                 boolean createKeys;
-                while (true) {
+                while (socketManager.continueListening()) {
                     try {
                         if (!session.isSingleUseMode())
                             createKeys = true;
