@@ -287,8 +287,8 @@ public class GliderLauncher {
                                 .put(hostAddress.name(), session.getHostAddress())
                                 .put(SessionKeys.hostPort.name(), hostPort)
                                 .put(SessionKeys.token.name(), "Glider"), "Glider.png", 250,
-                        true, new File(Objects.requireNonNull(Objects.requireNonNull(GliderLauncher.class
-                                .getClassLoader().getResource("qrcode.html"))).getFile()));
+                        true, new File(Objects.requireNonNull(this.getClass().getClassLoader()
+                                .getResource("qrcode.html")).getFile()));
             } catch (BindException e) {
                 System.err.println("You cannot have multiple sessions on the same port at the same time");
                 e.printStackTrace();
@@ -314,6 +314,27 @@ public class GliderLauncher {
      **/
     public GliderLauncher(String databasePath, String password, boolean singleUseMode, boolean QRCodeLoginEnabled,
                           int hostPort, boolean runInLocalhost) throws Exception {
+        this(databasePath, password, singleUseMode, QRCodeLoginEnabled, new SocketManager(false)
+                .getHost(!runInLocalhost), hostPort, runInLocalhost);
+    }
+
+    /**
+     * Constructor to init {@link GliderLauncher} object
+     *
+     * @param databasePath:       path where create the database
+     * @param password:           password to protect the {@link Session}
+     * @param singleUseMode:      whether the session allows multiple connections, so multiple devices
+     * @param QRCodeLoginEnabled: whether the session allows login by QR-CODE method
+     *                            (if enabled will be shown on {@code "hostAddress:(hostPort + 1)"})
+     * @param hostAddress:        hostAddress address of the session
+     * @param hostPort:           host port of the session
+     * @param runInLocalhost:     whether the session can accept requests outside localhost
+     * @throws SaveData to safe the {@link Session}'s data
+     * @apiNote this constructor is used to create a new {@link Session} if you need to start the {@code Glider}'s
+     * service for the first time
+     **/
+    public GliderLauncher(String databasePath, String password, boolean singleUseMode, boolean QRCodeLoginEnabled,
+                          String hostAddress, int hostPort, boolean runInLocalhost) throws Exception {
         if (databasePath.isBlank() || password.isBlank())
             throw new IllegalArgumentException("You must fill the required fields as the database path and the password");
         if (!databasePath.endsWith(".db"))
@@ -322,8 +343,8 @@ public class GliderLauncher {
         String ivSpec = createCBCIvParameterSpecString();
         String secretKey = createCBCSecretKeyString(k256);
         String token = UUID.randomUUID().toString().replaceAll("-", "");
-        databaseManager.insertNewSession(token, ivSpec, secretKey, password, new SocketManager(false)
-                .getHost(!runInLocalhost), hostPort, singleUseMode, QRCodeLoginEnabled, runInLocalhost);
+        databaseManager.insertNewSession(token, ivSpec, secretKey, password, hostAddress, hostPort, singleUseMode,
+                QRCodeLoginEnabled, runInLocalhost);
         throw new SaveData("\n" + new JSONObject().put(SessionKeys.ivSpec.name(), ivSpec)
                 .put(SessionKeys.secretKey.name(), secretKey)
                 .put(SessionKeys.token.name(), token)
@@ -332,10 +353,11 @@ public class GliderLauncher {
     }
 
     /**
-     * Method to start the {@code Glider}'s service with the details 
-     * fetched from the database if already exist or with that inserted at the 
+     * Method to start the {@code Glider}'s service with the details
+     * fetched from the database if already exist or with that inserted at the
      * first run <br>
      * Any params required
+     *
      * @throws IOException when an error occurred during {@link #socketManager}'s workflow
      **/
     public void startService() throws IOException {
@@ -393,7 +415,6 @@ public class GliderLauncher {
                                         socketManager.sendDefaultErrorResponse();
                                 } else
                                     connect = true;
-                                System.out.println(device);
                                 if ((connect && (device == null || !device.isBlacklisted()))) {
                                     if (device == null) {
                                         databaseManager.insertNewDevice(session, deviceName, ipAddress,
