@@ -397,10 +397,8 @@ public class GliderLauncher {
                             request = null;
                         }
                     }
-                    System.out.println(request);
                     if(request != null) {
                         boolean check = true;
-                        System.out.println(session.runInLocalhost());
                         if (session.runInLocalhost()) {
                             StringBuilder address = new StringBuilder(ipAddress);
                             address.reverse();

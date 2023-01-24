@@ -281,6 +281,7 @@ public class Session {
         JSONObject session = new JSONObject(this);
         session.remove("OIvSpec");
         session.remove("OSecretKey");
+        session.put(SessionKeys.runInLocalhost.name(), runInLocalhost);
         return session;
     }
 
