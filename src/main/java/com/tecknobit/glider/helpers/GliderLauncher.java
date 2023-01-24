@@ -351,6 +351,7 @@ public class GliderLauncher {
                     try {
                         request = new JSONObject(socketManager.readContent());
                     } catch (IllegalArgumentException | BadPaddingException e) {
+                        e.printStackTrace();
                         String privateSecretKey = session.getSecretKey();
                         if (socketManager.getCipherKey().equals(privateSecretKey))
                             socketManager.changeCipherKeys(publicIvSpec, publicCipherKey);
@@ -359,6 +360,7 @@ public class GliderLauncher {
                         try {
                             request = new JSONObject(socketManager.readLastContent());
                         } catch (IllegalArgumentException | BadPaddingException eP) {
+                            eP.printStackTrace();
                             socketManager.writePlainContent(new JSONObject().put(ivSpec.name(), publicIvSpec)
                                     .put(secretKey.name(), publicCipherKey));
                             socketManager.changeCipherKeys(session.getIvSpec(), privateSecretKey);
@@ -394,7 +396,6 @@ public class GliderLauncher {
                                         socketManager.sendDefaultErrorResponse();
                                 } else
                                     connect = true;
-                                System.out.println(connect);
                                 if ((connect && (device == null || !device.isBlacklisted()))) {
                                     if (device == null) {
                                         databaseManager.insertNewDevice(session, deviceName, ipAddress,
@@ -546,7 +547,6 @@ public class GliderLauncher {
                             socketManager.sendDefaultErrorResponse();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     try {
                         socketManager.sendDefaultErrorResponse();
                     } catch (Exception ex) {
