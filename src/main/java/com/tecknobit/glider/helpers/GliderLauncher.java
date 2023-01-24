@@ -13,8 +13,7 @@ import org.json.JSONObject;
 import javax.crypto.BadPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.BindException;
 import java.util.*;
 
@@ -282,13 +281,25 @@ public class GliderLauncher {
         this.hostPort = session.getHostPort();
         if(session.isQRCodeLoginEnabled()) {
             qrCodeHelper = new QRCodeHelper();
+            File file = File.createTempFile("qrcode", "html");
+            file.deleteOnExit();
+            InputStreamReader inputStreamReader = new InputStreamReader(Objects.requireNonNull(this.getClass()
+                    .getClassLoader().getResourceAsStream("qrcode.html")));
+            try (FileWriter fileWriter = new FileWriter(file)) {
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String line;
+                while ((line = bufferedReader.readLine()) != null)
+                    fileWriter.write(line);
+            }
             try {
                 qrCodeHelper.hostQRCode(session.getHostPort() + 1, new JSONObject()
                                 .put(hostAddress.name(), session.getHostAddress())
                                 .put(SessionKeys.hostPort.name(), hostPort)
-                                .put(SessionKeys.token.name(), "Glider"), "Glider.png", 250,
-                        true, new File(Objects.requireNonNull(this.getClass().getClassLoader()
-                                .getResource("qrcode.html")).getFile()));
+                                .put(SessionKeys.token.name(), "Glider"),
+                        "Glider.png",
+                        250,
+                        true,
+                        file);
             } catch (BindException e) {
                 System.err.println("You cannot have multiple sessions on the same port at the same time");
                 e.printStackTrace();
@@ -326,7 +337,7 @@ public class GliderLauncher {
      * @param singleUseMode:      whether the session allows multiple connections, so multiple devices
      * @param QRCodeLoginEnabled: whether the session allows login by QR-CODE method
      *                            (if enabled will be shown on {@code "hostAddress:(hostPort + 1)"})
-     * @param hostAddress:        hostAddress address of the session
+     * @param hostAddress:        host address of the session
      * @param hostPort:           host port of the session
      * @param runInLocalhost:     whether the session can accept requests outside localhost
      * @throws SaveData to safe the {@link Session}'s data
@@ -386,8 +397,10 @@ public class GliderLauncher {
                             request = null;
                         }
                     }
+                    System.out.println(request);
                     if(request != null) {
                         boolean check = true;
+                        System.out.println(session.runInLocalhost());
                         if (session.runInLocalhost()) {
                             StringBuilder address = new StringBuilder(ipAddress);
                             address.reverse();
