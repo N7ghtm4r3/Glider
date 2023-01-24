@@ -16,10 +16,7 @@ import javax.crypto.spec.IvParameterSpec;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.*;
 import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
@@ -290,7 +287,8 @@ public class GliderLauncher {
                                 .put(hostAddress.name(), session.getHostAddress())
                                 .put(SessionKeys.hostPort.name(), hostPort)
                                 .put(SessionKeys.token.name(), "Glider"), "Glider.png", 250,
-                        true, new File("src/main/resources/qrcode.html"));
+                        true, new File(Objects.requireNonNull(GliderLauncher.class.getClassLoader()
+                                .getResource("qrcode.html")).toURI()));
             } catch (BindException e) {
                 System.err.println("You cannot have multiple sessions on the same port at the same time");
                 e.printStackTrace();
@@ -367,7 +365,6 @@ public class GliderLauncher {
                             request = null;
                         }
                     }
-                    System.out.println(request);
                     if(request != null) {
                         boolean check = false;
                         if (session.runInLocalhost()) {
@@ -397,6 +394,7 @@ public class GliderLauncher {
                                         socketManager.sendDefaultErrorResponse();
                                 } else
                                     connect = true;
+                                System.out.println(connect);
                                 if ((connect && (device == null || !device.isBlacklisted()))) {
                                     if (device == null) {
                                         databaseManager.insertNewDevice(session, deviceName, ipAddress,
@@ -548,6 +546,7 @@ public class GliderLauncher {
                             socketManager.sendDefaultErrorResponse();
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     try {
                         socketManager.sendDefaultErrorResponse();
                     } catch (Exception ex) {
