@@ -287,8 +287,8 @@ public class GliderLauncher {
                                 .put(hostAddress.name(), session.getHostAddress())
                                 .put(SessionKeys.hostPort.name(), hostPort)
                                 .put(SessionKeys.token.name(), "Glider"), "Glider.png", 250,
-                        true, new File(Objects.requireNonNull(GliderLauncher.class.getClassLoader()
-                                .getResource("qrcode.html")).toURI()));
+                        true, new File(Objects.requireNonNull(Objects.requireNonNull(GliderLauncher.class
+                                .getClassLoader().getResource("qrcode.html"))).getFile()));
             } catch (BindException e) {
                 System.err.println("You cannot have multiple sessions on the same port at the same time");
                 e.printStackTrace();
@@ -351,7 +351,6 @@ public class GliderLauncher {
                     try {
                         request = new JSONObject(socketManager.readContent());
                     } catch (IllegalArgumentException | BadPaddingException e) {
-                        e.printStackTrace();
                         String privateSecretKey = session.getSecretKey();
                         if (socketManager.getCipherKey().equals(privateSecretKey))
                             socketManager.changeCipherKeys(publicIvSpec, publicCipherKey);
@@ -360,15 +359,13 @@ public class GliderLauncher {
                         try {
                             request = new JSONObject(socketManager.readLastContent());
                         } catch (IllegalArgumentException | BadPaddingException eP) {
-                            eP.printStackTrace();
                             socketManager.writePlainContent(new JSONObject().put(ivSpec.name(), publicIvSpec)
                                     .put(secretKey.name(), publicCipherKey));
-                            socketManager.changeCipherKeys(session.getIvSpec(), privateSecretKey);
                             request = null;
                         }
                     }
                     if(request != null) {
-                        boolean check = false;
+                        boolean check = true;
                         if (session.runInLocalhost()) {
                             StringBuilder address = new StringBuilder(ipAddress);
                             address.reverse();
@@ -396,6 +393,7 @@ public class GliderLauncher {
                                         socketManager.sendDefaultErrorResponse();
                                 } else
                                     connect = true;
+                                System.out.println(device);
                                 if ((connect && (device == null || !device.isBlacklisted()))) {
                                     if (device == null) {
                                         databaseManager.insertNewDevice(session, deviceName, ipAddress,
