@@ -58,7 +58,7 @@ dependencies {
 This project will be constantly developed to reach different platforms to work on, following the platforms releases steps:
 
 - Mobile
-  - <a href="https://github.com/N7ghtm4r3/Glider-Android#readme">Android</a>
+  - <a href="https://github.com/N7ghtm4r3/Glider-Android#readme">Android</a> -> **available!**
   - iOS
 - Desktop Glider version
 
