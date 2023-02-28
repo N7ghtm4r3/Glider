@@ -431,14 +431,14 @@ public class GliderLauncher {
                                         databaseManager.insertNewDevice(session, deviceName, ipAddress,
                                                 currentTimeMillis(), Device.Type.valueOf(request.getString(type.name())));
                                     }
-                                    sendAllData(response, true, ipAddress);
+                                    sendAllData(response, true, deviceName);
                                     socketManager.changeCipherKeys(session.getIvSpec(), session.getSecretKey());
                                 } else
                                     socketManager.sendDefaultErrorResponse();
                             } else if (vOpe.equals(REFRESH_DATA)) {
                                 if (device != null) {
                                     if (!device.isBlacklisted())
-                                        sendAllData(response, false, ipAddress);
+                                        sendAllData(response, false, deviceName);
                                     else
                                         socketManager.sendDefaultErrorResponse();
                                 } else
@@ -572,7 +572,6 @@ public class GliderLauncher {
                             socketManager.sendDefaultErrorResponse();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                     try {
                         socketManager.sendDefaultErrorResponse();
                     } catch (Exception ex) {
@@ -619,17 +618,17 @@ public class GliderLauncher {
     /**
      * Method to send all data of a {@link Session}
      *
-     * @param response          : response where link {@link Session}
-     * @param insertSession     : whether insert the {@link #session} details
-     * @param excludeIpAddress: the ip address to exclude
+     * @param response       : response where link {@link Session}
+     * @param insertSession  : whether insert the {@link #session} details
+     * @param excludeDevice: the device to exclude
      **/
-    private void sendAllData(JSONObject response, boolean insertSession, String excludeIpAddress) throws Exception {
+    private void sendAllData(JSONObject response, boolean insertSession, String excludeDevice) throws Exception {
         if (insertSession) {
             JSONObject jSession = session.toJSON();
             response.put(SessionKeys.session.name(), jSession);
         }
         sendSuccessfulResponse(response.put(passwords.name(), databaseManager.getPasswords(session, false))
-                .put(devices.name(), databaseManager.getDevices(session, false, excludeIpAddress)));
+                .put(devices.name(), databaseManager.getDevices(session, false, excludeDevice)));
     }
 
     /**

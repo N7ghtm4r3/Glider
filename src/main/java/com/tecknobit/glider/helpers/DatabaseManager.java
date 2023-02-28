@@ -283,13 +283,13 @@ public class DatabaseManager {
     /**
      * Method to get a list of {@link Device} from the database
      *
-     * @param session:          session linked to the device to fetch
-     * @param insertSession:    whether insert the session, if {@code "false"} the session will be set as null
-     * @param excludeIpAddress: the ip address to exclude
+     * @param session:       session linked to the device to fetch
+     * @param insertSession: whether insert the session, if {@code "false"} the session will be set as null
+     * @param excludeDevice: the device to exclude
      * @return devices list as {@link ArrayList} of {@link Device}
      * @throws Exception when an error occurred
      **/
-    public ArrayList<Device> getDevices(Session session, boolean insertSession, String excludeIpAddress) throws Exception {
+    public ArrayList<Device> getDevices(Session session, boolean insertSession, String excludeDevice) throws Exception {
         ResultSet rDevices = fetchRecord("SELECT * FROM " + devices + " WHERE token='" + encrypt(session,
                 session.getToken()) + "'");
         ArrayList<Device> devices = new ArrayList<>();
@@ -297,11 +297,11 @@ public class DatabaseManager {
             Session iSession = null;
             if (insertSession)
                 iSession = session;
-            String vIpAddress = decrypt(session, rDevices.getString(ipAddress.name()));
-            if (!vIpAddress.equals(excludeIpAddress)) {
+            String vDeviceName = decrypt(session, rDevices.getString(DeviceKeys.name.name()));
+            if (!vDeviceName.equals(excludeDevice)) {
                 devices.add(new Device(iSession,
-                        decrypt(session, rDevices.getString(DeviceKeys.name.name())),
-                        vIpAddress,
+                        vDeviceName,
+                        decrypt(session, rDevices.getString(ipAddress.name())),
                         getStringDate(parseLong(decrypt(session, rDevices.getString(loginDate.name())))),
                         getStringDate(parseLong(decrypt(session, rDevices.getString(lastActivity.name())))),
                         Type.valueOf(decrypt(session, rDevices.getString(type.name()))),
