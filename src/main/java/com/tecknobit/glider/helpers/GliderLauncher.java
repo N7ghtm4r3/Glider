@@ -137,9 +137,9 @@ public class GliderLauncher {
         MANAGE_DEVICE_AUTHORIZATION,
 
         /**
-         * {@code DELETE_ACCOUNT} account deletion operation
+         * {@code DELETE_SESSION} session deletion operation
          */
-        DELETE_ACCOUNT,
+        DELETE_SESSION,
 
     }
 
@@ -413,7 +413,7 @@ public class GliderLauncher {
                                 sessionPassword.name()))) {
                             String deviceName = request.getString(name.name());
                             Operation vOpe = Operation.valueOf(request.getString(ope.name()));
-                            device = databaseManager.getDevice(session, deviceName, ipAddress);
+                            device = databaseManager.getDevice(session, deviceName);
                             if (vOpe.equals(GET_PUBLIC_KEYS)) {
                                 socketManager.writePlainContent(new JSONObject().put(ivSpec.name(), publicIvSpec)
                                         .put(secretKey.name(), publicCipherKey));
@@ -445,7 +445,7 @@ public class GliderLauncher {
                                     socketManager.writeContent(response.put(statusCode.name(), GENERIC_RESPONSE));
                             } else {
                                 if (!device.isBlacklisted()) {
-                                    databaseManager.updateLastActivity(device);
+                                    databaseManager.updateLastActivity(device, ipAddress);
                                     switch (vOpe) {
                                         case CREATE_PASSWORD -> {
                                             int length = request.getInt(Password.PasswordKeys.length.name());
@@ -537,32 +537,27 @@ public class GliderLauncher {
                                         case DISCONNECT -> {
                                             if(JsonHelper.getJSONObject(request, targetDevice.name()) != null) {
                                                 request = request.getJSONObject(targetDevice.name());
-                                                device = databaseManager.getDevice(session, request.getString(name.name()),
-                                                        request.getString(Device.DeviceKeys.ipAddress.name()));
+                                                device = databaseManager.getDevice(session, request.getString(name.name()));
                                             }
                                             if(device != null) {
-                                                databaseManager.deleteDevice(session, device.getName(), device.getIpAddress());
+                                                databaseManager.deleteDevice(session, device.getName());
                                                 sendSuccessfulResponse(response);
                                             } else
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case MANAGE_DEVICE_AUTHORIZATION -> {
                                             request = request.getJSONObject(targetDevice.name());
-                                            device = databaseManager.getDevice(session, request.getString(name.name()),
-                                                    request.getString(Device.DeviceKeys.ipAddress.name()));
-                                            if(device != null) {
-                                                if(device.isBlacklisted()) {
-                                                    databaseManager.unblacklistDevice(session, device.getName(),
-                                                            device.getIpAddress());
-                                                } else {
-                                                    databaseManager.blacklistDevice(session, device.getName(),
-                                                            device.getIpAddress());
-                                                }
+                                            device = databaseManager.getDevice(session, request.getString(name.name()));
+                                            if (device != null) {
+                                                if (device.isBlacklisted())
+                                                    databaseManager.unblacklistDevice(session, device.getName());
+                                                else
+                                                    databaseManager.blacklistDevice(session, device.getName());
                                                 sendSuccessfulResponse(response);
                                             } else
                                                 socketManager.sendDefaultErrorResponse();
                                         }
-                                        case DELETE_ACCOUNT -> {
+                                        case DELETE_SESSION -> {
                                             databaseManager.deleteSession(session);
                                             sendSuccessfulResponse(response);
                                             qrCodeHelper.stopHosting();
@@ -577,6 +572,7 @@ public class GliderLauncher {
                             socketManager.sendDefaultErrorResponse();
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     try {
                         socketManager.sendDefaultErrorResponse();
                     } catch (Exception ex) {

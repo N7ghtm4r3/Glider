@@ -106,7 +106,7 @@ public class DatabaseManager {
                     "lastActivity VARCHAR(24) NOT NULL, \n" +
                     "type VARCHAR(24) NOT NULL, \n" +
                     "blacklisted VARCHAR(24) NOT NULL, \n" +
-                    "PRIMARY KEY(token, name, ipAddress), \n" +
+                    "PRIMARY KEY(token, name), \n" +
                     "FOREIGN KEY(token) REFERENCES " + sessions + "(token) ON DELETE CASCADE);"
             );
             statement.execute("CREATE TABLE IF NOT EXISTS " + passwords + "(\n" +
@@ -244,18 +244,16 @@ public class DatabaseManager {
 
     /**
      * Method to get a {@link Device} from the database
-     * @param session: session linked to the device to fetch
-     * @param name:         name of the device
-     * @param ipAddress:    ip address of the device
      *
+     * @param session: session linked to the device to fetch
+     * @param name:    name of the device
      * @return device as {@link Device}
      * @throws Exception when an error occurred
      **/
-    public Device getDevice(Session session, String name, String ipAddress) throws Exception {
+    public Device getDevice(Session session, String name) throws Exception {
         ResultSet rDevice = fetchRecord("SELECT * FROM " + devices + " WHERE token='" + encrypt(session,
-                session.getToken()) + "' AND name='" + encrypt(session, name) + "' AND ipAddress='"
-                + encrypt(session, ipAddress) + "'");
-        if(rDevice.next()) {
+                session.getToken()) + "' AND name='" + encrypt(session, name) + "'");
+        if (rDevice.next()) {
             Device device = new Device(session,
                     decrypt(session, rDevice.getString(DeviceKeys.name.name())),
                     decrypt(session, rDevice.getString(DeviceKeys.ipAddress.name())),
@@ -318,12 +316,13 @@ public class DatabaseManager {
     /**
      * Method to update the last activity of a {@link Device}
      *
-     * @param device: device to update its last activity
+     * @param device:    device to update its last activity
+     * @param ipAddress: the ip address to update
      * @throws SQLException when an error occurred
      **/
     @Wrapper
-    public void updateLastActivity(Device device) throws Exception {
-        updateLastActivity(device.getSession(), device.getName(), device.getIpAddress());
+    public void updateLastActivity(Device device, String ipAddress) throws Exception {
+        updateLastActivity(device.getSession(), device.getName(), ipAddress);
     }
 
     /**
@@ -331,13 +330,13 @@ public class DatabaseManager {
      *
      * @param session: session linked to the device
      * @param name:         name of the device
-     * @param ipAddress:    ip address of the device
+     * @param ipAddress: the ip address to update
      * @throws SQLException when an error occurred
      **/
     public void updateLastActivity(Session session, String name, String ipAddress) throws Exception {
         connection.prepareStatement("UPDATE " + devices + " SET lastActivity='" + encrypt(session,
-                currentTimeMillis()) + "' WHERE token='" + encrypt(session, session.getToken()) + "' AND name='"
-                + encrypt(session, name) + "' AND ipAddress='" + encrypt(session, ipAddress) + "'").executeUpdate();
+                currentTimeMillis()) + "' , ipAddress='" + encrypt(session, ipAddress) + "' WHERE token='"
+                + encrypt(session, session.getToken()) + "' AND name='" + encrypt(session, name) + "'").executeUpdate();
     }
 
     /**
@@ -349,7 +348,7 @@ public class DatabaseManager {
      **/
     @Wrapper
     public void blacklistDevice(Device device) throws Exception {
-        blacklistDevice(device.getSession(), device.getName(), device.getIpAddress());
+        blacklistDevice(device.getSession(), device.getName());
     }
 
     /**
@@ -357,12 +356,11 @@ public class DatabaseManager {
      * {@link Session}
      *
      * @param session: session linked to the device to blacklist
-     * @param name:         name of the device
-     * @param ipAddress:    ip address of the device
+     * @param name:    name of the device
      * @throws Exception when an error occurred
      **/
-    public void blacklistDevice(Session session, String name, String ipAddress) throws Exception {
-        changeDeviceAuthorization(session, name, ipAddress, true);
+    public void blacklistDevice(Session session, String name) throws Exception {
+        changeDeviceAuthorization(session, name, true);
     }
 
     /**
@@ -374,7 +372,7 @@ public class DatabaseManager {
      **/
     @Wrapper
     public void unblacklistDevice(Device device) throws Exception {
-        unblacklistDevice(device.getSession(), device.getName(), device.getIpAddress());
+        unblacklistDevice(device.getSession(), device.getName());
     }
 
     /**
@@ -383,11 +381,11 @@ public class DatabaseManager {
      *
      * @param session: session linked to the device to blacklist
      * @param name:         name of the device
-     * @param ipAddress:    ip address of the device
+     *
      * @throws Exception when an error occurred
      **/
-    public void unblacklistDevice(Session session, String name, String ipAddress) throws Exception {
-        changeDeviceAuthorization(session, name, ipAddress, false);
+    public void unblacklistDevice(Session session, String name) throws Exception {
+        changeDeviceAuthorization(session, name, false);
     }
 
     /**
@@ -395,14 +393,13 @@ public class DatabaseManager {
      *
      * @param session: session linked to the device to blacklist
      * @param name:         name of the device
-     * @param ipAddress:    ip address of the device
      * @param blacklist: whether the device have to be blacklisted
      * @throws Exception when an error occurred
      **/
-    private void changeDeviceAuthorization(Session session, String name, String ipAddress, boolean blacklist) throws Exception {
+    private void changeDeviceAuthorization(Session session, String name, boolean blacklist) throws Exception {
         connection.prepareStatement("UPDATE " + devices + " SET blacklisted='" + encrypt(session, blacklist)
                 + "' WHERE token='" + encrypt(session, session.getToken()) + "' AND name='" + encrypt(session, name)
-                + "' AND ipAddress='" + encrypt(session, ipAddress) + "'").executeUpdate();
+                + "'").executeUpdate();
     }
 
     /**
@@ -413,7 +410,7 @@ public class DatabaseManager {
      **/
     @Wrapper
     public void deleteDevice(Device device) throws Exception {
-        deleteDevice(device.getSession(), device.getName(), device.getIpAddress());
+        deleteDevice(device.getSession(), device.getName());
     }
 
     /**
@@ -421,13 +418,12 @@ public class DatabaseManager {
      *
      * @param session: session which the {@link Device} is connected to delete
      * @param name: name of the {@link Device} to delete
-     * @param ipAddress: ip address of the {@link Device} to delete
+     *
      * @throws Exception when an error occurred
      **/
-    public void deleteDevice(Session session, String name, String ipAddress) throws Exception {
-        connection.prepareStatement("DELETE FROM " + devices + " WHERE token='" + encrypt(session, session.getToken()) 
-                + "' AND name='" + encrypt(session, name) + "' AND ipAddress='" + encrypt(session, ipAddress) + "'")
-                .executeUpdate();
+    public void deleteDevice(Session session, String name) throws Exception {
+        connection.prepareStatement("DELETE FROM " + devices + " WHERE token='" + encrypt(session, session.getToken())
+                + "' AND name='" + encrypt(session, name) + "'").executeUpdate();
     }
 
     /**
