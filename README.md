@@ -60,7 +60,7 @@ This project will be constantly developed to reach different platforms to work o
 - Mobile
   - <a href="https://github.com/N7ghtm4r3/Glider-Android#readme">Android</a> -> **available!**
   - iOS
-- Desktop Glider version
+- <a href="https://github.com/N7ghtm4r3/Glider-Desktop">Desktop Glider version</a> -> **available!**
 
 ## Usages
 
