@@ -159,7 +159,7 @@ public class Password extends GliderRecord {
 
     /**
      * Method to get {@link #tail} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #tail} instance as {@link String}
      **/
@@ -169,7 +169,7 @@ public class Password extends GliderRecord {
 
     /**
      * Method to get {@link #scopes} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #scopes} instance as {@link Collection} of {@link String}
      **/
@@ -179,7 +179,7 @@ public class Password extends GliderRecord {
 
     /**
      * Method to get {@link #scopes} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #scopes} instance as {@link Collection} of {@link String} alphabetically sorted
      **/
@@ -191,7 +191,7 @@ public class Password extends GliderRecord {
 
     /**
      * Method to get {@link #password} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #password} instance as {@link String}
      **/
@@ -201,7 +201,7 @@ public class Password extends GliderRecord {
 
     /**
      * Method to get {@link #status} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #status} instance as {@link Status}
      **/

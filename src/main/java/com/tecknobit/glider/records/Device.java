@@ -165,7 +165,7 @@ public class Device extends GliderRecord {
 
     /**
      * Method to get {@link #name} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #name} instance as {@link String}
      **/
@@ -175,7 +175,7 @@ public class Device extends GliderRecord {
 
     /**
      * Method to get {@link #ipAddress} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #ipAddress} instance as {@link String}
      **/
@@ -185,7 +185,7 @@ public class Device extends GliderRecord {
 
     /**
      * Method to get {@link #loginDate} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #loginDate} instance as {@link String}
      **/
@@ -195,7 +195,7 @@ public class Device extends GliderRecord {
 
     /**
      * Method to get {@link #loginDate} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #loginDate} instance as long
      **/
@@ -205,7 +205,7 @@ public class Device extends GliderRecord {
 
     /**
      * Method to get {@link #lastActivity} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #lastActivity} instance as {@link String}
      **/
@@ -215,7 +215,7 @@ public class Device extends GliderRecord {
 
     /**
      * Method to get {@link #lastActivity} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #lastActivity} instance as long
      **/
@@ -225,7 +225,7 @@ public class Device extends GliderRecord {
 
     /**
      * Method to get {@link #type} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #type} instance as {@link Type}
      **/
@@ -235,7 +235,7 @@ public class Device extends GliderRecord {
 
     /**
      * Method to get {@link #blacklisted} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #blacklisted} instance as boolean
      **/

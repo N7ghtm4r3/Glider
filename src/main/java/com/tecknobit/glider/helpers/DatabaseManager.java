@@ -71,15 +71,21 @@ public class DatabaseManager {
     private final Connection connection;
 
     /**
+     * {@code databasePath} value of the database path
+     **/
+    private final String databasePath;
+
+    /**
      * Constructor to init {@link DatabaseManager} object
      *
      * @param databasePath: path where create the database, if it exists will be only read and not recreated
      * @apiNote will be set the {@link #connection} instance and created the tables if they don't exist
      **/
     public DatabaseManager(String databasePath) throws IOException, SQLException {
-        if(!databasePath.endsWith(".db"))
+        if (!databasePath.endsWith(".db"))
             databasePath += ".db";
         File database = new File(databasePath);
+        this.databasePath = databasePath;
         boolean dbCreated = true;
         if(!database.exists())
             dbCreated = database.createNewFile();
@@ -653,10 +659,20 @@ public class DatabaseManager {
     }
 
     /**
-     * Method to encrypt a record
-     * @param session: session of the value
-     * @param value: value to encrypt
+     * Method to get {@link #databasePath} instance <br>
+     * No-any params required
      *
+     * @return {@link #databasePath} instance as {@link String}
+     **/
+    public String getDatabasePath() {
+        return databasePath;
+    }
+
+    /**
+     * Method to encrypt a record
+     *
+     * @param session: session of the value
+     * @param value:   value to encrypt
      * @return value encrypted as {@link String}
      * @throws Exception when an error occurred
      **/

@@ -44,7 +44,7 @@ public class GliderRecord {
 
     /**
      * Method to get {@link #session} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #session} instance as {@link Session}
      **/
@@ -54,7 +54,7 @@ public class GliderRecord {
 
     /**
      * Returns a string representation of the object <br>
-     * Any params required
+     * No-any params required
      *
      * @return a string representation of the object as {@link JSONObject}
      */
@@ -64,7 +64,7 @@ public class GliderRecord {
 
     /**
      * Returns a string representation of the object <br>
-     * Any params required
+     * No-any params required
      *
      * @return a string representation of the object as {@link String}
      */

@@ -164,7 +164,7 @@ public class Session {
 
     /**
      * Method to get {@link #token} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #token} instance as {@link String}
      **/
@@ -174,7 +174,7 @@ public class Session {
 
     /**
      * Method to get {@link #ivSpec} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #ivSpec} instance as {@link String}
      **/
@@ -184,7 +184,7 @@ public class Session {
 
     /**
      * Method to get {@link #ivSpec} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #ivSpec} instance as {@link IvParameterSpec}
      **/
@@ -194,7 +194,7 @@ public class Session {
 
     /**
      * Method to get {@link #secretKey} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #secretKey} instance as {@link String}
      **/
@@ -204,7 +204,7 @@ public class Session {
 
     /**
      * Method to get {@link #secretKey} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #secretKey} instance as {@link SecretKey}
      **/
@@ -214,7 +214,7 @@ public class Session {
 
     /**
      * Method to get {@link #sessionPassword} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #sessionPassword} instance as {@link String}
      **/
@@ -224,7 +224,7 @@ public class Session {
 
     /**
      * Method to get {@link #hostAddress} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #hostAddress} instance as {@link String}
      **/
@@ -234,7 +234,7 @@ public class Session {
 
     /**
      * Method to get {@link #hostPort} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #hostPort} instance as int
      **/
@@ -244,7 +244,7 @@ public class Session {
 
     /**
      * Method to get {@link #singleUseMode} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #singleUseMode} instance as boolean
      **/
@@ -254,7 +254,7 @@ public class Session {
 
     /**
      * Method to get {@link #QRCodeLoginEnabled} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #QRCodeLoginEnabled} instance as boolean
      **/
@@ -264,7 +264,7 @@ public class Session {
 
     /**
      * Method to get {@link #runInLocalhost} instance <br>
-     * Any params required
+     * No-any params required
      *
      * @return {@link #runInLocalhost} instance as boolean
      **/
@@ -287,7 +287,7 @@ public class Session {
 
     /**
      * Returns a string representation of the object <br>
-     * Any params required
+     * No-any params required
      *
      * @return a string representation of the object as {@link String}
      */
