@@ -303,44 +303,46 @@ public class GliderLauncher {
      */
     private String publicCipherKey;
 
-    // TODO: 13/05/2023 CHANGE DEFAULT PATH OF THE JSON FILE, SET ONLY DURING THE TESTINGS AND SET THE LINK FOR THE MD PAGE
-    //  WHERE IS EXPLAINED HOW THE CONFIGURATION FILE WORKS
-
     /**
      * Constructor to init a {@link GliderLauncher} object <br>
      * No-any params required
      *
      * @apiNote this constructor is used to automatically start the {@code Glider}'s service from a JSON configuration
-     * file, you can before set that <a href="pathtomdwhereisexplainedthecfile">file</a> and then invoke this constructor
-     * or execute directly the JAR file created by us to run directly the {@code Glider}'s backend service
+     * file, you can before set that <a href="https://github.com/N7ghtm4r3/Glider/tree/main/documd/GliderBackend.md">file</a>
+     * and then invoke this constructor or execute directly the JAR file created by us to run directly the {@code Glider}'s
+     * backend service
      * @implSpec <b>you need at least the Java 18 JDK installed on your machine</b>
      */
     public GliderLauncher() throws Exception {
-        File fConfigs = new File("glider_configstest.json");
-        JSONObject configs = new JSONObject(new Scanner(fConfigs).useDelimiter("\\Z").next());
-        JsonHelper hConfigs = new JsonHelper(configs);
-        if (hConfigs.getJSONObject(SessionKeys.session.name()) != null)
-            invokeRunningMode(configs);
-        else {
-            hConfigs.setJSONObjectSource(hConfigs.getJSONObject("configuration", new JSONObject()));
-            try {
-                setConfigurationMode(hConfigs.getString(databasePath.name()),
-                        hConfigs.getString(password.name()),
-                        hConfigs.getBoolean(singleUseMode.name()),
-                        hConfigs.getBoolean(QRCodeLoginEnabled.name()),
-                        hConfigs.getString(hostAddress.name()),
-                        hConfigs.getInt(SessionKeys.hostPort.name()),
-                        hConfigs.getBoolean(runInLocalhost.name()));
-            } catch (SaveData e) {
-                // TODO: 13/05/2023 REPLACE WITH SAVE DATA METHOD BEFORE RELEASE e.getMethodName();
-                JSONObject session = new JSONObject(e.getLocalizedMessage().replace("Note: is not an error, but is an alert!\n" +
-                        "Please you should safely save: ", ""));
-                configs.getJSONObject("glider").put(SessionKeys.session.name(), session);
-                try (FileWriter writer = new FileWriter(fConfigs, false)) {
-                    writer.write(configs.toString(4));
-                }
+        try {
+            File fConfigs = getResourceFile("glider_configs", "json");
+            JSONObject configs = new JSONObject(new Scanner(fConfigs).useDelimiter("\\Z").next());
+            JsonHelper hConfigs = new JsonHelper(configs);
+            if (hConfigs.getJSONObject(SessionKeys.session.name()) != null)
                 invokeRunningMode(configs);
+            else {
+                hConfigs.setJSONObjectSource(hConfigs.getJSONObject("configuration", new JSONObject()));
+                try {
+                    setConfigurationMode(hConfigs.getString(databasePath.name()),
+                            hConfigs.getString(password.name()),
+                            hConfigs.getBoolean(singleUseMode.name()),
+                            hConfigs.getBoolean(QRCodeLoginEnabled.name()),
+                            hConfigs.getString(hostAddress.name()),
+                            hConfigs.getInt(SessionKeys.hostPort.name()),
+                            hConfigs.getBoolean(runInLocalhost.name()));
+                } catch (SaveData e) {
+                    // TODO: 13/05/2023 REPLACE WITH SAVE DATA METHOD BEFORE RELEASE e.getMethodName();
+                    JSONObject session = new JSONObject(e.getLocalizedMessage().replace("Note: is not an error, but is an alert!\n" +
+                            "Please you should safely save: ", ""));
+                    configs.getJSONObject("glider").put(SessionKeys.session.name(), session);
+                    try (FileWriter writer = new FileWriter(fConfigs, false)) {
+                        writer.write(configs.toString(4));
+                    }
+                    invokeRunningMode(configs);
+                }
             }
+        } catch (NullPointerException e) {
+            throw new Exception("glider_configs.json not found, cannot continue");
         }
     }
 
@@ -521,16 +523,6 @@ public class GliderLauncher {
         this.hostPort = session.getHostPort();
         if (session.isQRCodeLoginEnabled()) {
             qrCodeHelper = new QRCodeHelper();
-            File file = File.createTempFile("qrcode", "html");
-            file.deleteOnExit();
-            InputStreamReader inputStreamReader = new InputStreamReader(Objects.requireNonNull(this.getClass()
-                    .getClassLoader().getResourceAsStream("qrcode.html")));
-            try (FileWriter fileWriter = new FileWriter(file)) {
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String line;
-                while ((line = bufferedReader.readLine()) != null)
-                    fileWriter.write(line);
-            }
             try {
                 qrCodeHelper.hostQRCode(session.getHostPort() + 1, new JSONObject()
                                 .put(hostAddress.name(), session.getHostAddress())
@@ -539,7 +531,7 @@ public class GliderLauncher {
                         "Glider.png",
                         250,
                         true,
-                        file);
+                        getResourceFile("qrcode", "html"));
             } catch (BindException e) {
                 System.err.println("You cannot have multiple sessions on the same port at the same time");
                 e.printStackTrace();
@@ -547,6 +539,27 @@ public class GliderLauncher {
             }
         } else
             qrCodeHelper = null;
+    }
+
+    /**
+     * Method to get a file from the resources folder
+     *
+     * @param prefix: prefix of the file to fetch
+     * @param suffix: suffix of the file to fetch
+     * @return file from the resources folder as {@link File}
+     */
+    private File getResourceFile(String prefix, String suffix) throws IOException {
+        File file = File.createTempFile(prefix, suffix);
+        file.deleteOnExit();
+        InputStreamReader inputStreamReader = new InputStreamReader(Objects.requireNonNull(this.getClass()
+                .getClassLoader().getResourceAsStream(prefix + "." + suffix)));
+        try (FileWriter fileWriter = new FileWriter(file)) {
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            String line;
+            while ((line = bufferedReader.readLine()) != null)
+                fileWriter.write(line);
+        }
+        return file;
     }
 
     /**
