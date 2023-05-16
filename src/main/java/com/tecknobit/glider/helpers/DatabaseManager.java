@@ -4,6 +4,7 @@ import com.tecknobit.apimanager.annotations.Wrapper;
 import com.tecknobit.apimanager.apis.encryption.aes.ClientCipher;
 import com.tecknobit.glider.records.Device;
 import com.tecknobit.glider.records.Device.DeviceKeys;
+import com.tecknobit.glider.records.Device.DevicePermission;
 import com.tecknobit.glider.records.Password;
 import com.tecknobit.glider.records.Password.PasswordKeys;
 import com.tecknobit.glider.records.Session;
@@ -112,6 +113,7 @@ public class DatabaseManager {
                     "lastActivity VARCHAR(24) NOT NULL, \n" +
                     "type VARCHAR(24) NOT NULL, \n" +
                     "blacklisted VARCHAR(24) NOT NULL, \n" +
+                    "permission VARCHAR(16) DEFAULT SIMPLE_USER, \n" +
                     "PRIMARY KEY(token, name), \n" +
                     "FOREIGN KEY(token) REFERENCES " + sessions + "(token) ON DELETE CASCADE);"
             );
@@ -226,26 +228,29 @@ public class DatabaseManager {
     @Wrapper
     public void insertNewDevice(Device device) throws Exception {
         insertNewDevice(device.getSession(), device.getName(), device.getIpAddress(), device.getLoginDateTimestamp(),
-                device.getType());
+                device.getType(), device.getPermission());
     }
 
     /**
      * Method to insert a new device in the {@link Table#devices} table
      *
-     * @param session: session where device is connected
-     * @param name:         name of the device
-     * @param ipAddress:    ip address of the device
-     * @param loginDate:    loginDate date of the device
-     * @param type:         type of the devices
-     * @apiNote the device will link with a one {@link Session} inserted in the {@link Table#sessions} table
+     * @param session     : session where device is connected
+     * @param name        :         name of the device
+     * @param ipAddress   :    ip address of the device
+     * @param loginDate   :    loginDate date of the device
+     * @param type        :         type of the devices
+     * @param permission: permission of the device
      * @throws Exception when an error occurred
+     * @apiNote the device will link with a one {@link Session} inserted in the {@link Table#sessions} table
      **/
-    public void insertNewDevice(Session session, String name, String ipAddress, long loginDate, Type type) throws Exception {
+    public void insertNewDevice(Session session, String name, String ipAddress, long loginDate, Type type,
+                                DevicePermission permission) throws Exception {
         String sLoginDate = encrypt(session, loginDate);
         connection.prepareStatement("INSERT INTO " + devices + "(token, name, ipAddress, loginDate, lastActivity,"
-                + "type, blacklisted) VALUES('" + encrypt(session, session.getToken()) + "','" + encrypt(session, name)
-                + "','" + encrypt(session, ipAddress) + "','" + sLoginDate + "','" + sLoginDate + "','"
-                + encrypt(session, type) + "','" + encrypt(session, false) + "')").executeUpdate();
+                + "type, blacklisted, permission) VALUES('" + encrypt(session, session.getToken())
+                + "','" + encrypt(session, name) + "','" + encrypt(session, ipAddress) + "','" + sLoginDate
+                + "','" + sLoginDate + "','" + encrypt(session, type) + "','" + encrypt(session, false)
+                + "','" + encrypt(session, permission) + "')").executeUpdate();
     }
 
     /**
@@ -266,7 +271,8 @@ public class DatabaseManager {
                     getStringDate(parseLong(decrypt(session, rDevice.getString(loginDate.name())))),
                     getStringDate(parseLong(decrypt(session, rDevice.getString(lastActivity.name())))),
                     Type.valueOf(decrypt(session, rDevice.getString(type.name()))),
-                    parseBoolean(decrypt(session, rDevice.getString(blacklisted.name()))));
+                    parseBoolean(decrypt(session, rDevice.getString(blacklisted.name()))),
+                    DevicePermission.valueOf(decrypt(session, rDevice.getString(permission.name()))));
             rDevice.close();
             return device;
         }
@@ -311,8 +317,8 @@ public class DatabaseManager {
                         getStringDate(parseLong(decrypt(session, rDevices.getString(loginDate.name())))),
                         getStringDate(parseLong(decrypt(session, rDevices.getString(lastActivity.name())))),
                         Type.valueOf(decrypt(session, rDevices.getString(type.name()))),
-                        parseBoolean(decrypt(session, rDevices.getString(blacklisted.name())))
-                ));
+                        parseBoolean(decrypt(session, rDevices.getString(blacklisted.name()))),
+                        DevicePermission.valueOf(decrypt(session, rDevices.getString(permission.name())))));
             }
         }
         rDevices.close();

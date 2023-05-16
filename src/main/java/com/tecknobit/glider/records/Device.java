@@ -3,6 +3,8 @@ package com.tecknobit.glider.records;
 import com.tecknobit.apimanager.formatters.TimeFormatter;
 import org.json.JSONObject;
 
+import static com.tecknobit.glider.records.Device.DevicePermission.SIMPLE_USER;
+
 /**
  * The {@link Device} is class useful to store all the information for a {@code Glider}'s device
  * allowing the correct workflow
@@ -48,9 +50,61 @@ public class Device extends GliderRecord {
         blacklisted,
 
         /**
+         * {@code permission} of the
+         **/
+        permission,
+
+        /**
          * {@code targetDevice} target device key
          **/
         targetDevice
+
+    }
+
+    /**
+     * {@code Type} list of available types for a {@link Device}
+     **/
+    public enum Type {
+
+        /**
+         * {@code "DESKTOP"} device type
+         **/
+        DESKTOP,
+
+        /**
+         * {@code "MOBILE"} device type
+         **/
+        MOBILE
+
+    }
+
+    /**
+     * {@code DevicePermission} list of available device permissions
+     **/
+    public enum DevicePermission {
+
+        /**
+         * {@code "ADMIN"} -> full access to manage both passwords and the account sections of the session
+         */
+        ADMIN,
+
+        /**
+         * {@code "PASSWORD_MANAGER"} -> can only manage the passwords section, but cannot manage the account section
+         * of the session
+         */
+        PASSWORD_MANAGER,
+
+        /**
+         * {@code "ACCOUNT_MANAGER"} -> can only manage the account section, but cannot manage the passwords section
+         * of the session
+         */
+        ACCOUNT_MANAGER,
+
+        /**
+         * {@code "SIMPLE_USER"} -> can only use the passwords and see who is connected to the session, but without the
+         * possibility to manage the passwords or the account section
+         */
+        SIMPLE_USER
 
     }
 
@@ -85,60 +139,112 @@ public class Device extends GliderRecord {
     private boolean blacklisted;
 
     /**
+     * {@code permission} of the device
+     **/
+    private final DevicePermission permission;
+
+    /**
      * Constructor to init {@link Device} object
      *
-     * @param name:         name of the device
-     * @param ipAddress:    ip address of the device
-     * @param loginDate:    loginDate date of the device
-     * @param lastActivity: last activity of the device
-     * @param type:         type of the devices
+     * @param name         :         name of the device
+     * @param ipAddress    :    ip address of the device
+     * @param loginDate    :    loginDate date of the device
+     * @param lastActivity : last activity of the device
+     * @param type         :         type of the devices
      **/
     public Device(String name, String ipAddress, String loginDate, String lastActivity, Type type) {
-        this(null, name, ipAddress, loginDate, lastActivity, type, false);
+        this(null, name, ipAddress, loginDate, lastActivity, type, false, SIMPLE_USER);
     }
 
     /**
      * Constructor to init {@link Device} object
      *
-     * @param name:         name of the device
-     * @param ipAddress:    ip address of the device
-     * @param loginDate:    loginDate date of the device
-     * @param lastActivity: last activity of the device
-     * @param type:         type of the devices
-     * @param blacklisted:  whether the device has been blacklisted
+     * @param name         :         name of the device
+     * @param ipAddress    :    ip address of the device
+     * @param loginDate    :    loginDate date of the device
+     * @param lastActivity : last activity of the device
+     * @param type         :         type of the devices
+     * @param permission:  permission of the device
      **/
     public Device(String name, String ipAddress, String loginDate, String lastActivity, Type type,
-                  boolean blacklisted) {
-        this(null, name, ipAddress, loginDate, lastActivity, type, blacklisted);
+                  DevicePermission permission) {
+        this(null, name, ipAddress, loginDate, lastActivity, type, false, permission);
     }
 
     /**
      * Constructor to init {@link Device} object
      *
-     * @param session: session value
-     * @param name:         name of the device
-     * @param ipAddress:    ip address of the device
-     * @param loginDate:    loginDate date of the device
-     * @param lastActivity: last activity of the device
-     * @param type:         type of the devices
+     * @param name         :         name of the device
+     * @param ipAddress    :    ip address of the device
+     * @param loginDate    :    loginDate date of the device
+     * @param lastActivity : last activity of the device
+     * @param type         :         type of the devices
+     * @param blacklisted  :  whether the device has been blacklisted
+     **/
+    public Device(String name, String ipAddress, String loginDate, String lastActivity, Type type, boolean blacklisted) {
+        this(null, name, ipAddress, loginDate, lastActivity, type, blacklisted, SIMPLE_USER);
+    }
+
+    /**
+     * Constructor to init {@link Device} object
+     *
+     * @param name         :         name of the device
+     * @param ipAddress    :    ip address of the device
+     * @param loginDate    :    loginDate date of the device
+     * @param lastActivity : last activity of the device
+     * @param type         :         type of the devices
+     * @param blacklisted  :  whether the device has been blacklisted
+     * @param permission:  permission of the device
+     **/
+    public Device(String name, String ipAddress, String loginDate, String lastActivity, Type type, boolean blacklisted,
+                  DevicePermission permission) {
+        this(null, name, ipAddress, loginDate, lastActivity, type, blacklisted, permission);
+    }
+
+    /**
+     * Constructor to init {@link Device} object
+     *
+     * @param session      : session value
+     * @param name         :         name of the device
+     * @param ipAddress    :    ip address of the device
+     * @param loginDate    :    loginDate date of the device
+     * @param lastActivity : last activity of the device
+     * @param type         :         type of the devices
      **/
     public Device(Session session, String name, String ipAddress, String loginDate, String lastActivity, Type type) {
-        this(session, name, ipAddress, loginDate, lastActivity, type, false);
+        this(session, name, ipAddress, loginDate, lastActivity, type, false, SIMPLE_USER);
     }
 
     /**
      * Constructor to init {@link Device} object
      *
-     * @param session: session value
-     * @param name:         name of the device
-     * @param ipAddress:    ip address of the device
-     * @param loginDate:    loginDate date of the device
-     * @param lastActivity: last activity of the device
-     * @param type:         type of the devices
-     * @param blacklisted:  whether the device has been blacklisted
+     * @param session      : session value
+     * @param name         :         name of the device
+     * @param ipAddress    :    ip address of the device
+     * @param loginDate    :    loginDate date of the device
+     * @param lastActivity : last activity of the device
+     * @param type         :         type of the devices
+     * @param permission:  permission of the device
      **/
     public Device(Session session, String name, String ipAddress, String loginDate, String lastActivity, Type type,
-                  boolean blacklisted) {
+                  DevicePermission permission) {
+        this(session, name, ipAddress, loginDate, lastActivity, type, false, permission);
+    }
+
+    /**
+     * Constructor to init {@link Device} object
+     *
+     * @param session      : session value
+     * @param name         :         name of the device
+     * @param ipAddress    :    ip address of the device
+     * @param loginDate    :    loginDate date of the device
+     * @param lastActivity : last activity of the device
+     * @param type         :         type of the devices
+     * @param blacklisted  :  whether the device has been blacklisted
+     * @param permission:  permission of the device
+     **/
+    public Device(Session session, String name, String ipAddress, String loginDate, String lastActivity, Type type,
+                  boolean blacklisted, DevicePermission permission) {
         super(session);
         this.name = name;
         this.ipAddress = ipAddress;
@@ -146,6 +252,7 @@ public class Device extends GliderRecord {
         this.lastActivity = lastActivity;
         this.type = type;
         this.blacklisted = blacklisted;
+        this.permission = permission;
     }
 
     /**
@@ -161,6 +268,7 @@ public class Device extends GliderRecord {
         lastActivity = hRecord.getString(DeviceKeys.lastActivity.name());
         type = Type.valueOf(hRecord.getString(DeviceKeys.type.name(), Type.MOBILE.name()));
         blacklisted = hRecord.getBoolean(DeviceKeys.blacklisted.name());
+        permission = DevicePermission.valueOf(hRecord.getString(DeviceKeys.permission.name(), SIMPLE_USER.toString()));
     }
 
     /**
@@ -258,20 +366,13 @@ public class Device extends GliderRecord {
     }
 
     /**
-     * {@code Type} list of available types for a {@link Device}
+     * Method to get {@link #permission} instance <br>
+     * No-any params required
+     *
+     * @return {@link #permission} instance as {@link DevicePermission}
      **/
-    public enum Type {
-
-        /**
-         * {@code "DESKTOP"} device type
-         **/
-        DESKTOP,
-
-        /**
-         * {@code "MOBILE"} device type
-         **/
-        MOBILE
-
+    public DevicePermission getPermission() {
+        return permission;
     }
 
 }

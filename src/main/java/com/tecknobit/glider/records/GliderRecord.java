@@ -1,5 +1,6 @@
 package com.tecknobit.glider.records;
 
+import com.tecknobit.apimanager.annotations.Structure;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.records.Session.SessionKeys;
 import org.json.JSONObject;
@@ -10,6 +11,7 @@ import org.json.JSONObject;
  *
  * @author Tecknobit - N7ghtm4r3
  **/
+@Structure
 public class GliderRecord {
 
     /**
