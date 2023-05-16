@@ -42,6 +42,7 @@ import static com.tecknobit.glider.records.Password.Status.ACTIVE;
 import static com.tecknobit.glider.records.Password.Status.DELETED;
 import static com.tecknobit.glider.records.Session.SessionKeys.*;
 import static java.lang.System.currentTimeMillis;
+import static java.lang.Thread.sleep;
 
 /**
  * The {@link GliderLauncher} is class useful to start the {@code Glider}'s service <br>
@@ -750,16 +751,16 @@ public class GliderLauncher {
                                         }
                                         case DISCONNECT -> {
                                             // TODO: 16/05/2023 ADMIN, ACCOUNT_MANAGER
-                                            if (isAccountManager(device)) {
-                                                if (JsonHelper.getJSONObject(request, targetDevice.name()) != null) {
+                                            if (JsonHelper.getJSONObject(request, targetDevice.name()) != null) {
+                                                if (isAccountManager(device)) {
                                                     request = request.getJSONObject(targetDevice.name());
                                                     device = databaseManager.getDevice(session, request.getString(name.name()));
-                                                }
-                                                if (device != null) {
-                                                    databaseManager.deleteDevice(session, device.getName());
-                                                    sendSuccessfulResponse(response);
                                                 } else
-                                                    socketManager.sendDefaultErrorResponse();
+                                                    device = null;
+                                            }
+                                            if (device != null) {
+                                                databaseManager.deleteDevice(session, device.getName());
+                                                sendSuccessfulResponse(response);
                                             } else
                                                 socketManager.sendDefaultErrorResponse();
                                         }
@@ -780,7 +781,6 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case DELETE_SESSION -> {
-                                            // TODO: 16/05/2023 ADMIN
                                             if (isAdmin(device)) {
                                                 databaseManager.deleteSession(session);
                                                 sendSuccessfulResponse(response);
@@ -934,7 +934,8 @@ public class GliderLauncher {
         executor.execute(() -> {
             while (socketManager.continueListening()) {
                 try {
-                    Thread.sleep(backupInterval.getInterval());
+                    // TODO: 16/05/2023 WHEN THE SESSION HAS BEEN DELETED THIS THREAD MUST STOP, CHECK OUT A WAY TO DO IT
+                    sleep(backupInterval.getInterval());
                     if (autoNameBackup)
                         lambdaBackupPath[0] = databaseName + "-backup" + System.currentTimeMillis() + ".db";
                     Files.copy(Path.of(databasePath), Path.of(lambdaBackupPath[0]), StandardCopyOption.REPLACE_EXISTING);
@@ -961,7 +962,6 @@ public class GliderLauncher {
      *
      * @throws Exception when an error occurred
      **/
-    // TODO: 13/05/2023 CHECK WHEN TESTING THE NEW VERSION
     private void stopService() throws Exception {
         if (qrCodeHelper != null)
             qrCodeHelper.stopHosting();
