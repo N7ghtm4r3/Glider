@@ -35,7 +35,8 @@ import static com.tecknobit.glider.helpers.DatabaseManager.Table.passwords;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.*;
 import static com.tecknobit.glider.helpers.GliderLauncher.Operation.*;
 import static com.tecknobit.glider.records.Device.DeviceKeys.*;
-import static com.tecknobit.glider.records.Device.DevicePermission.*;
+import static com.tecknobit.glider.records.Device.DevicePermission.ADMIN;
+import static com.tecknobit.glider.records.Device.DevicePermission.SIMPLE_USER;
 import static com.tecknobit.glider.records.Password.*;
 import static com.tecknobit.glider.records.Password.PasswordKeys.*;
 import static com.tecknobit.glider.records.Password.Status.ACTIVE;
@@ -145,6 +146,11 @@ public class GliderLauncher {
          * {@code MANAGE_DEVICE_AUTHORIZATION} blacklist / unblacklist device operation
          */
         MANAGE_DEVICE_AUTHORIZATION,
+
+        /**
+         * {@code CHANGE_DEVICE_PERMISSION} change the device permission choosing between {@link DevicePermission}
+         */
+        CHANGE_DEVICE_PERMISSION,
 
         /**
          * {@code DELETE_SESSION} session deletion operation
@@ -578,7 +584,7 @@ public class GliderLauncher {
         socketManager.setDefaultErrorResponse(new JSONObject().put(statusCode.name(), FAILED));
         socketManager.startListener(hostPort, () -> {
             JSONObject request;
-            Device device;
+            Device device, clientDevice;
             while (socketManager.continueListening()) {
                 System.out.println("Waiting...");
                 try {
@@ -653,10 +659,9 @@ public class GliderLauncher {
                                 if (!device.isBlacklisted()) {
                                     databaseManager.updateLastActivity(device, ipAddress);
                                     switch (vOpe) {
-                                        // TODO: 16/05/2023 ADMIN, PASSWORD_MANAGER 
                                         case CREATE_PASSWORD -> {
                                             int length = request.getInt(Password.PasswordKeys.length.name());
-                                            if (isPasswordManager(device) && (length >= PASSWORD_MIN_LENGTH
+                                            if (device.isPasswordManager() && (length >= PASSWORD_MIN_LENGTH
                                                     && length <= PASSWORD_MAX_LENGTH)) {
                                                 ArrayList<Integer> letters = new ArrayList<>();
                                                 StringBuilder password = new StringBuilder();
@@ -677,10 +682,9 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case INSERT_PASSWORD -> {
-                                            // TODO: 16/05/2023 ADMIN, PASSWORD_MANAGER
                                             String tail = request.getString(PasswordKeys.tail.name());
                                             int length = tail.length();
-                                            if (isPasswordManager(device) && (length > 0 && length < 30)) {
+                                            if (device.isPasswordManager() && (length > 0 && length < 30)) {
                                                 String password = request.getString(PasswordKeys.password.name());
                                                 length = password.length();
                                                 if (length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH) {
@@ -693,10 +697,9 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case DELETE_PASSWORD -> {
-                                            // TODO: 16/05/2023 ADMIN, PASSWORD_MANAGER
                                             String tail = request.getString(PasswordKeys.tail.name());
                                             Password password = databaseManager.getPassword(session, tail);
-                                            if (isPasswordManager(device) && password != null) {
+                                            if (device.isPasswordManager() && password != null) {
                                                 if (password.getStatus().equals(ACTIVE))
                                                     databaseManager.deletePassword(session, tail);
                                                 else
@@ -706,10 +709,9 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case RECOVER_PASSWORD -> {
-                                            // TODO: 16/05/2023 ADMIN, PASSWORD_MANAGER
                                             String tail = request.getString(PasswordKeys.tail.name());
                                             Password password = databaseManager.getPassword(session, tail);
-                                            if (isPasswordManager(device) && password != null
+                                            if (device.isPasswordManager() && password != null
                                                     && password.getStatus().equals(DELETED)) {
                                                 databaseManager.recoverPassword(session, tail);
                                                 sendSuccessfulResponse(response);
@@ -717,10 +719,9 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case ADD_SCOPE -> {
-                                            // TODO: 16/05/2023 ADMIN, PASSWORD_MANAGER
                                             String tail = request.getString(PasswordKeys.tail.name());
                                             Password password = databaseManager.getPassword(session, tail);
-                                            if (isPasswordManager(device) && password != null) {
+                                            if (device.isPasswordManager() && password != null) {
                                                 databaseManager.addPasswordScope(session, password,
                                                         request.getString(scope.name()));
                                                 sendSuccessfulResponse(response);
@@ -728,10 +729,9 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case EDIT_SCOPE -> {
-                                            // TODO: 16/05/2023 ADMIN, PASSWORD_MANAGER
                                             String tail = request.getString(PasswordKeys.tail.name());
                                             Password password = databaseManager.getPassword(session, tail);
-                                            if (isPasswordManager(device) && password != null) {
+                                            if (device.isPasswordManager() && password != null) {
                                                 databaseManager.editPasswordScope(session, password,
                                                         request.getString(oldScope.name()), request.getString(scope.name()));
                                                 sendSuccessfulResponse(response);
@@ -739,10 +739,9 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case REMOVE_SCOPE -> {
-                                            // TODO: 16/05/2023 ADMIN, PASSWORD_MANAGER
                                             String tail = request.getString(PasswordKeys.tail.name());
                                             Password password = databaseManager.getPassword(session, tail);
-                                            if (isPasswordManager(device) && password != null) {
+                                            if (device.isPasswordManager() && password != null) {
                                                 databaseManager.removePasswordScope(session, password,
                                                         request.getString(scope.name()));
                                                 sendSuccessfulResponse(response);
@@ -750,11 +749,13 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case DISCONNECT -> {
-                                            // TODO: 16/05/2023 ADMIN, ACCOUNT_MANAGER
                                             if (JsonHelper.getJSONObject(request, targetDevice.name()) != null) {
-                                                if (isAccountManager(device)) {
+                                                clientDevice = device;
+                                                if (clientDevice.isAccountManager()) {
                                                     request = request.getJSONObject(targetDevice.name());
                                                     device = databaseManager.getDevice(session, request.getString(name.name()));
+                                                    if (device.isAdmin() && !clientDevice.isAdmin())
+                                                        device = null;
                                                 } else
                                                     device = null;
                                             }
@@ -765,15 +766,31 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case MANAGE_DEVICE_AUTHORIZATION -> {
-                                            // TODO: 16/05/2023 ADMIN, ACCOUNT_MANAGER
-                                            if (isAccountManager(device)) {
+                                            clientDevice = device;
+                                            if (clientDevice.isAccountManager()) {
                                                 request = request.getJSONObject(targetDevice.name());
                                                 device = databaseManager.getDevice(session, request.getString(name.name()));
-                                                if (device != null) {
+                                                if (device != null && (!device.isAdmin() || clientDevice.isAdmin())) {
+                                                    String mDeviceName = device.getName();
                                                     if (device.isBlacklisted())
-                                                        databaseManager.unblacklistDevice(session, device.getName());
+                                                        databaseManager.unblacklistDevice(session, mDeviceName);
                                                     else
-                                                        databaseManager.blacklistDevice(session, device.getName());
+                                                        databaseManager.blacklistDevice(session, mDeviceName);
+                                                    sendSuccessfulResponse(response);
+                                                } else
+                                                    socketManager.sendDefaultErrorResponse();
+                                            } else
+                                                socketManager.sendDefaultErrorResponse();
+                                        }
+                                        case CHANGE_DEVICE_PERMISSION -> {
+                                            // TODO: 17/05/2023 targetDevice, name, permission
+                                            clientDevice = device;
+                                            if (clientDevice.isAccountManager()) {
+                                                request = request.getJSONObject(targetDevice.name());
+                                                device = databaseManager.getDevice(session, request.getString(name.name()));
+                                                if (device != null && (!device.isAdmin() || clientDevice.isAdmin())) {
+                                                    databaseManager.changeDevicePermission(session, device.getName(),
+                                                            DevicePermission.valueOf(request.getString(permission.name())));
                                                     sendSuccessfulResponse(response);
                                                 } else
                                                     socketManager.sendDefaultErrorResponse();
@@ -781,7 +798,7 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case DELETE_SESSION -> {
-                                            if (isAdmin(device)) {
+                                            if (device.isAdmin()) {
                                                 databaseManager.deleteSession(session);
                                                 sendSuccessfulResponse(response);
                                                 stopService();
@@ -838,38 +855,6 @@ public class GliderLauncher {
                 }
             }
         }.start();
-    }
-
-    /**
-     * Method to check whether a device has the {@link DevicePermission#ADMIN} or
-     * {@link DevicePermission#PASSWORD_MANAGER} permissions
-     *
-     * @param device: the device where check its permission
-     * @return whether a device has the right permission
-     */
-    private boolean isPasswordManager(Device device) {
-        return device.getPermission() == PASSWORD_MANAGER || isAdmin(device);
-    }
-
-    /**
-     * Method to check whether a device has the {@link DevicePermission#ADMIN} or
-     * {@link DevicePermission#ACCOUNT_MANAGER} permissions
-     *
-     * @param device: the device where check its permission
-     * @return whether a device has the right permission
-     */
-    private boolean isAccountManager(Device device) {
-        return device.getPermission() == ACCOUNT_MANAGER || isAdmin(device);
-    }
-
-    /**
-     * Method to check whether a device has the {@link DevicePermission#ADMIN} permission
-     *
-     * @param device: the device where check its permission
-     * @return whether a device has the right permission
-     */
-    private boolean isAdmin(Device device) {
-        return device.getPermission() == ADMIN;
     }
 
     /**

@@ -3,7 +3,7 @@ package com.tecknobit.glider.records;
 import com.tecknobit.apimanager.formatters.TimeFormatter;
 import org.json.JSONObject;
 
-import static com.tecknobit.glider.records.Device.DevicePermission.SIMPLE_USER;
+import static com.tecknobit.glider.records.Device.DevicePermission.*;
 
 /**
  * The {@link Device} is class useful to store all the information for a {@code Glider}'s device
@@ -373,6 +373,38 @@ public class Device extends GliderRecord {
      **/
     public DevicePermission getPermission() {
         return permission;
+    }
+
+    /**
+     * Method to check whether a device has the {@link DevicePermission#ADMIN} or
+     * {@link DevicePermission#PASSWORD_MANAGER} permissions <br>
+     * No-any params required
+     *
+     * @return whether a device has the right permission
+     */
+    public boolean isPasswordManager() {
+        return permission == PASSWORD_MANAGER || isAdmin();
+    }
+
+    /**
+     * Method to check whether a device has the {@link DevicePermission#ADMIN} or
+     * {@link DevicePermission#ACCOUNT_MANAGER} permissions <br>
+     * No-any params required
+     *
+     * @return whether a device has the right permission
+     */
+    public boolean isAccountManager() {
+        return permission == ACCOUNT_MANAGER || isAdmin();
+    }
+
+    /**
+     * Method to check whether a device has the {@link DevicePermission#ADMIN} permission <br>
+     * No-any params required
+     *
+     * @return whether a device has the right permission
+     */
+    public boolean isAdmin() {
+        return permission == ADMIN;
     }
 
 }

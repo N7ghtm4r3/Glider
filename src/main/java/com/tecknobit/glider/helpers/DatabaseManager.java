@@ -372,7 +372,7 @@ public class DatabaseManager {
      * @throws Exception when an error occurred
      **/
     public void blacklistDevice(Session session, String name) throws Exception {
-        changeDeviceAuthorization(session, name, true);
+        changeDeviceRow(session, name, blacklisted.name(), true);
     }
 
     /**
@@ -397,19 +397,45 @@ public class DatabaseManager {
      * @throws Exception when an error occurred
      **/
     public void unblacklistDevice(Session session, String name) throws Exception {
-        changeDeviceAuthorization(session, name, false);
+        changeDeviceRow(session, name, blacklisted.name(), false);
     }
 
     /**
-     * Method to blacklist or unblacklist a {@link Device}
+     * Method to change the permission for a {@link Device} to allow it for a specific operations
      *
-     * @param session: session linked to the device to blacklist
-     * @param name:         name of the device
-     * @param blacklist: whether the device have to be blacklisted
+     * @param session:    session linked to the device
+     * @param device:     the device to change the permission
+     * @param permission: the permission to set
      * @throws Exception when an error occurred
-     **/
-    private void changeDeviceAuthorization(Session session, String name, boolean blacklist) throws Exception {
-        connection.prepareStatement("UPDATE " + devices + " SET blacklisted='" + encrypt(session, blacklist)
+     */
+    @Wrapper
+    public void changeDevicePermission(Session session, Device device, DevicePermission permission) throws Exception {
+        changeDevicePermission(session, device.getName(), permission);
+    }
+
+    /**
+     * Method to change the permission for a {@link Device} to allow it for a specific operations
+     *
+     * @param session:    session linked to the device
+     * @param name:       the device name to change the permission
+     * @param permission: the permission to set
+     * @throws Exception when an error occurred
+     */
+    public void changeDevicePermission(Session session, String name, DevicePermission permission) throws Exception {
+        changeDeviceRow(session, name, DeviceKeys.permission.name(), permission);
+    }
+
+    /**
+     * Method to change a {@link Device} detail
+     *
+     * @param session: session linked to the device
+     * @param name:    the device name to change the detail
+     * @param column:  the column of the value to set
+     * @param value:   the value to set
+     * @throws Exception when an error occurred
+     */
+    private <T> void changeDeviceRow(Session session, String name, String column, T value) throws Exception {
+        connection.prepareStatement("UPDATE " + devices + " SET " + column + "='" + encrypt(session, value)
                 + "' WHERE token='" + encrypt(session, session.getToken()) + "' AND name='" + encrypt(session, name)
                 + "'").executeUpdate();
     }
