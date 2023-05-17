@@ -280,30 +280,111 @@ public class DatabaseManager {
     }
 
     /**
-     * Method to get a list of {@link Device} from the database
-     * @param session: session linked to the device to fetch
-     * @param insertSession: whether insert the session, if {@code "false"} the session will be set as null
+     * Method to get the older {@link Device} by its permission from the database
      *
-     * @return devices list as {@link ArrayList} of {@link Device}
+     * @param session:    session linked to the device to fetch
+     * @param permission: permission target
+     * @return older device as {@link Device}
      * @throws Exception when an error occurred
-     **/
+     */
     @Wrapper
-    public ArrayList<Device> getDevices(Session session, boolean insertSession) throws Exception {
-        return getDevices(session, insertSession, null);
+    public Device getOlderDevice(Session session, DevicePermission permission) throws Exception {
+        return getOlderDevice(session, permission, null);
+    }
+
+    /**
+     * Method to get the older {@link Device} by its permission from the database
+     *
+     * @param session:       session linked to the devices to fetch
+     * @param permission:    permission target
+     * @param excludeDevice: the device to exclude
+     * @return older device as {@link Device}
+     * @throws Exception when an error occurred
+     */
+    public Device getOlderDevice(Session session, DevicePermission permission, String excludeDevice) throws Exception {
+        long olderDeviceLoginDate = System.currentTimeMillis();
+        Device olderDevice = null;
+        for (Device device : getDevices(session, false, excludeDevice, permission)) {
+            long loginDate = device.getLoginDateTimestamp();
+            if (loginDate < olderDeviceLoginDate) {
+                olderDeviceLoginDate = loginDate;
+                olderDevice = device;
+            }
+        }
+        return olderDevice;
     }
 
     /**
      * Method to get a list of {@link Device} from the database
      *
-     * @param session:       session linked to the device to fetch
+     * @param session:       session linked to the devices to fetch
+     * @param insertSession: whether insert the session, if {@code "false"} the session will be set as null
+     * @return devices list as {@link ArrayList} of {@link Device}
+     * @throws Exception when an error occurred
+     */
+    @Wrapper
+    public ArrayList<Device> getDevices(Session session, boolean insertSession) throws Exception {
+        return getDevices(session, insertSession, (String) null);
+    }
+
+    /**
+     * Method to get a list of {@link Device} from the database
+     *
+     * @param session:       session linked to the devices to fetch
      * @param insertSession: whether insert the session, if {@code "false"} the session will be set as null
      * @param excludeDevice: the device to exclude
      * @return devices list as {@link ArrayList} of {@link Device}
      * @throws Exception when an error occurred
-     **/
+     */
     public ArrayList<Device> getDevices(Session session, boolean insertSession, String excludeDevice) throws Exception {
-        ResultSet rDevices = fetchRecord("SELECT * FROM " + devices + " WHERE token='" + encrypt(session,
-                session.getToken()) + "'");
+        return getDevices(session, insertSession, null, excludeDevice);
+    }
+
+    /**
+     * Method to get a list of {@link Device} filtered by them {@link DevicePermission} from the database
+     *
+     * @param session:       session linked to the devices to fetch
+     * @param insertSession: whether insert the session, if {@code "false"} the session will be set as null
+     * @param permission:    the filter permission
+     * @return filtered devices list as {@link ArrayList} of {@link Device}
+     * @throws Exception when an error occurred
+     */
+    @Wrapper
+    public ArrayList<Device> getDevices(Session session, boolean insertSession, DevicePermission permission) throws Exception {
+        return getDevices(session, insertSession, null, permission);
+    }
+
+    /**
+     * Method to get a list of {@link Device} filtered by them {@link DevicePermission} from the database
+     *
+     * @param session:       session linked to the devices to fetch
+     * @param insertSession: whether insert the session, if {@code "false"} the session will be set as null
+     * @param permission:    the filter permission
+     * @param excludeDevice: the device to exclude
+     * @return filtered devices list as {@link ArrayList} of {@link Device}
+     * @throws Exception when an error occurred
+     */
+    public ArrayList<Device> getDevices(Session session, boolean insertSession, String excludeDevice,
+                                        DevicePermission permission) throws Exception {
+        return getDevices(session, insertSession, permission, excludeDevice);
+    }
+
+    /**
+     * Method to get a list of {@link Device} from the database
+     *
+     * @param session:       session linked to the devices to fetch
+     * @param insertSession: whether insert the session, if {@code "false"} the session will be set as null
+     * @param permission:    the filter permission
+     * @param excludeDevice: the device to exclude
+     * @return filtered devices list as {@link ArrayList} of {@link Device}
+     * @throws Exception when an error occurred
+     */
+    private ArrayList<Device> getDevices(Session session, boolean insertSession, DevicePermission permission,
+                                         String excludeDevice) throws Exception {
+        String query = "SELECT * FROM " + devices + " WHERE token='" + encrypt(session, session.getToken()) + "'";
+        if (permission != null)
+            query += " AND permission='" + encrypt(session, permission) + "'";
+        ResultSet rDevices = fetchRecord(query);
         ArrayList<Device> devices = new ArrayList<>();
         while (rDevices.next()) {
             Session iSession = null;
@@ -318,7 +399,7 @@ public class DatabaseManager {
                         getStringDate(parseLong(decrypt(session, rDevices.getString(lastActivity.name())))),
                         Type.valueOf(decrypt(session, rDevices.getString(type.name()))),
                         parseBoolean(decrypt(session, rDevices.getString(blacklisted.name()))),
-                        DevicePermission.valueOf(decrypt(session, rDevices.getString(permission.name())))));
+                        DevicePermission.valueOf(decrypt(session, rDevices.getString(DeviceKeys.permission.name())))));
             }
         }
         rDevices.close();

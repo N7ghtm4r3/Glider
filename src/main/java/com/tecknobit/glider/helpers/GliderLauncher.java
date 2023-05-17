@@ -1,6 +1,7 @@
 package com.tecknobit.glider.helpers;
 
 import com.tecknobit.apimanager.annotations.Wrapper;
+import com.tecknobit.apimanager.apis.ConsolePainter;
 import com.tecknobit.apimanager.apis.QRCodeHelper;
 import com.tecknobit.apimanager.apis.SocketManager;
 import com.tecknobit.apimanager.exceptions.SaveData;
@@ -24,26 +25,28 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 
+import static com.tecknobit.apimanager.apis.ConsolePainter.ANSIColor.GREEN;
+import static com.tecknobit.apimanager.apis.ConsolePainter.ANSIColor.RED;
 import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.*;
 import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
 import static com.tecknobit.apimanager.apis.encryption.aes.serverside.CBCServerCipher.createCBCIvParameterSpecString;
 import static com.tecknobit.apimanager.apis.encryption.aes.serverside.CBCServerCipher.createCBCSecretKeyString;
 import static com.tecknobit.apimanager.apis.encryption.aes.serverside.GenericServerCipher.KeySize.k256;
+import static com.tecknobit.apimanager.formatters.TimeFormatter.getStringDate;
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.devices;
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.passwords;
 import static com.tecknobit.glider.helpers.GliderLauncher.GliderKeys.*;
 import static com.tecknobit.glider.helpers.GliderLauncher.Operation.*;
 import static com.tecknobit.glider.records.Device.DeviceKeys.*;
-import static com.tecknobit.glider.records.Device.DevicePermission.ADMIN;
-import static com.tecknobit.glider.records.Device.DevicePermission.SIMPLE_USER;
+import static com.tecknobit.glider.records.Device.DevicePermission.*;
 import static com.tecknobit.glider.records.Password.*;
 import static com.tecknobit.glider.records.Password.PasswordKeys.*;
 import static com.tecknobit.glider.records.Password.Status.ACTIVE;
 import static com.tecknobit.glider.records.Password.Status.DELETED;
 import static com.tecknobit.glider.records.Session.SessionKeys.*;
 import static java.lang.System.currentTimeMillis;
-import static java.lang.Thread.sleep;
 
 /**
  * The {@link GliderLauncher} is class useful to start the {@code Glider}'s service <br>
@@ -313,6 +316,11 @@ public class GliderLauncher {
     private String publicCipherKey;
 
     /**
+     * {@code consolePainter} useful to color the output console
+     */
+    private final ConsolePainter consolePainter = new ConsolePainter();
+
+    /**
      * Constructor to init a {@link GliderLauncher} object <br>
      * No-any params required
      *
@@ -542,7 +550,7 @@ public class GliderLauncher {
                         true,
                         getResourceFile("qrcode", "html"));
             } catch (BindException e) {
-                System.err.println("You cannot have multiple sessions on the same port at the same time");
+                consolePainter.printBold("You cannot have multiple sessions on the same port at the same time", RED);
                 e.printStackTrace();
                 System.exit(1);
             }
@@ -586,7 +594,7 @@ public class GliderLauncher {
             JSONObject request;
             Device device, clientDevice;
             while (socketManager.continueListening()) {
-                System.out.println("Waiting...");
+                consolePainter.printBold("Waiting...");
                 try {
                     String ipAddress = SocketManager.getIpAddress(socketManager.acceptRequest());
                     try {
@@ -749,8 +757,8 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case DISCONNECT -> {
+                                            clientDevice = device;
                                             if (JsonHelper.getJSONObject(request, targetDevice.name()) != null) {
-                                                clientDevice = device;
                                                 if (clientDevice.isAccountManager()) {
                                                     request = request.getJSONObject(targetDevice.name());
                                                     device = databaseManager.getDevice(session, request.getString(name.name()));
@@ -760,6 +768,7 @@ public class GliderLauncher {
                                                     device = null;
                                             }
                                             if (device != null) {
+                                                assignNewAdmin(clientDevice);
                                                 databaseManager.deleteDevice(session, device.getName());
                                                 sendSuccessfulResponse(response);
                                             } else
@@ -823,7 +832,7 @@ public class GliderLauncher {
                     response.clear();
                 }
             }
-            System.err.println("This session has been deleted");
+            consolePainter.printBold("This session has been deleted", RED);
         });
         refreshPublicKeys();
     }
@@ -874,6 +883,27 @@ public class GliderLauncher {
     }
 
     /**
+     * Method to assign a new admin when an admin has been logged out
+     *
+     * @param device: the current device that has being logged out
+     * @throws Exception when an error occurred
+     * @apiNote the assign is executed choosing for each {@link DevicePermission} the older {@link Device}
+     */
+    private void assignNewAdmin(Device device) throws Exception {
+        String deviceName = device.getName();
+        if (device.isAdmin() && databaseManager.getDevices(session, false, deviceName).size() != 0 &&
+                databaseManager.getDevices(session, false, deviceName, ADMIN).size() == 0) {
+            Device newAdmin = databaseManager.getOlderDevice(session, ACCOUNT_MANAGER);
+            if (newAdmin == null) {
+                newAdmin = databaseManager.getOlderDevice(session, PASSWORD_MANAGER);
+                if (newAdmin == null)
+                    newAdmin = databaseManager.getOlderDevice(session, SIMPLE_USER);
+            }
+            databaseManager.changeDevicePermission(session, newAdmin, ADMIN);
+        }
+    }
+
+    /**
      * Method to send a successful response to the client
      *
      * @param message: message to send
@@ -903,6 +933,7 @@ public class GliderLauncher {
      * @throws Exception when an error occurred
      **/
     public void execDatabaseBackup(String backupPath, BackupInterval backupInterval) throws Exception {
+        AtomicLong previousBackup = new AtomicLong(currentTimeMillis());
         String databasePath = databaseManager.getDatabasePath();
         String databaseName = databasePath.split(".db")[0];
         final boolean autoNameBackup = backupPath == null;
@@ -919,11 +950,14 @@ public class GliderLauncher {
         executor.execute(() -> {
             while (socketManager.continueListening()) {
                 try {
-                    // TODO: 16/05/2023 WHEN THE SESSION HAS BEEN DELETED THIS THREAD MUST STOP, CHECK OUT A WAY TO DO IT
-                    sleep(backupInterval.getInterval());
-                    if (autoNameBackup)
-                        lambdaBackupPath[0] = databaseName + "-backup" + System.currentTimeMillis() + ".db";
-                    Files.copy(Path.of(databasePath), Path.of(lambdaBackupPath[0]), StandardCopyOption.REPLACE_EXISTING);
+                    if (System.currentTimeMillis() - previousBackup.get() >= backupInterval.getInterval()) {
+                        if (autoNameBackup)
+                            lambdaBackupPath[0] = databaseName + "-backup" + System.currentTimeMillis() + ".db";
+                        Files.copy(Path.of(databasePath), Path.of(lambdaBackupPath[0]), StandardCopyOption.REPLACE_EXISTING);
+                        previousBackup.set(currentTimeMillis());
+                        consolePainter.printBold("Backup of [" + getStringDate(previousBackup.get()) +
+                                "] executed", GREEN);
+                    }
                 } catch (NoSuchFileException fileException) {
                     String[] directories = lambdaBackupPath[0].replaceAll("\\\\", "/").split("/");
                     String directoriesPath = lambdaBackupPath[0].replace(directories[directories.length - 1], "");
@@ -938,6 +972,7 @@ public class GliderLauncher {
                     throw new RuntimeException(e);
                 }
             }
+            executor.shutdownNow();
         });
     }
 
