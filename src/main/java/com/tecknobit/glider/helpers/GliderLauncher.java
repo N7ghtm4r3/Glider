@@ -651,14 +651,14 @@ public class GliderLauncher {
                                         databaseManager.insertNewDevice(session, deviceName, ipAddress, currentTimeMillis(),
                                                 Device.Type.valueOf(request.getString(type.name())), permission);
                                     }
-                                    sendAllData(response, true, deviceName);
+                                    sendAllData(response, true, device);
                                     socketManager.changeCipherKeys(session.getIvSpec(), session.getSecretKey());
                                 } else
                                     socketManager.sendDefaultErrorResponse();
                             } else if (vOpe.equals(REFRESH_DATA)) {
                                 if (device != null) {
                                     if (!device.isBlacklisted())
-                                        sendAllData(response, false, deviceName);
+                                        sendAllData(response, false, device);
                                     else
                                         socketManager.sendDefaultErrorResponse();
                                 } else
@@ -869,17 +869,18 @@ public class GliderLauncher {
     /**
      * Method to send all data of a {@link Session}
      *
-     * @param response       : response where link {@link Session}
-     * @param insertSession  : whether insert the {@link #session} details
-     * @param excludeDevice: the device to exclude
+     * @param response      : response where link {@link Session}
+     * @param insertSession : whether insert the {@link #session} details
+     * @param device:       the device that has been request the data
      **/
-    private void sendAllData(JSONObject response, boolean insertSession, String excludeDevice) throws Exception {
+    private void sendAllData(JSONObject response, boolean insertSession, Device device) throws Exception {
         if (insertSession) {
             JSONObject jSession = session.toJSON();
             response.put(SessionKeys.session.name(), jSession);
         }
         sendSuccessfulResponse(response.put(passwords.name(), databaseManager.getPasswords(session, false))
-                .put(devices.name(), databaseManager.getDevices(session, false, excludeDevice)));
+                .put(devices.name(), databaseManager.getDevices(session, false, device.getName()))
+                .put(permission.name(), device.getPermission()));
     }
 
     /**
