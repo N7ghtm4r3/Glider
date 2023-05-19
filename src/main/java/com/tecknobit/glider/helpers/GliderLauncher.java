@@ -332,7 +332,7 @@ public class GliderLauncher {
      */
     public GliderLauncher() throws Exception {
         try {
-            File fConfigs = getResourceFile("glider_configs", "json");
+            File fConfigs = new File("glider_configs.json");
             JSONObject configs = new JSONObject(new Scanner(fConfigs).useDelimiter("\\Z").next());
             JsonHelper hConfigs = new JsonHelper(configs);
             if (hConfigs.getJSONObject(SessionKeys.session.name()) != null)
@@ -340,13 +340,15 @@ public class GliderLauncher {
             else {
                 hConfigs.setJSONObjectSource(hConfigs.getJSONObject("configuration", new JSONObject()));
                 try {
+                    boolean bRunInLocalhost = hConfigs.getBoolean(runInLocalhost.name());
                     setConfigurationMode(hConfigs.getString(databasePath.name()),
                             hConfigs.getString(password.name()),
                             hConfigs.getBoolean(singleUseMode.name()),
                             hConfigs.getBoolean(QRCodeLoginEnabled.name()),
-                            hConfigs.getString(hostAddress.name()),
+                            hConfigs.getString(hostAddress.name(), new SocketManager(false)
+                                    .getHost(!bRunInLocalhost)),
                             hConfigs.getInt(SessionKeys.hostPort.name()),
-                            hConfigs.getBoolean(runInLocalhost.name()));
+                            bRunInLocalhost);
                 } catch (SaveData e) {
                     // TODO: 13/05/2023 REPLACE WITH SAVE DATA METHOD BEFORE RELEASE e.getMethodName();
                     JSONObject session = new JSONObject(e.getLocalizedMessage().replace("Note: is not an error, but is an alert!\n" +
@@ -359,6 +361,7 @@ public class GliderLauncher {
                 }
             }
         } catch (NullPointerException e) {
+            e.printStackTrace();
             throw new Exception("glider_configs.json not found, cannot continue");
         }
     }
@@ -792,7 +795,6 @@ public class GliderLauncher {
                                                 socketManager.sendDefaultErrorResponse();
                                         }
                                         case CHANGE_DEVICE_PERMISSION -> {
-                                            // TODO: 17/05/2023 targetDevice, name, permission
                                             clientDevice = device;
                                             if (clientDevice.isAccountManager()) {
                                                 request = request.getJSONObject(targetDevice.name());

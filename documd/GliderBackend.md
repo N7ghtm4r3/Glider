@@ -2,7 +2,8 @@
 **v1.0.3**
 
 This is the section of Glider where you can find how to run directly the Glider's backend without need to
-implement it anywhere
+implement it anywhere, but your machine must at least have installed and configured **Java18 JDK** as Java's version to 
+run this service.
 
 ## First configuration
 
@@ -27,22 +28,17 @@ values of the "configuration" branch, then save it.
 }
 ```
 
-To found that snippet you need to:
+To correctly launch the backend service you must:
 <ul>
     <li>
-        <b>open the alinktojarfilea file as archive, and not launch it</b>
+        create a JSON file named <b>"glider_configs.json"</b>
     </li>
     <li>
-        navigate to <b>"resources"</b> folder
+        customize that file with your preferences
     </li>
     <li>
-        find the configuration file saved as <b>"glider_configs.json"</b>
-    </li>
-    <li>
-        customize the <b>"glider_configs.json"</b> file
-    </li>
-    <li>
-        <b>save that file with the same name, or the backend service will not work</b>
+        <b>save the configs file in the same place where the alinktojarfilea has been saved, 
+        or the backend service will not work</b>
     </li>
 </ul>
 
