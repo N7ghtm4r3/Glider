@@ -31,20 +31,23 @@ values of the "configuration" branch, then save it.
 To correctly launch the backend service you must:
 <ul>
     <li>
+       download the jar file <b>(GliderBackendService.jar)</b> of the backend service from the <b>assets</b> section <a href="https://github.com/N7ghtm4r3/Glider/releases/tag/1.0.3">here</a>
+    </li> 
+    <li>
         create a JSON file named <b>"glider_configs.json"</b>
     </li>
     <li>
         customize that file with your preferences
     </li>
     <li>
-        <b>save the configs file in the same place where the alinktojarfilea has been saved, 
+        <b>save the configs file in the same place where the jar has been saved, 
         or the backend service will not work</b>
     </li>
 </ul>
 
 ## Next launches 
 
-After the first configuration that snippet will appear like this, and you can directly run the alinktojarfilea without 
+After the first configuration that snippet will appear like this, and you can directly run the jar without 
 change any details to make work the backend service
 
 ```json
@@ -86,7 +89,7 @@ If you need to change some details you need to follow these options:
     </li>
 </ul> 
 
-<b>After the change of the configuration you will need to restart the alinktojarfilea file</b> to correctly configure 
+<b>After the change of the configuration you will need to restart the jar file</b> to correctly configure 
 the backend service 
 
 ## Authors
