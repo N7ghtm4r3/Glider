@@ -44,6 +44,7 @@ To correctly launch the backend service you must:
         or the backend service will not work</b>
     </li>
 </ul>
+Now you can run the jar file, good use!
 
 ## Next launches 
 
