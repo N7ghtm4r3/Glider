@@ -1,5 +1,5 @@
 # Glider
-**v1.0.2**
+**v1.0.3**
 
 This is a Java Based open source project useful to manage the creation and the storage of your passwords
 with the **Glider** ecosystem
@@ -24,7 +24,7 @@ allprojects {
 
 ```gradle
 dependencies {
-    implementation 'com.github.N7ghtm4r3:Glider:1.0.2'
+    implementation 'com.github.N7ghtm4r3:Glider:1.0.3'
 }
 ```
 
@@ -46,7 +46,7 @@ dependencies {
 <dependency>
     <groupId>com.github.N7ghtm4r3</groupId>
   <artifactId>Glider</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
 </dependency>
 ```
 
@@ -61,6 +61,7 @@ This project will be constantly developed to reach different platforms to work o
   - <a href="https://github.com/N7ghtm4r3/Glider-Android#readme">Android</a> -> **available!**
   - iOS
 - <a href="https://github.com/N7ghtm4r3/Glider-Desktop">Desktop Glider version</a> -> **available!**
+- <a href="https://github.com/N7ghtm4r3/Glider/tree/main/documd/GliderBackend.md">Backend service "out-of-the-box"</a>
 
 ## Usages
 

@@ -350,7 +350,6 @@ public class GliderLauncher {
                             hConfigs.getInt(SessionKeys.hostPort.name()),
                             bRunInLocalhost);
                 } catch (SaveData e) {
-                    // TODO: 13/05/2023 REPLACE WITH SAVE DATA METHOD BEFORE RELEASE e.getMethodName();
                     JSONObject session = new JSONObject(e.getLocalizedMessage().replace("Note: is not an error, but is an alert!\n" +
                             "Please you should safely save: ", ""));
                     configs.getJSONObject("glider").put(SessionKeys.session.name(), session);
