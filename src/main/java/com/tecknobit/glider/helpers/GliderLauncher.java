@@ -4,6 +4,7 @@ import com.tecknobit.apimanager.annotations.Wrapper;
 import com.tecknobit.apimanager.apis.ConsolePainter;
 import com.tecknobit.apimanager.apis.QRCodeHelper;
 import com.tecknobit.apimanager.apis.SocketManager;
+import com.tecknobit.apimanager.apis.encryption.aes.ClientCipher;
 import com.tecknobit.apimanager.exceptions.SaveData;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.records.Device;
@@ -26,6 +27,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.prefs.Preferences;
 
 import static com.tecknobit.apimanager.apis.ConsolePainter.ANSIColor.GREEN;
 import static com.tecknobit.apimanager.apis.ConsolePainter.ANSIColor.RED;
@@ -331,9 +333,20 @@ public class GliderLauncher {
      * @implSpec <b>you need at least the Java 18 JDK installed on your machine</b>
      */
     public GliderLauncher() throws Exception {
+        Preferences preferences = Preferences.userRoot().node("/user/glider/server");
         try {
             File fConfigs = new File("glider_configs.json");
-            JSONObject configs = new JSONObject(new Scanner(fConfigs).useDelimiter("\\Z").next());
+            String sConfigs = new Scanner(fConfigs).useDelimiter("\\Z").next();
+            String ivSpec = preferences.get(SessionKeys.ivSpec.name(), null);
+            if (ivSpec != null) {
+                try {
+                    sConfigs = new ClientCipher(ivSpec, preferences.get(secretKey.name(), null), CBC_ALGORITHM)
+                            .decrypt(sConfigs);
+                } catch (IllegalArgumentException e) {
+                    preferences.clear();
+                }
+            }
+            JSONObject configs = new JSONObject(sConfigs);
             JsonHelper hConfigs = new JsonHelper(configs);
             if (hConfigs.getJSONObject(SessionKeys.session.name()) != null)
                 invokeRunningMode(configs);
@@ -350,11 +363,18 @@ public class GliderLauncher {
                             hConfigs.getInt(SessionKeys.hostPort.name()),
                             bRunInLocalhost);
                 } catch (SaveData e) {
-                    JSONObject session = new JSONObject(e.getLocalizedMessage().replace("Note: is not an error, but is an alert!\n" +
-                            "Please you should safely save: ", ""));
+                    JSONObject session = new JSONObject(e.getSaveableContent().toString());
                     configs.getJSONObject("glider").put(SessionKeys.session.name(), session);
                     try (FileWriter writer = new FileWriter(fConfigs, false)) {
-                        writer.write(configs.toString(4));
+                        String vConfigs = configs.toString(4);
+                        if (hConfigs.getBoolean("encryptConfigsFile")) {
+                            ivSpec = session.getString(SessionKeys.ivSpec.name());
+                            String secretKey = session.getString(SessionKeys.secretKey.name());
+                            vConfigs = new ClientCipher(ivSpec, secretKey, CBC_ALGORITHM).encrypt(vConfigs);
+                            preferences.put(SessionKeys.ivSpec.name(), ivSpec);
+                            preferences.put(SessionKeys.secretKey.name(), secretKey);
+                        }
+                        writer.write(vConfigs);
                     }
                     invokeRunningMode(configs);
                 }

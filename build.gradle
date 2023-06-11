@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'tecknobit.com'
-version '1.0.3'
+version '1.0.4'
 
 repositories {
     mavenCentral()
@@ -14,7 +14,7 @@ repositories {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
-    implementation 'com.github.N7ghtm4r3:APIManager:2.1.2'
+    implementation 'com.github.N7ghtm4r3:APIManager:2.1.4'
     implementation 'org.xerial:sqlite-jdbc:3.39.3.0'
     implementation 'org.json:json:20220924'
 
@@ -25,7 +25,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'com.tecknobit.glider'
             artifactId = 'Glider'
-            version = '1.0.3'
+            version = '1.0.4'
             from components.java
         }
     }

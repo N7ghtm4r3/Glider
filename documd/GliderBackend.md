@@ -14,6 +14,7 @@ values of the "configuration" branch, then save it.
 {
   "glider": {
     "configuration": {
+      "encryptConfigsFile" : "[BOOLEAN] -> whether the \"glider_configs.json\" file must be encrypted, NOTE you will no longer be able to edit this file directly",
       "backupPath" : "[STRING] -> insert your path here, also null or this key removed is valid",
       "backupInterval": "[STRING] -> insert the interval to schedule the database backup (null or remove this key to not set a scheduled backup) -> [FIVE_MINUTES, FIFTEEN_MINUTES, HALF_HOUR, ONE_HOUR, FOUR_HOURS, EIGHT_HOURS, TWELVE_HOURS, ONE_DAY, ONE_WEEK, ONE_MONTH]",
       "databasePath": "[STRING] -> path where create the database",
@@ -55,6 +56,7 @@ change any details to make work the backend service
 {
   "glider": {
     "configuration": {
+      "encryptConfigsFile" : "[BOOLEAN] -> whether the \"glider_configs.json\" file must be encrypted, NOTE you will no longer be able to edit this file directly",
       "backupPath" : "[STRING] -> insert your path here, also null or this key removed is valid",
       "backupInterval": "[STRING] -> insert the interval to schedule the database backup (null or remove this key to not set a scheduled backup) -> [FIVE_MINUTES, FIFTEEN_MINUTES, HALF_HOUR, ONE_HOUR, FOUR_HOURS, EIGHT_HOURS, TWELVE_HOURS, ONE_DAY, ONE_WEEK, ONE_MONTH]",
       "databasePath": "[STRING] -> path where create the database",
@@ -78,7 +80,8 @@ change any details to make work the backend service
 
 ### Change configuration
 
-If you need to change some details you need to follow these options: 
+If you need to change some details you need to follow these options, but only if <b>"encryptConfigsFile" property is "false", 
+otherwise you cannot change the past configuration directly, but you must fill again the configs template</b>: 
 <ul>
     <li>
         If you need to change any configuration details you need to remove the <b>"session"</b> branch or the changes
