@@ -1,5 +1,5 @@
 # Glider Backend Service
-**v1.0.3**
+**v1.0.4**
 
 This is the section of Glider where you can find how to run directly the Glider's backend without need to
 implement it anywhere, but your machine must at least have installed and configured **Java18 JDK** as Java's version to 
