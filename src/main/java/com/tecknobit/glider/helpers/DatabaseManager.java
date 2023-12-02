@@ -1,7 +1,7 @@
 package com.tecknobit.glider.helpers;
 
 import com.tecknobit.apimanager.annotations.Wrapper;
-import com.tecknobit.apimanager.apis.encryption.aes.ClientCipher;
+import com.tecknobit.apimanager.apis.encryption.aes.AESClientCipher;
 import com.tecknobit.glider.records.Device;
 import com.tecknobit.glider.records.Device.DeviceKeys;
 import com.tecknobit.glider.records.Device.DevicePermission;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 
-import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
+import static com.tecknobit.apimanager.apis.encryption.BaseCipher.Algorithm.CBC_ALGORITHM;
 import static com.tecknobit.apimanager.formatters.TimeFormatter.getStringDate;
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.*;
 import static com.tecknobit.glider.records.Device.DeviceKeys.*;
@@ -842,11 +842,11 @@ public class DatabaseManager {
      * @throws Exception when an error occurred
      **/
     private <T> String doAES(String ivSpec, String secretKey, boolean encrypt, T value) throws Exception {
-        ClientCipher cipher = new ClientCipher(ivSpec, secretKey, CBC_ALGORITHM);
+        AESClientCipher cipher = new AESClientCipher(ivSpec, secretKey, CBC_ALGORITHM);
         if(encrypt)
-            return cipher.encrypt(value.toString());
+            return cipher.encryptBase64(value.toString());
         else
-            return cipher.decrypt(value.toString());
+            return cipher.decryptBase64(value.toString());
     }
 
     /**

@@ -3,8 +3,9 @@ package com.tecknobit.glider.helpers;
 import com.tecknobit.apimanager.annotations.Wrapper;
 import com.tecknobit.apimanager.apis.ConsolePainter;
 import com.tecknobit.apimanager.apis.QRCodeHelper;
-import com.tecknobit.apimanager.apis.SocketManager;
-import com.tecknobit.apimanager.apis.encryption.aes.ClientCipher;
+import com.tecknobit.apimanager.apis.encryption.aes.AESClientCipher;
+import com.tecknobit.apimanager.apis.sockets.SocketManager;
+import com.tecknobit.apimanager.apis.sockets.encrypteds.AESSocketManager;
 import com.tecknobit.apimanager.exceptions.SaveData;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.glider.records.Device;
@@ -31,11 +32,11 @@ import java.util.prefs.Preferences;
 
 import static com.tecknobit.apimanager.apis.ConsolePainter.ANSIColor.GREEN;
 import static com.tecknobit.apimanager.apis.ConsolePainter.ANSIColor.RED;
-import static com.tecknobit.apimanager.apis.SocketManager.StandardResponseCode.*;
-import static com.tecknobit.apimanager.apis.encryption.aes.ClientCipher.Algorithm.CBC_ALGORITHM;
-import static com.tecknobit.apimanager.apis.encryption.aes.serverside.CBCServerCipher.createCBCIvParameterSpecString;
-import static com.tecknobit.apimanager.apis.encryption.aes.serverside.CBCServerCipher.createCBCSecretKeyString;
-import static com.tecknobit.apimanager.apis.encryption.aes.serverside.GenericServerCipher.KeySize.k256;
+import static com.tecknobit.apimanager.apis.encryption.BaseCipher.Algorithm.CBC_ALGORITHM;
+import static com.tecknobit.apimanager.apis.encryption.aes.AESServerCipher.AESKeySize.k256;
+import static com.tecknobit.apimanager.apis.encryption.aes.AESServerCipher.createBase64IvParameterSpec;
+import static com.tecknobit.apimanager.apis.encryption.aes.AESServerCipher.createBase64SecretKey;
+import static com.tecknobit.apimanager.apis.sockets.SocketManager.StandardResponseCode.*;
 import static com.tecknobit.apimanager.formatters.TimeFormatter.getStringDate;
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.devices;
 import static com.tecknobit.glider.helpers.DatabaseManager.Table.passwords;
@@ -290,7 +291,7 @@ public class GliderLauncher {
     /**
      * {@code socketManager} manager of the socket communication
      */
-    private SocketManager socketManager;
+    private AESSocketManager socketManager;
 
     /**
      * {@code session} of the {@code Glider}'s service
@@ -333,15 +334,15 @@ public class GliderLauncher {
      * @implSpec <b>you need at least the Java 18 JDK installed on your machine</b>
      */
     public GliderLauncher() throws Exception {
-        Preferences preferences = Preferences.userRoot().node("/user/glider/server");
+        Preferences preferences = Preferences.userRoot().node("/user/tecknobit/glider/backend");
         try {
             File fConfigs = new File("glider_configs.json");
             String sConfigs = new Scanner(fConfigs).useDelimiter("\\Z").next();
             String ivSpec = preferences.get(SessionKeys.ivSpec.name(), null);
             if (ivSpec != null) {
                 try {
-                    sConfigs = new ClientCipher(ivSpec, preferences.get(secretKey.name(), null), CBC_ALGORITHM)
-                            .decrypt(sConfigs);
+                    sConfigs = new AESClientCipher(ivSpec, preferences.get(secretKey.name(), null), CBC_ALGORITHM)
+                            .decryptBase64(sConfigs);
                 } catch (IllegalArgumentException e) {
                     preferences.clear();
                 }
@@ -370,7 +371,7 @@ public class GliderLauncher {
                         if (hConfigs.getBoolean("encryptConfigsFile")) {
                             ivSpec = session.getString(SessionKeys.ivSpec.name());
                             String secretKey = session.getString(SessionKeys.secretKey.name());
-                            vConfigs = new ClientCipher(ivSpec, secretKey, CBC_ALGORITHM).encrypt(vConfigs);
+                            vConfigs = new AESClientCipher(ivSpec, secretKey, CBC_ALGORITHM).encryptBase64(vConfigs);
                             preferences.put(SessionKeys.ivSpec.name(), ivSpec);
                             preferences.put(SessionKeys.secretKey.name(), secretKey);
                         }
@@ -380,7 +381,6 @@ public class GliderLauncher {
                 }
             }
         } catch (NullPointerException e) {
-            e.printStackTrace();
             throw new Exception("glider_configs.json not found, cannot continue");
         }
     }
@@ -533,8 +533,8 @@ public class GliderLauncher {
         if (!databasePath.endsWith(".db"))
             databasePath += ".db";
         databaseManager = new DatabaseManager(databasePath);
-        String ivSpec = createCBCIvParameterSpecString();
-        String secretKey = createCBCSecretKeyString(k256);
+        String ivSpec = createBase64IvParameterSpec();
+        String secretKey = createBase64SecretKey(k256);
         String token = UUID.randomUUID().toString().replaceAll("-", "");
         databaseManager.insertNewSession(token, ivSpec, secretKey, password, hostAddress, hostPort, singleUseMode,
                 QRCodeLoginEnabled, runInLocalhost);
@@ -558,7 +558,7 @@ public class GliderLauncher {
         session = databaseManager.getSession(token, ivSpec, secretKey);
         if (session == null)
             throw new Exception("No-any sessions found with that token, retry");
-        socketManager = new SocketManager(false, session.getIvSpec(), session.getSecretKey(), CBC_ALGORITHM);
+        socketManager = new AESSocketManager(false, session.getIvSpec(), session.getSecretKey(), CBC_ALGORITHM);
         this.hostPort = session.getHostPort();
         if (session.isQRCodeLoginEnabled()) {
             qrCodeHelper = new QRCodeHelper();
@@ -573,7 +573,6 @@ public class GliderLauncher {
                         getResourceFile("qrcode", "html"));
             } catch (BindException e) {
                 consolePainter.printBold("You cannot have multiple sessions on the same port at the same time", RED);
-                e.printStackTrace();
                 System.exit(1);
             }
         } else
@@ -623,7 +622,7 @@ public class GliderLauncher {
                         request = new JSONObject(socketManager.readContent());
                     } catch (IllegalArgumentException | BadPaddingException e) {
                         String privateSecretKey = session.getSecretKey();
-                        if (socketManager.getCipherKey().equals(privateSecretKey))
+                        if (socketManager.getBase64SecretKey().equals(privateSecretKey))
                             socketManager.changeCipherKeys(publicIvSpec, publicCipherKey);
                         else
                             socketManager.changeCipherKeys(session.getIvSpec(), privateSecretKey);
@@ -873,10 +872,10 @@ public class GliderLauncher {
                         if (!session.isSingleUseMode())
                             createKeys = true;
                         else
-                            createKeys = databaseManager.getDevices(session, false).size() < 1;
+                            createKeys = databaseManager.getDevices(session, false).isEmpty();
                         if (createKeys) {
-                            publicIvSpec = createCBCIvParameterSpecString();
-                            publicCipherKey = createCBCSecretKeyString(k256);
+                            publicIvSpec = createBase64IvParameterSpec();
+                            publicCipherKey = createBase64SecretKey(k256);
                         }
                         sleep(5000);
                     } catch (Exception e) {
@@ -913,8 +912,8 @@ public class GliderLauncher {
      */
     private void assignNewAdmin(Device device) throws Exception {
         String deviceName = device.getName();
-        if (device.isAdmin() && databaseManager.getDevices(session, false, deviceName).size() != 0 &&
-                databaseManager.getDevices(session, false, deviceName, ADMIN).size() == 0) {
+        if (device.isAdmin() && !databaseManager.getDevices(session, false, deviceName).isEmpty() &&
+                databaseManager.getDevices(session, false, deviceName, ADMIN).isEmpty()) {
             Device newAdmin = databaseManager.getOlderDevice(session, ACCOUNT_MANAGER);
             if (newAdmin == null) {
                 newAdmin = databaseManager.getOlderDevice(session, PASSWORD_MANAGER);

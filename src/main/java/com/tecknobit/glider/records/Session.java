@@ -1,6 +1,7 @@
 package com.tecknobit.glider.records;
 
-import com.tecknobit.apimanager.apis.encryption.aes.ClientCipher;
+import com.tecknobit.apimanager.apis.encryption.aes.AESClientCipher;
+import com.tecknobit.apimanager.apis.encryption.aes.AESServerCipher;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import org.json.JSONObject;
 
@@ -189,7 +190,7 @@ public class Session {
      * @return {@link #ivSpec} instance as {@link IvParameterSpec}
      **/
     public IvParameterSpec getOIvSpec() {
-        return ClientCipher.createIvParameter(ivSpec);
+        return AESClientCipher.createIvParameter(ivSpec);
     }
 
     /**
@@ -209,7 +210,7 @@ public class Session {
      * @return {@link #secretKey} instance as {@link SecretKey}
      **/
     public SecretKey getOSecretKey() {
-        return ClientCipher.createSecretKey(secretKey);
+        return AESServerCipher.createSecretKey(secretKey);
     }
 
     /**
