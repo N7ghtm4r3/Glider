@@ -1,5 +1,5 @@
 # Glider Backend Service
-**v1.0.1**
+**v1.0.2**
 
 This is the section of Glider where you can find how to run directly the Glider's backend without need to
 implement it anywhere, but your machine must at least have installed and configured **Java18 JDK** as Java's version to 
@@ -120,10 +120,12 @@ Thank you for your help!
 
 ## Donations
 
-If you want support project and developer: **0x5f63cc6d13b16dcf39cd8083f21d50151efea60e**
+If you want support project and developer
 
-![](https://img.shields.io/badge/Bitcoin-000000?style=for-the-badge&logo=bitcoin&logoColor=white)
-![](https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=Ethereum&logoColor=white)
+| Crypto                                                                                              | Address                                        | Network  |
+|-----------------------------------------------------------------------------------------------------|------------------------------------------------|----------|
+| ![](https://img.shields.io/badge/Bitcoin-000000?style=for-the-badge&logo=bitcoin&logoColor=white)   | **3H3jyCzcRmnxroHthuXh22GXXSmizin2yp**         | Bitcoin  |
+| ![](https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=Ethereum&logoColor=white) | **0x1b45bc41efeb3ed655b078f95086f25fc83345c4** | Ethereum 
 
 If you want support project and developer with <a href="https://www.paypal.com/donate/?hosted_button_id=5QMN5UQH7LDT4">PayPal</a>
 
