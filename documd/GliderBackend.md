@@ -32,7 +32,7 @@ values of the "configuration" branch, then save it.
 To correctly launch the backend service you must:
 <ul>
     <li>
-       download the jar file <b>(GliderBackendService.jar)</b> of the backend service from the <b>assets</b> section <a href="https://github.com/N7ghtm4r3/Glider/releases/tag/1.0.4">here</a>
+       download the jar file <b>(GliderBackendService.jar)</b> of the backend service from the <b>assets</b> section <a href="https://github.com/N7ghtm4r3/Glider/releases/tag/1.0.5">here</a>
     </li> 
     <li>
         create a JSON file named <b>"glider_configs.json"</b>

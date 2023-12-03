@@ -15,7 +15,6 @@ import com.tecknobit.glider.records.Session;
 import com.tecknobit.glider.records.Session.SessionKeys;
 import org.json.JSONObject;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
@@ -620,7 +619,7 @@ public class GliderLauncher {
                     String ipAddress = SocketManager.getIpAddress(socketManager.acceptRequest());
                     try {
                         request = new JSONObject(socketManager.readContent());
-                    } catch (IllegalArgumentException | BadPaddingException e) {
+                    } catch (Exception e) {
                         String privateSecretKey = session.getSecretKey();
                         if (socketManager.getBase64SecretKey().equals(privateSecretKey))
                             socketManager.changeCipherKeys(publicIvSpec, publicCipherKey);
@@ -628,7 +627,7 @@ public class GliderLauncher {
                             socketManager.changeCipherKeys(session.getIvSpec(), privateSecretKey);
                         try {
                             request = new JSONObject(socketManager.readLastContent());
-                        } catch (IllegalArgumentException | BadPaddingException eP) {
+                        } catch (Exception eP) {
                             socketManager.writePlainContent(new JSONObject().put(ivSpec.name(), publicIvSpec)
                                     .put(secretKey.name(), publicCipherKey));
                             request = null;

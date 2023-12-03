@@ -1,5 +1,5 @@
 # Glider
-**v1.0.4**
+**v1.0.5**
 
 This is a Java Based open source project useful to manage the creation and the storage of your passwords
 with the **Glider** ecosystem
@@ -36,7 +36,7 @@ Add the JitPack repository to your build file
          
     ```gradle
     dependencies {
-        implementation 'com.github.N7ghtm4r3:Glider:1.0.4'
+        implementation 'com.github.N7ghtm4r3:Glider:1.0.5'
     }
     ```
 
@@ -44,7 +44,7 @@ Add the JitPack repository to your build file
          
     ```gradle
     dependencies {
-        implementation("com.github.N7ghtm4r3:Glider:1.0.4")
+        implementation("com.github.N7ghtm4r3:Glider:1.0.5")
     }
     ```
 
@@ -66,7 +66,7 @@ Add the JitPack repository to your build file
 <dependency>
     <groupId>com.github.N7ghtm4r3</groupId>
   <artifactId>Glider</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
 </dependency>
 ```
 
