@@ -37,7 +37,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "Pandoro-Core"
+            baseName = "Glider-Core"
             isStatic = true
         }
     }
