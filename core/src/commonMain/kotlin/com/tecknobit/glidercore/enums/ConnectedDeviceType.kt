@@ -3,16 +3,12 @@ package com.tecknobit.glidercore.enums
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class PasswordEventType {
+enum class ConnectedDeviceType {
 
-    GENERATED,
+    MOBILE,
 
-    INSERTED,
+    DESKTOP,
 
-    COPIED,
-
-    EDITED,
-
-    REFRESHED
+    WEB
 
 }
