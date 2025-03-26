@@ -14,7 +14,9 @@ import static com.tecknobit.glidercore.ConstantsKt.*;
 @Table(name = USERS_KEY)
 public class GliderUser extends EquinoxUser {
 
-    @ManyToMany
+    @ManyToMany(
+            fetch = FetchType.EAGER
+    )
     @JoinTable(
             name = USER_DEVICES_KEY,
             joinColumns = @JoinColumn(
@@ -27,6 +29,10 @@ public class GliderUser extends EquinoxUser {
             )
     )
     private final List<ConnectedDevice> devices;
+
+    public GliderUser() {
+        this(null, null, null, null, null, null, null, List.of());
+    }
 
     public GliderUser(String id, String token, String name, String surname, String email, String password, String language,
                       List<ConnectedDevice> devices) {

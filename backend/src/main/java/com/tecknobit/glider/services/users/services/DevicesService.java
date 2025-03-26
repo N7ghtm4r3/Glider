@@ -13,15 +13,17 @@ public class DevicesService {
     private DevicesRepository devicesRepository;
 
     public void storeDevice(String userId, Object[] rawDevice) {
-        try {
-            JSONObject device = new JSONObject(rawDevice[0]);
-            ConnectedDevice connectedDevice = new ConnectedDevice(device);
-            System.out.println(connectedDevice.getId());
-            devicesRepository.save(connectedDevice);
-            devicesRepository.attachDeviceToUser(userId, connectedDevice.getId());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        JSONObject device = new JSONObject(rawDevice[0].toString());
+        ConnectedDevice connectedDevice = new ConnectedDevice(device);
+        devicesRepository.save(connectedDevice);
+        devicesRepository.attachDeviceToUser(userId, connectedDevice.getId());
+    }
+
+    public void deleteDeviceIfNotReferenced(ConnectedDevice device) {
+        String deviceId = device.getId();
+        boolean isNotReferenced = devicesRepository.countDeviceReferences(deviceId) == 0;
+        if (isNotReferenced)
+            devicesRepository.deleteById(deviceId);
     }
 
 }

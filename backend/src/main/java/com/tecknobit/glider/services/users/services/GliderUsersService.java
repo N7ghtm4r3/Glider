@@ -1,6 +1,8 @@
 package com.tecknobit.glider.services.users.services;
 
+import com.tecknobit.equinoxbackend.environment.services.users.entity.EquinoxUser;
 import com.tecknobit.equinoxbackend.environment.services.users.service.EquinoxUsersService;
+import com.tecknobit.glider.services.users.entities.ConnectedDevice;
 import com.tecknobit.glider.services.users.entities.GliderUser;
 import com.tecknobit.glider.services.users.repositories.GliderUsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,34 @@ public class GliderUsersService extends EquinoxUsersService<GliderUser, GliderUs
                            String language, Object... custom) throws NoSuchAlgorithmException {
         super.signUpUser(id, token, name, surname, email, password, language);
         devicesService.storeDevice(id, custom);
+    }
+
+    /**
+     * Method to sign in an existing user
+     *
+     * @param email    The email of the user
+     * @param password The password of the user
+     * @param custom   The custom parameters added in a customization of the {@link EquinoxUser}
+     * @return the authenticated user as {@link EquinoxUser} if the credentials inserted were correct
+     */
+    @Override
+    public GliderUser signInUser(String email, String password, Object... custom) throws NoSuchAlgorithmException {
+        GliderUser loggedUser = super.signInUser(email, password);
+        devicesService.storeDevice(loggedUser.getId(), custom);
+        return loggedUser;
+    }
+
+    /**
+     * Method to delete a user
+     *
+     * @param id The identifier of the user to delete
+     */
+    @Override
+    public void deleteUser(String id) {
+        GliderUser user = usersRepository.getReferenceById(id);
+        super.deleteUser(id);
+        for (ConnectedDevice device : user.getDevices())
+            devicesService.deleteDeviceIfNotReferenced(device);
     }
 
 }

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import static com.tecknobit.equinoxbackend.environment.services.builtin.service.EquinoxItemsHelper._WHERE_;
 import static com.tecknobit.glidercore.ConstantsKt.*;
 
 @Repository
@@ -29,6 +30,15 @@ public interface DevicesRepository extends JpaRepository<ConnectedDevice, String
     )
     void attachDeviceToUser(
             @Param(USER_IDENTIFIER_KEY) String userId,
+            @Param(DEVICE_IDENTIFIER_KEY) String deviceId
+    );
+
+    @Query(
+            value = "SELECT COUNT(*) FROM " + USER_DEVICES_KEY +
+                    _WHERE_ + DEVICE_IDENTIFIER_KEY + "=:" + DEVICE_IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    long countDeviceReferences(
             @Param(DEVICE_IDENTIFIER_KEY) String deviceId
     );
 
