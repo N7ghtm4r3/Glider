@@ -159,11 +159,31 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
             @RequestParam(name = PAGE_KEY, defaultValue = DEFAULT_PAGE_HEADER_VALUE, required = false) int page,
             @RequestParam(name = PAGE_SIZE_KEY, defaultValue = DEFAULT_PAGE_SIZE_HEADER_VALUE, required = false) int pageSize,
             @PathVariable(IDENTIFIER_KEY) String userId,
-            @RequestHeader(TOKEN_KEY) String token
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId
     ) {
-        if (!isMe(userId, token))
+        if (!isMe(userId, token) || !me.deviceBelongsToMe(deviceId))
             return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
         return (T) usersService.getPagedDevices(page, pageSize, userId);
+    }
+
+    @DeleteMapping(
+            path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + "/" + DEVICES_KEY + "/{" + DEVICE_IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY,
+                    DEVICE_IDENTIFIER_KEY
+            }
+    )
+    public String disconnectDevice(
+            @PathVariable(IDENTIFIER_KEY) String userId,
+            @PathVariable(DEVICE_IDENTIFIER_KEY) String disconnectingDeviceId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId
+    ) {
+        if (!isMe(userId, token) || !me.deviceBelongsToMe(deviceId) || !me.deviceBelongsToMe(disconnectingDeviceId))
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        usersService.disconnectDevice(userId, disconnectingDeviceId);
+        return successResponse();
     }
 
 }

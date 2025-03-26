@@ -1,5 +1,6 @@
 package com.tecknobit.glider.services.users.services;
 
+import com.tecknobit.equinoxcore.annotations.Wrapper;
 import com.tecknobit.equinoxcore.pagination.PaginatedResponse;
 import com.tecknobit.glider.services.users.dtos.DeviceLastLogin;
 import com.tecknobit.glider.services.users.entities.ConnectedDevice;
@@ -45,8 +46,17 @@ public class DevicesService {
         return new PaginatedResponse<>(devices, page, pageSize, totalDevices);
     }
 
+    public void disconnectDevice(String userId, String deviceId) {
+        devicesRepository.disconnectDevice(userId, deviceId);
+        deleteDeviceIfNotReferenced(deviceId);
+    }
+
+    @Wrapper
     public void deleteDeviceIfNotReferenced(ConnectedDevice device) {
-        String deviceId = device.getId();
+        deleteDeviceIfNotReferenced(device.getId());
+    }
+
+    public void deleteDeviceIfNotReferenced(String deviceId) {
         boolean isNotReferenced = devicesRepository.countDeviceReferences(deviceId) == 0;
         if (isNotReferenced)
             devicesRepository.deleteById(deviceId);

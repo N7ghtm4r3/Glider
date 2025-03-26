@@ -70,6 +70,10 @@ public class GliderUsersService extends EquinoxUsersService<GliderUser, GliderUs
         return devicesService.getDevices(page, pageSize, userId);
     }
 
+    public void disconnectDevice(String userId, String deviceId) {
+        devicesService.disconnectDevice(userId, deviceId);
+    }
+
     /**
      * Method to delete a user
      *

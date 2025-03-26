@@ -2,6 +2,7 @@ package com.tecknobit.glider.services.users.repositories;
 
 import com.tecknobit.glider.services.users.dtos.DeviceLastLogin;
 import com.tecknobit.glider.services.users.entities.ConnectedDevice;
+import com.tecknobit.glidercore.ConstantsKt;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -84,6 +85,19 @@ public interface DevicesRepository extends JpaRepository<ConnectedDevice, String
     List<DeviceLastLogin> getDevices(
             @Param(USER_IDENTIFIER_KEY) String userId,
             Pageable pageable
+    );
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query(
+            value = "DELETE FROM " + USER_DEVICES_KEY +
+                    _WHERE_ + USER_IDENTIFIER_KEY + "=:" + USER_IDENTIFIER_KEY
+                    + " AND " + DEVICE_IDENTIFIER_KEY + "=:" + DEVICE_IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void disconnectDevice(
+            @Param(USER_IDENTIFIER_KEY) String userId,
+            @Param(ConstantsKt.DEVICE_IDENTIFIER_KEY) String deviceId
     );
 
 }
