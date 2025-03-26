@@ -1,5 +1,6 @@
 package com.tecknobit.glider.services.users.controller;
 
+import com.tecknobit.apimanager.annotations.RequestPath;
 import com.tecknobit.equinoxbackend.environment.services.users.controller.EquinoxUsersController;
 import com.tecknobit.equinoxbackend.environment.services.users.entity.EquinoxUser;
 import com.tecknobit.equinoxcore.annotations.CustomParametersOrder;
@@ -7,12 +8,16 @@ import com.tecknobit.equinoxcore.annotations.Validator;
 import com.tecknobit.glider.services.users.entities.GliderUser;
 import com.tecknobit.glider.services.users.repositories.GliderUsersRepository;
 import com.tecknobit.glider.services.users.services.GliderUsersService;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
-import static com.tecknobit.glidercore.ConstantsKt.DEVICE_KEY;
+import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.GET;
+import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.*;
+import static com.tecknobit.equinoxcore.network.EquinoxBaseEndpointsSet.DYNAMIC_ACCOUNT_DATA_ENDPOINT;
+import static com.tecknobit.equinoxcore.pagination.PaginatedResponse.*;
+import static com.tecknobit.glidercore.ConstantsKt.*;
 
 @RestController
 public class GliderUsersController extends EquinoxUsersController<GliderUser, GliderUsersRepository, GliderUsersService> {
@@ -99,6 +104,32 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
     }
 
     /**
+     * Method used to get the dynamic data of the user to correctly update in all the devices where the user is connected
+     *
+     * @param id       The identifier of the user
+     * @param token    The token of the user
+     * @param deviceId The identifier of the device
+     * @return the result of the request as {@link String}
+     */
+    @GetMapping(
+            path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + DYNAMIC_ACCOUNT_DATA_ENDPOINT,
+            headers = {
+                    TOKEN_KEY,
+                    DEVICE_IDENTIFIER_KEY
+            }
+    )
+    @RequestPath(path = "/api/v1/users/{id}/dynamicAccountData", method = GET)
+    public String getDynamicAccountData(
+            @PathVariable(IDENTIFIER_KEY) String id,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId
+    ) {
+        if (!isMe(id, token))
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        return successResponse(usersService.getDynamicAccountData(id));
+    }
+
+    /**
      * {@inheritDoc}
      *
      * @apiNote Endpoint not used
@@ -106,6 +137,23 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
     @Override
     public String changeProfilePic(String id, String token, MultipartFile profilePic) {
         return null;
+    }
+
+    @GetMapping(
+            path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + "/" + DEVICES_KEY,
+            headers = {
+                    TOKEN_KEY
+            }
+    )
+    public <T> T getDevices(
+            @RequestParam(name = PAGE_KEY, defaultValue = DEFAULT_PAGE_HEADER_VALUE, required = false) int page,
+            @RequestParam(name = PAGE_SIZE_KEY, defaultValue = DEFAULT_PAGE_SIZE_HEADER_VALUE, required = false) int pageSize,
+            @PathVariable(IDENTIFIER_KEY) String userId,
+            @RequestHeader(TOKEN_KEY) String token
+    ) {
+        if (!isMe(userId, token))
+            return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        return (T) usersService.getPagedDevices(page, pageSize, userId);
     }
 
 }

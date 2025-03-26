@@ -2,47 +2,46 @@ package com.tecknobit.glider.services.users.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tecknobit.equinoxbackend.environment.services.users.entity.EquinoxUser;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.IDENTIFIER_KEY;
 import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.USERS_KEY;
-import static com.tecknobit.glidercore.ConstantsKt.*;
+import static com.tecknobit.glidercore.ConstantsKt.USER_KEY;
 
 @Entity
 @Table(name = USERS_KEY)
 public class GliderUser extends EquinoxUser {
 
-    @ManyToMany(
-            fetch = FetchType.EAGER
+    @OneToMany(
+            mappedBy = USER_KEY,
+            cascade = CascadeType.ALL
     )
-    @JoinTable(
-            name = USER_DEVICES_KEY,
-            joinColumns = @JoinColumn(
-                    name = USER_IDENTIFIER_KEY,
-                    referencedColumnName = IDENTIFIER_KEY
-            ),
-            inverseJoinColumns = @JoinColumn(
-                    name = DEVICE_IDENTIFIER_KEY,
-                    referencedColumnName = IDENTIFIER_KEY
-            )
-    )
-    private final List<ConnectedDevice> devices;
+    private final List<DeviceUserSession> devices;
 
     public GliderUser() {
         this(null, null, null, null, null, null, null, List.of());
     }
 
     public GliderUser(String id, String token, String name, String surname, String email, String password, String language,
-                      List<ConnectedDevice> devices) {
+                      List<DeviceUserSession> devices) {
         super(id, token, name, surname, email, password, null, language);
         this.devices = devices;
     }
 
     @JsonIgnore
     public List<ConnectedDevice> getDevices() {
-        return devices;
+        ArrayList<ConnectedDevice> connectedDevices = new ArrayList<>();
+        for (DeviceUserSession deviceSession : devices) {
+            ConnectedDevice device = deviceSession.getDevice();
+            device.setLastLogin(device.getLastLogin());
+            connectedDevices.add(device);
+        }
+        return connectedDevices;
     }
 
 }

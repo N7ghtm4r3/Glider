@@ -2,6 +2,18 @@ package com.tecknobit.glidercore
 
 import com.tecknobit.equinoxcore.annotations.FutureEquinoxApi
 
+@FutureEquinoxApi(
+    releaseVersion = "1.10.0",
+    additionalNotes = "Will be integrated in the CommonKeys.kt file"
+)
+const val USER_KEY = "user"
+
+const val DEVICE_SESSION_KEY = "device_session"
+
+const val SESSION_IDENTIFIER_KEY = "session_id"
+
+const val SESSIONS_KEY = "sessions"
+
 const val USER_DEVICES_KEY = "user_devices"
 
 const val DEVICE_KEY = "device"

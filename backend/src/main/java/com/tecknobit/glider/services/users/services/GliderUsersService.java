@@ -2,9 +2,11 @@ package com.tecknobit.glider.services.users.services;
 
 import com.tecknobit.equinoxbackend.environment.services.users.entity.EquinoxUser;
 import com.tecknobit.equinoxbackend.environment.services.users.service.EquinoxUsersService;
+import com.tecknobit.equinoxcore.pagination.PaginatedResponse;
 import com.tecknobit.glider.services.users.entities.ConnectedDevice;
 import com.tecknobit.glider.services.users.entities.GliderUser;
 import com.tecknobit.glider.services.users.repositories.GliderUsersRepository;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,9 +33,13 @@ public class GliderUsersService extends EquinoxUsersService<GliderUser, GliderUs
      */
     @Override
     public void signUpUser(String id, String token, String name, String surname, String email, String password,
-                           String language, Object... custom) throws NoSuchAlgorithmException {
-        super.signUpUser(id, token, name, surname, email, password, language);
-        devicesService.storeDevice(id, custom);
+                           String language, Object... custom) {
+        try {
+            super.signUpUser(id, token, name, surname, email, password, language);
+            devicesService.storeDevice(id, custom);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -49,6 +55,23 @@ public class GliderUsersService extends EquinoxUsersService<GliderUser, GliderUs
         GliderUser loggedUser = super.signInUser(email, password);
         devicesService.storeDevice(loggedUser.getId(), custom);
         return loggedUser;
+    }
+
+    /**
+     * Method used to get the dynamic data of the user to correctly update in all the devices where the user is connected
+     *
+     * @param userId   The identifier of the user
+     * @param deviceId The identifier of the device
+     * @return the dynamic data as {@link JSONObject}
+     */
+    public JSONObject getDynamicAccountData(String userId, String deviceId) {
+        JSONObject deviceData = getDynamicAccountData(userId);
+
+        return deviceData;
+    }
+
+    public PaginatedResponse<ConnectedDevice> getPagedDevices(int page, int pageSize, String userId) {
+        return devicesService.getDevices(page, pageSize, userId);
     }
 
     /**
