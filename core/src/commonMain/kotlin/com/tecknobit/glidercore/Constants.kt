@@ -8,11 +8,7 @@ import com.tecknobit.equinoxcore.annotations.FutureEquinoxApi
 )
 const val USER_KEY = "user"
 
-const val DEVICE_SESSION_KEY = "device_session"
-
 const val SESSION_IDENTIFIER_KEY = "session_id"
-
-const val SESSIONS_KEY = "sessions"
 
 const val USER_DEVICES_KEY = "user_devices"
 

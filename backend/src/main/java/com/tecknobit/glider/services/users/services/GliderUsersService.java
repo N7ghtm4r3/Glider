@@ -3,6 +3,7 @@ package com.tecknobit.glider.services.users.services;
 import com.tecknobit.equinoxbackend.environment.services.users.entity.EquinoxUser;
 import com.tecknobit.equinoxbackend.environment.services.users.service.EquinoxUsersService;
 import com.tecknobit.equinoxcore.pagination.PaginatedResponse;
+import com.tecknobit.glider.helpers.ServerVault;
 import com.tecknobit.glider.services.users.entities.ConnectedDevice;
 import com.tecknobit.glider.services.users.entities.GliderUser;
 import com.tecknobit.glider.services.users.repositories.GliderUsersRepository;
@@ -33,9 +34,15 @@ public class GliderUsersService extends EquinoxUsersService<GliderUser, GliderUs
      */
     @Override
     public void signUpUser(String id, String token, String name, String surname, String email, String password,
-                           String language, Object... custom) throws NoSuchAlgorithmException {
-        super.signUpUser(id, token, name, surname, email, password, language);
-        devicesService.storeDevice(id, custom);
+                           String language, Object... custom) {
+        ServerVault vault = ServerVault.getInstance();
+        try {
+            vault.createUserPrivateKey(token);
+            super.signUpUser(id, token, name, surname, email, password, language);
+            devicesService.storeDevice(id, custom);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

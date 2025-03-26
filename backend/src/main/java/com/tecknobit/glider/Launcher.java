@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import static com.tecknobit.equinoxbackend.resourcesutils.ResourcesProvider.CUSTOM_CONFIGURATION_FILE_PATH;
 import static com.tecknobit.equinoxbackend.resourcesutils.ResourcesProvider.DEFAULT_CONFIGURATION_FILE_PATH;
+import static com.tecknobit.glider.helpers.ServerVault.VAULT_FOLDER;
 
 /**
  * The {@code Launcher} class is useful to launch <b>Glider's backend service</b>
@@ -63,7 +64,8 @@ public class Launcher {
                 "com/tecknobit/glider",
                 " to correctly register a new user in the Glider system ",
                 Launcher.class,
-                args
+                args,
+                VAULT_FOLDER
         );
         SpringApplication.run(Launcher.class, args);
     }
