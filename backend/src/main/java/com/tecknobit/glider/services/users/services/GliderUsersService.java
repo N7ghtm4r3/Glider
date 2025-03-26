@@ -33,13 +33,9 @@ public class GliderUsersService extends EquinoxUsersService<GliderUser, GliderUs
      */
     @Override
     public void signUpUser(String id, String token, String name, String surname, String email, String password,
-                           String language, Object... custom) {
-        try {
-            super.signUpUser(id, token, name, surname, email, password, language);
-            devicesService.storeDevice(id, custom);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                           String language, Object... custom) throws NoSuchAlgorithmException {
+        super.signUpUser(id, token, name, surname, email, password, language);
+        devicesService.storeDevice(id, custom);
     }
 
     /**
@@ -66,7 +62,7 @@ public class GliderUsersService extends EquinoxUsersService<GliderUser, GliderUs
      */
     public JSONObject getDynamicAccountData(String userId, String deviceId) {
         JSONObject deviceData = getDynamicAccountData(userId);
-
+        devicesService.updateLastLogin(userId, deviceId);
         return deviceData;
     }
 

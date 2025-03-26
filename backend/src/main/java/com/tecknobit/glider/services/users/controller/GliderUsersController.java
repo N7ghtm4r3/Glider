@@ -104,6 +104,16 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * @apiNote Endpoint not used
+     */
+    @Override
+    public String getDynamicAccountData(String id, String token) {
+        return null;
+    }
+
+    /**
      * Method used to get the dynamic data of the user to correctly update in all the devices where the user is connected
      *
      * @param id       The identifier of the user
@@ -124,9 +134,9 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
             @RequestHeader(TOKEN_KEY) String token,
             @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId
     ) {
-        if (!isMe(id, token))
+        if (!isMe(id, token) || !me.deviceBelongsToMe(deviceId))
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
-        return successResponse(usersService.getDynamicAccountData(id));
+        return successResponse(usersService.getDynamicAccountData(id, deviceId));
     }
 
     /**

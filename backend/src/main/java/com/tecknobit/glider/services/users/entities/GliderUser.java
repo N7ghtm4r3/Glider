@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.USERS_KEY;
@@ -35,13 +34,17 @@ public class GliderUser extends EquinoxUser {
 
     @JsonIgnore
     public List<ConnectedDevice> getDevices() {
-        ArrayList<ConnectedDevice> connectedDevices = new ArrayList<>();
+        return devices.stream().map(DeviceUserSession::getDevice).toList();
+    }
+
+    @JsonIgnore
+    public boolean deviceBelongsToMe(String deviceId) {
         for (DeviceUserSession deviceSession : devices) {
             ConnectedDevice device = deviceSession.getDevice();
-            device.setLastLogin(device.getLastLogin());
-            connectedDevices.add(device);
+            if (device.getId().equals(deviceId))
+                return true;
         }
-        return connectedDevices;
+        return false;
     }
 
 }
