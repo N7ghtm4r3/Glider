@@ -59,4 +59,12 @@ public class PasswordConfiguration extends EquinoxItem {
         return includeSpecialCharacters;
     }
 
+    public Password getPassword() {
+        return password;
+    }
+
+    public void setPassword(Password password) {
+        this.password = password;
+    }
+
 }

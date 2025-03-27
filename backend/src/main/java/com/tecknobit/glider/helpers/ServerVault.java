@@ -3,6 +3,7 @@ package com.tecknobit.glider.helpers;
 import com.tecknobit.apimanager.apis.APIRequest;
 import com.tecknobit.apimanager.apis.encryption.aes.AESServerCipher;
 import kotlin.Pair;
+import kotlin.Triple;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -48,17 +49,19 @@ public class ServerVault {
         }
     }
 
-    public Pair<String, String> encryptPasswordAndScopes(String token, String password, String scopes) throws Exception {
-        AESServerCipher decipher = getDecipher(token);
+    public Triple<String, String, String> encryptPasswordData(String token, String tail, String password,
+                                                              String scopes) throws Exception {
+        AESServerCipher cipher = getCipherInstance(token);
         if (scopes == null)
-            scopes = "";
-        String encryptedPassword = decipher.encryptBase64(password);
-        String encryptedScopes = decipher.encryptBase64(scopes);
-        return new Pair<>(encryptedPassword, encryptedScopes);
+            scopes = " ";
+        String encryptedTail = cipher.encryptBase64(tail);
+        String encryptedPassword = cipher.encryptBase64(password);
+        String encryptedScopes = cipher.encryptBase64(scopes);
+        return new Triple<>(encryptedTail, encryptedPassword, encryptedScopes);
     }
 
     public Map<String, String> decryptPasswordAndScopes(String token, Map<String, String> passwordsScopes) throws Exception {
-        AESServerCipher decipher = getDecipher(token);
+        AESServerCipher decipher = getCipherInstance(token);
         HashMap<String, String> decryptedPasswordsScopes = new HashMap<>();
         for (String password : passwordsScopes.keySet()) {
             String encryptedScopes = passwordsScopes.get(password);
@@ -70,13 +73,13 @@ public class ServerVault {
     }
 
     public Pair<String, String> decryptPasswordAndScopes(String token, String password, String scopes) throws Exception {
-        AESServerCipher decipher = getDecipher(token);
+        AESServerCipher decipher = getCipherInstance(token);
         String decryptedPassword = decipher.decryptBase64(password);
         String decryptedScopes = decipher.decryptBase64(scopes);
         return new Pair<>(decryptedPassword, decryptedScopes);
     }
 
-    private AESServerCipher getDecipher(String token) throws Exception {
+    private AESServerCipher getCipherInstance(String token) throws Exception {
         Pair<String, String> keySlices = retrievePrivateKey(token);
         return new AESServerCipher(keySlices.getFirst(), keySlices.getSecond(), CTR_ALGORITHM);
     }

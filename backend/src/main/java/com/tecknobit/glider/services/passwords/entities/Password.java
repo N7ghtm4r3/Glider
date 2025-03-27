@@ -23,7 +23,8 @@ public class Password extends EquinoxItem {
     private final long creationDate;
 
     @Column(
-            length = TAIL_MAX_LENGTH
+            length = TAIL_MAX_LENGTH,
+            unique = true
     )
     private final String tail;
 
@@ -44,7 +45,7 @@ public class Password extends EquinoxItem {
 
     @ManyToOne
     @OnDelete(action = CASCADE)
-    private GliderUser user;
+    private final GliderUser user;
 
     @OneToOne(
             mappedBy = PASSWORD_KEY,
@@ -53,11 +54,16 @@ public class Password extends EquinoxItem {
     private final PasswordConfiguration configuration;
 
     public Password() {
-        this(null, -1, null, null, null, null, List.of(), null);
+        this(null, -1, null, null, null, null, List.of(), null, null);
     }
 
     public Password(String id, long creationDate, String tail, String password, String scopes, PasswordType type,
-                    List<PasswordEvent> events, PasswordConfiguration configuration) {
+                    PasswordConfiguration configuration, GliderUser user) {
+        this(id, creationDate, tail, password, scopes, type, List.of(), configuration, user);
+    }
+
+    public Password(String id, long creationDate, String tail, String password, String scopes, PasswordType type,
+                    List<PasswordEvent> events, PasswordConfiguration configuration, GliderUser user) {
         super(id);
         this.creationDate = creationDate;
         this.tail = tail;
@@ -66,6 +72,7 @@ public class Password extends EquinoxItem {
         this.type = type;
         this.events = events;
         this.configuration = configuration;
+        this.user = user;
     }
 
     @JsonGetter(CREATION_DATE_KEY)
@@ -96,6 +103,11 @@ public class Password extends EquinoxItem {
     @JsonIgnore
     public PasswordConfiguration getConfiguration() {
         return configuration;
+    }
+
+    @JsonIgnore
+    public GliderUser getUser() {
+        return user;
     }
 
 }
