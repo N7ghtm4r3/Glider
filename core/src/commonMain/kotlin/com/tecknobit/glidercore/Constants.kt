@@ -28,9 +28,15 @@ const val USER_IDENTIFIER_KEY = "user_id"
 
 const val DEVICE_IDENTIFIER_KEY = "device_id"
 
+const val PASSWODS_KEY = "passwords"
+
+const val PASSWOD_KEY = "password"
+
 const val TAIL_KEY = "tail"
 
 const val SCOPES_KEY = "scopes"
+
+const val PASSWORD_EVENTS_KEY = "password_events"
 
 @FutureEquinoxApi(
     releaseVersion = "1.10.0",

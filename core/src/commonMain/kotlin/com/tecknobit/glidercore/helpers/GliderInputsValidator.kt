@@ -5,9 +5,9 @@ import com.tecknobit.equinoxcore.helpers.InputsValidator
 
 object GliderInputsValidator : InputsValidator() {
 
-    private const val TAIL_MAX_LENGTH = 30
+    const val TAIL_MAX_LENGTH = 30
 
-    private const val SCOPES_MAX_LENGTH = 50
+    const val SCOPES_MAX_LENGTH = 50
 
     @Validator
     fun tailIsValid(

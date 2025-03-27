@@ -2,6 +2,7 @@ package com.tecknobit.glider.services.users.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tecknobit.equinoxbackend.environment.services.users.entity.EquinoxUser;
+import com.tecknobit.glider.services.passwords.entities.Password;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -22,14 +23,22 @@ public class GliderUser extends EquinoxUser {
     )
     private final List<DeviceUserSession> devices;
 
+    @OneToMany(
+            mappedBy = USER_KEY,
+            cascade = CascadeType.ALL
+    )
+    private final List<Password> passwords;
+
     public GliderUser() {
-        this(null, null, null, null, null, null, null, List.of());
+        this(null, null, null, null, null, null, null, List.of(),
+                List.of());
     }
 
     public GliderUser(String id, String token, String name, String surname, String email, String password, String language,
-                      List<DeviceUserSession> devices) {
+                      List<DeviceUserSession> devices, List<Password> passwords) {
         super(id, token, name, surname, email, password, null, language);
         this.devices = devices;
+        this.passwords = passwords;
     }
 
     @JsonIgnore
@@ -45,6 +54,10 @@ public class GliderUser extends EquinoxUser {
                 return true;
         }
         return false;
+    }
+
+    public List<Password> getPasswords() {
+        return passwords;
     }
 
 }
