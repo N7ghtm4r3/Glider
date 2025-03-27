@@ -1,5 +1,8 @@
 package com.tecknobit.glider.services.passwords.helpers;
 
+import com.tecknobit.equinoxcore.annotations.Wrapper;
+import com.tecknobit.glider.services.passwords.entities.PasswordConfiguration;
+
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +40,12 @@ public class PasswordGenerator {
     private static final int BASE_OFFSET = 26;
 
     private PasswordGenerator() {
+    }
+
+    @Wrapper
+    public String generatePassword(PasswordConfiguration configuration) {
+        return generatePassword(configuration.getLength(), configuration.includeNumbers(),
+                configuration.includeUppercaseLetters(), configuration.includeSpecialCharacters());
     }
 
     public String generatePassword(int length, boolean includeNumbers, boolean includeUppercaseLetters,

@@ -6,4 +6,6 @@ object GliderEndpointsSet : EquinoxBaseEndpointsSet() {
 
     const val KEYCHAIN_ENDPOINT = "/keychain"
 
+    const val REFRESH_ENDPOINT = "/refresh"
+
 }

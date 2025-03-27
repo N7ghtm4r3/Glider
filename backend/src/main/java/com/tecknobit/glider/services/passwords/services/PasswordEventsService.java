@@ -38,6 +38,11 @@ public class PasswordEventsService {
     }
 
     @Wrapper
+    public void registerRefreshedPasswordEvent(Password password) {
+        registerPasswordEvent(password, REFRESHED);
+    }
+
+    @Wrapper
     private void registerPasswordEvent(Password password, PasswordEventType type) {
         registerPasswordEvent(password, System.currentTimeMillis(), type);
     }

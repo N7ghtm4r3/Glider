@@ -144,8 +144,22 @@ public class PasswordsService {
         eventsService.registerCopiedPasswordEvent(password);
     }
 
+    public void refreshGeneratedPassword(String passwordId) {
+        Password password = findPasswordById(passwordId);
+        if (password.getType() == INSERTED)
+            throw new IllegalStateException("Wrong password type");
+        PasswordGenerator generator = PasswordGenerator.getInstance();
+        String refreshedPassword = generator.generatePassword(password.getConfiguration());
+        passwordsRepository.refreshPassword(refreshedPassword, passwordId);
+        eventsService.registerRefreshedPasswordEvent(password);
+    }
+
     private Password findPasswordById(String passwordId) {
         return passwordsRepository.getReferenceById(passwordId);
+    }
+
+    public void deletePassword(String passwordId) {
+        passwordsRepository.deletePassword(passwordId);
     }
 
 }

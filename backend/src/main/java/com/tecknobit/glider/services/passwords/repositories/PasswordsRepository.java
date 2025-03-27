@@ -75,4 +75,27 @@ public interface PasswordsRepository extends JpaRepository<Password, String> {
             Pageable pageable
     );
 
+    @Modifying
+    @Transactional
+    @Query(
+            value = "UPDATE " + PASSWORDS_KEY + " SET " +
+                    PASSWORD_KEY + "=:" + PASSWORD_KEY +
+                    _WHERE_ + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void refreshPassword(
+            @Param(PASSWORD_KEY) String password,
+            @Param(IDENTIFIER_KEY) String passwordId
+    );
+
+    @Modifying
+    @Transactional
+    @Query(
+            value = "DELETE FROM " + PASSWORDS_KEY + _WHERE_ + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void deletePassword(
+            @Param(IDENTIFIER_KEY) String passwordId
+    );
+
 }

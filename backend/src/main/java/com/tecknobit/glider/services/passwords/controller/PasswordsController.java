@@ -15,6 +15,7 @@ import static com.tecknobit.equinoxcore.network.EquinoxBaseEndpointsSet.BASE_EQU
 import static com.tecknobit.equinoxcore.pagination.PaginatedResponse.*;
 import static com.tecknobit.glidercore.ConstantsKt.*;
 import static com.tecknobit.glidercore.helpers.GliderEndpointsSet.KEYCHAIN_ENDPOINT;
+import static com.tecknobit.glidercore.helpers.GliderEndpointsSet.REFRESH_ENDPOINT;
 import static com.tecknobit.glidercore.helpers.GliderInputsValidator.INSTANCE;
 
 @RestController
@@ -193,6 +194,48 @@ public class PasswordsController extends DefaultGliderController {
         if (!validPasswordRequest(userId, token, deviceId, passwordId))
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
         passwordsService.notifyCopiedPassword(passwordId);
+        return successResponse();
+    }
+
+    @PatchMapping(
+            path = "/{" + PASSWORD_IDENTIFIER_KEY + "}" + REFRESH_ENDPOINT,
+            headers = {
+                    TOKEN_KEY,
+                    DEVICE_IDENTIFIER_KEY
+            }
+    )
+    public String refreshGeneratedPassword(
+            @PathVariable(IDENTIFIER_KEY) String userId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId,
+            @PathVariable(PASSWORD_IDENTIFIER_KEY) String passwordId
+    ) {
+        if (!validPasswordRequest(userId, token, deviceId, passwordId))
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        try {
+            passwordsService.refreshGeneratedPassword(passwordId);
+            return successResponse();
+        } catch (IllegalStateException e) {
+            return failedResponse(WRONG_PROCEDURE_MESSAGE);
+        }
+    }
+
+    @DeleteMapping(
+            path = "/{" + PASSWORD_IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY,
+                    DEVICE_IDENTIFIER_KEY
+            }
+    )
+    public String deletePassword(
+            @PathVariable(IDENTIFIER_KEY) String userId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId,
+            @PathVariable(PASSWORD_IDENTIFIER_KEY) String passwordId
+    ) {
+        if (!validPasswordRequest(userId, token, deviceId, passwordId))
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        passwordsService.deletePassword(passwordId);
         return successResponse();
     }
 
