@@ -56,6 +56,14 @@ public class GliderUser extends EquinoxUser {
         return false;
     }
 
+    @JsonIgnore
+    public boolean passwordBelongsToMe(String passwordId) {
+        for (Password password : passwords)
+            if (password.getId().equals(passwordId))
+                return true;
+        return false;
+    }
+
     public List<Password> getPasswords() {
         return passwords;
     }

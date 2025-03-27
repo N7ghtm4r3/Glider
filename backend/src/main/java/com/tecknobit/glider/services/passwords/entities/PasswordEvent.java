@@ -25,16 +25,17 @@ public class PasswordEvent extends EquinoxItem {
             cascade = CascadeType.ALL
     )
     @OnDelete(action = CASCADE)
-    private Password password;
+    private final Password password;
 
     public PasswordEvent() {
-        this(null, -1, null);
+        this(null, -1, null, null);
     }
 
-    public PasswordEvent(String id, long eventDate, PasswordEventType type) {
+    public PasswordEvent(String id, long eventDate, PasswordEventType type, Password password) {
         super(id);
         this.eventDate = eventDate;
         this.type = type;
+        this.password = password;
     }
 
     @JsonGetter(EVENT_DATE_KEY)
@@ -44,6 +45,10 @@ public class PasswordEvent extends EquinoxItem {
 
     public PasswordEventType getType() {
         return type;
+    }
+
+    public Password getPassword() {
+        return password;
     }
 
 }

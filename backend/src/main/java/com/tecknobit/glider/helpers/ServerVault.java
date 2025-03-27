@@ -60,6 +60,15 @@ public class ServerVault {
         return new Triple<>(encryptedTail, encryptedPassword, encryptedScopes);
     }
 
+    public Pair<String, String> encryptPasswordData(String token, String tail, String scopes) throws Exception {
+        AESServerCipher cipher = getCipherInstance(token);
+        if (scopes == null)
+            scopes = " ";
+        String encryptedTail = cipher.encryptBase64(tail);
+        String encryptedScopes = cipher.encryptBase64(scopes);
+        return new Pair<>(encryptedTail, encryptedScopes);
+    }
+
     public Map<String, String> decryptPasswordAndScopes(String token, Map<String, String> passwordsScopes) throws Exception {
         AESServerCipher decipher = getCipherInstance(token);
         HashMap<String, String> decryptedPasswordsScopes = new HashMap<>();
