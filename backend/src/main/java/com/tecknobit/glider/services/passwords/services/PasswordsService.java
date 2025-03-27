@@ -139,6 +139,11 @@ public class PasswordsService {
         return filteredPasswords;
     }
 
+    public void notifyCopiedPassword(String passwordId) {
+        Password password = findPasswordById(passwordId);
+        eventsService.registerCopiedPasswordEvent(password);
+    }
+
     private Password findPasswordById(String passwordId) {
         return passwordsRepository.getReferenceById(passwordId);
     }

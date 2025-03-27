@@ -177,6 +177,25 @@ public class PasswordsController extends DefaultGliderController {
         }
     }
 
+    @PutMapping(
+            path = "/{" + PASSWORD_IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY,
+                    DEVICE_IDENTIFIER_KEY
+            }
+    )
+    public String notifyCopiedPassword(
+            @PathVariable(IDENTIFIER_KEY) String userId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId,
+            @PathVariable(PASSWORD_IDENTIFIER_KEY) String passwordId
+    ) {
+        if (!validPasswordRequest(userId, token, deviceId, passwordId))
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        passwordsService.notifyCopiedPassword(passwordId);
+        return successResponse();
+    }
+
     @Validator
     private boolean validPasswordRequest(String userId, String token, String deviceId, String passwordId) {
         boolean validRequester = validRequester(userId, token, deviceId);

@@ -29,7 +29,12 @@ public class PasswordEventsService {
 
     @Wrapper
     public void registerEditPasswordEvent(Password password) {
-        registerPasswordEvent(password, System.currentTimeMillis(), EDITED);
+        registerPasswordEvent(password, EDITED);
+    }
+
+    @Wrapper
+    public void registerCopiedPasswordEvent(Password password) {
+        registerPasswordEvent(password, COPIED);
     }
 
     @Wrapper
