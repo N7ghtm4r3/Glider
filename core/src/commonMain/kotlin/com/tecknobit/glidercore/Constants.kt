@@ -22,7 +22,7 @@ const val MODEL_KEY = "model"
 
 const val BROWSER_KEY = "browser"
 
-const val DEVICE_TYPE_KEY = "type"
+const val TYPE_KEY = "type"
 
 const val USER_IDENTIFIER_KEY = "user_id"
 

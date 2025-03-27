@@ -7,11 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Set;
 
 import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.*;
 import static com.tecknobit.equinoxcore.helpers.InputsValidator.Companion;
 import static com.tecknobit.equinoxcore.network.EquinoxBaseEndpointsSet.BASE_EQUINOX_ENDPOINT;
+import static com.tecknobit.equinoxcore.pagination.PaginatedResponse.*;
 import static com.tecknobit.glidercore.ConstantsKt.*;
+import static com.tecknobit.glidercore.helpers.GliderEndpointsSet.KEYCHAIN_ENDPOINT;
 import static com.tecknobit.glidercore.helpers.GliderInputsValidator.INSTANCE;
 
 @RestController
@@ -125,6 +128,53 @@ public class PasswordsController extends DefaultGliderController {
             return failedResponse(WRONG_PROCEDURE_MESSAGE);
         }
         return successResponse();
+    }
+
+    @GetMapping(
+            path = "/{" + PASSWORD_IDENTIFIER_KEY + "}",
+            headers = {
+                    TOKEN_KEY,
+                    DEVICE_IDENTIFIER_KEY
+            }
+    )
+    public <T> T getPassword(
+            @PathVariable(IDENTIFIER_KEY) String userId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId,
+            @PathVariable(PASSWORD_IDENTIFIER_KEY) String passwordId
+    ) {
+        if (!validPasswordRequest(userId, token, deviceId, passwordId))
+            return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        try {
+            return (T) successResponse(passwordsService.getPassword(token, passwordId));
+        } catch (Exception e) {
+            return (T) failedResponse(WRONG_PROCEDURE_MESSAGE);
+        }
+    }
+
+    @GetMapping(
+            path = KEYCHAIN_ENDPOINT,
+            headers = {
+                    TOKEN_KEY,
+                    DEVICE_IDENTIFIER_KEY
+            }
+    )
+    public <T> T getKeychain(
+            @PathVariable(IDENTIFIER_KEY) String userId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId,
+            @RequestParam(name = PAGE_KEY, defaultValue = DEFAULT_PAGE_HEADER_VALUE, required = false) int page,
+            @RequestParam(name = PAGE_SIZE_KEY, defaultValue = DEFAULT_PAGE_SIZE_HEADER_VALUE, required = false) int pageSize,
+            @RequestParam(name = KEYWORDS_KEY, defaultValue = "", required = false) Set<String> keywords,
+            @RequestParam(name = TYPE_KEY, defaultValue = "GENERATED, INSERTED", required = false) Set<String> types
+    ) {
+        if (!validRequester(userId, token, deviceId))
+            return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        try {
+            return (T) successResponse(passwordsService.getKeychain(userId, token, page, pageSize, keywords, types));
+        } catch (Exception e) {
+            return (T) failedResponse(WRONG_PROCEDURE_MESSAGE);
+        }
     }
 
     @Validator

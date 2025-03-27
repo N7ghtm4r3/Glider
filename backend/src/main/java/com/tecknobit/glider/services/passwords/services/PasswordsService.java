@@ -3,7 +3,9 @@ package com.tecknobit.glider.services.passwords.services;
 import com.tecknobit.apimanager.formatters.JsonHelper;
 import com.tecknobit.equinoxcore.annotations.Returner;
 import com.tecknobit.equinoxcore.annotations.Wrapper;
+import com.tecknobit.equinoxcore.pagination.PaginatedResponse;
 import com.tecknobit.glider.helpers.ServerVault;
+import com.tecknobit.glider.services.passwords.dtos.PasswordMask;
 import com.tecknobit.glider.services.passwords.entities.Password;
 import com.tecknobit.glider.services.passwords.entities.PasswordConfiguration;
 import com.tecknobit.glider.services.passwords.helpers.PasswordGenerator;
@@ -13,7 +15,12 @@ import com.tecknobit.glidercore.enums.PasswordType;
 import kotlin.Pair;
 import kotlin.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import static com.tecknobit.equinoxbackend.environment.services.builtin.controller.EquinoxController.generateIdentifier;
 import static com.tecknobit.equinoxcore.helpers.InputsValidator.Companion;
@@ -107,7 +114,32 @@ public class PasswordsService {
                 encryptedData.getThird(), passwordId);
     }
 
-    public Password findPasswordById(String passwordId) {
+    public PasswordMask getPassword(String token, String passwordId) throws Exception {
+        Password password = findPasswordById(passwordId);
+        ServerVault vault = ServerVault.getInstance();
+        vault.decryptPassword(token, password);
+        return new PasswordMask(password);
+    }
+
+    public PaginatedResponse<Password> getKeychain(String userId, String token, int page, int pageSize,
+                                                   Set<String> keywords, Set<String> types) throws Exception {
+        List<Password> passwords = passwordsRepository.getPasswords(userId, types, PageRequest.of(page, pageSize));
+        ServerVault vault = ServerVault.getInstance();
+        vault.decryptPasswords(token, passwords);
+        passwords = filterPasswords(passwords, keywords);
+        long totalPasswords = passwordsRepository.countPasswords(userId, types) - passwords.size();
+        return new PaginatedResponse<>(passwords, page, pageSize, totalPasswords);
+    }
+
+    private List<Password> filterPasswords(List<Password> passwords, Set<String> keywords) {
+        List<Password> filteredPasswords = new ArrayList<>();
+        for (Password password : passwords)
+            if (keywords.isEmpty() || (keywords.contains(password.getTail()) || password.scopesMatch(keywords)))
+                filteredPasswords.add(password);
+        return filteredPasswords;
+    }
+
+    private Password findPasswordById(String passwordId) {
         return passwordsRepository.getReferenceById(passwordId);
     }
 

@@ -52,7 +52,7 @@ public class ConnectedDevice extends EquinoxItem {
         brand = hItem.getString(BRAND_KEY);
         model = hItem.getString(MODEL_KEY);
         browser = hItem.getString(BROWSER_KEY);
-        type = ConnectedDeviceType.valueOf(hItem.getString(DEVICE_TYPE_KEY, ConnectedDeviceType.MOBILE.name()));
+        type = ConnectedDeviceType.valueOf(hItem.getString(TYPE_KEY, ConnectedDeviceType.MOBILE.name()));
     }
 
     public String getBrand() {

@@ -2,14 +2,19 @@ package com.tecknobit.glider.services.passwords.entities;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.equinoxbackend.environment.services.builtin.entity.EquinoxItem;
 import com.tecknobit.glider.services.users.entities.GliderUser;
 import com.tecknobit.glidercore.enums.PasswordType;
 import jakarta.persistence.*;
+import kotlin.Triple;
 import org.hibernate.annotations.OnDelete;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import static com.tecknobit.equinoxbackend.environment.services.builtin.service.EquinoxItemsHelper.COMMA;
 import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.PASSWORD_KEY;
 import static com.tecknobit.glidercore.ConstantsKt.*;
 import static jakarta.persistence.EnumType.STRING;
@@ -23,13 +28,13 @@ public class Password extends EquinoxItem {
     private final long creationDate;
 
     @Column(unique = true)
-    private final String tail;
+    private String tail;
 
     @Column
-    private final String password;
+    private String password;
 
     @Column
-    private final String scopes;
+    private String scopes;
 
     @Enumerated(value = STRING)
     private final PasswordType type;
@@ -38,6 +43,7 @@ public class Password extends EquinoxItem {
             mappedBy = PASSWORD_KEY
     )
     @OrderBy(EVENT_DATE_KEY + " DESC")
+    @JsonIgnoreProperties(PASSWORD_KEY)
     private final List<PasswordEvent> events;
 
     @ManyToOne
@@ -89,6 +95,13 @@ public class Password extends EquinoxItem {
         return scopes;
     }
 
+    @JsonIgnore
+    public void setDecryptedData(Triple<String, String, String> encryptedData) {
+        tail = encryptedData.getFirst();
+        scopes = encryptedData.getSecond();
+        password = encryptedData.getThird();
+    }
+
     public PasswordType getType() {
         return type;
     }
@@ -105,6 +118,11 @@ public class Password extends EquinoxItem {
     @JsonIgnore
     public GliderUser getUser() {
         return user;
+    }
+
+    public boolean scopesMatch(Set<String> keywords) {
+        Set<String> scopesSet = new HashSet<>(List.of(scopes.split(COMMA)));
+        return keywords.stream().anyMatch(scopesSet::contains);
     }
 
 }

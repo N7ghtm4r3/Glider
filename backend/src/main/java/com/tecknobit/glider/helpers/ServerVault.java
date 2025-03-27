@@ -2,6 +2,9 @@ package com.tecknobit.glider.helpers;
 
 import com.tecknobit.apimanager.apis.APIRequest;
 import com.tecknobit.apimanager.apis.encryption.aes.AESServerCipher;
+import com.tecknobit.equinoxcore.annotations.Wrapper;
+import com.tecknobit.glider.services.passwords.entities.Password;
+import com.tecknobit.glidercore.enums.PasswordType;
 import kotlin.Pair;
 import kotlin.Triple;
 
@@ -10,8 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import static com.tecknobit.apimanager.apis.APIRequest.SHA256_ALGORITHM;
 import static com.tecknobit.apimanager.apis.encryption.BaseCipher.Algorithm.CTR_ALGORITHM;
@@ -69,23 +71,24 @@ public class ServerVault {
         return new Pair<>(encryptedTail, encryptedScopes);
     }
 
-    public Map<String, String> decryptPasswordAndScopes(String token, Map<String, String> passwordsScopes) throws Exception {
+    public void decryptPasswords(String token, List<Password> passwords) throws Exception {
         AESServerCipher decipher = getCipherInstance(token);
-        HashMap<String, String> decryptedPasswordsScopes = new HashMap<>();
-        for (String password : passwordsScopes.keySet()) {
-            String encryptedScopes = passwordsScopes.get(password);
-            String decryptedPassword = decipher.decryptBase64(password);
-            String decryptedScopes = decipher.decryptBase64(encryptedScopes);
-            decryptedPasswordsScopes.put(decryptedPassword, decryptedScopes);
-        }
-        return decryptedPasswordsScopes;
+        for (Password password : passwords)
+            decryptPassword(decipher, password, true);
     }
 
-    public Pair<String, String> decryptPasswordAndScopes(String token, String password, String scopes) throws Exception {
-        AESServerCipher decipher = getCipherInstance(token);
-        String decryptedPassword = decipher.decryptBase64(password);
-        String decryptedScopes = decipher.decryptBase64(scopes);
-        return new Pair<>(decryptedPassword, decryptedScopes);
+    @Wrapper
+    public void decryptPassword(String token, Password password) throws Exception {
+        decryptPassword(getCipherInstance(token), password, false);
+    }
+
+    private void decryptPassword(AESServerCipher decipher, Password password, boolean bypassType) throws Exception {
+        String decryptedTail = decipher.decryptBase64(password.getTail());
+        String decryptedScopes = decipher.decryptBase64(password.getScopes());
+        String decryptedPassword = null;
+        if (bypassType || password.getType() == PasswordType.INSERTED)
+            decryptedPassword = decipher.decryptBase64(password.getPassword());
+        password.setDecryptedData(new Triple<>(decryptedTail, decryptedScopes, decryptedPassword));
     }
 
     private AESServerCipher getCipherInstance(String token) throws Exception {

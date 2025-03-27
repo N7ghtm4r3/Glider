@@ -1,6 +1,7 @@
 package com.tecknobit.glider.services.passwords.entities;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tecknobit.equinoxbackend.environment.services.builtin.entity.EquinoxItem;
 import com.tecknobit.glidercore.enums.PasswordEventType;
 import jakarta.persistence.*;
@@ -25,6 +26,7 @@ public class PasswordEvent extends EquinoxItem {
             cascade = CascadeType.ALL
     )
     @OnDelete(action = CASCADE)
+    @JsonIgnoreProperties(PASSWORD_EVENTS_KEY)
     private final Password password;
 
     public PasswordEvent() {
