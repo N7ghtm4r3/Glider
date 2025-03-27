@@ -1,20 +1,25 @@
 package com.tecknobit.glider.services.passwords.services;
 
 import com.tecknobit.apimanager.formatters.JsonHelper;
+import com.tecknobit.equinoxcore.annotations.Returner;
+import com.tecknobit.equinoxcore.annotations.Wrapper;
 import com.tecknobit.glider.helpers.ServerVault;
 import com.tecknobit.glider.services.passwords.entities.Password;
 import com.tecknobit.glider.services.passwords.entities.PasswordConfiguration;
 import com.tecknobit.glider.services.passwords.helpers.PasswordGenerator;
 import com.tecknobit.glider.services.passwords.repositories.PasswordsRepository;
 import com.tecknobit.glider.services.users.entities.GliderUser;
+import com.tecknobit.glidercore.enums.PasswordType;
 import kotlin.Pair;
 import kotlin.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.tecknobit.equinoxbackend.environment.services.builtin.controller.EquinoxController.generateIdentifier;
+import static com.tecknobit.equinoxcore.helpers.InputsValidator.Companion;
 import static com.tecknobit.glidercore.ConstantsKt.*;
 import static com.tecknobit.glidercore.enums.PasswordType.GENERATED;
+import static com.tecknobit.glidercore.enums.PasswordType.INSERTED;
 
 @Service
 public class PasswordsService {
@@ -33,7 +38,6 @@ public class PasswordsService {
         PasswordGenerator generator = PasswordGenerator.getInstance();
         String password = generator.generatePassword(length, includeNumbers, includeUppercaseLetters,
                 includeSpecialCharacters);
-        Triple<String, String, String> passwordData = cypherPasswordData(token, tail, password, scopes);
         PasswordConfiguration configuration = new PasswordConfiguration(
                 generateIdentifier(),
                 length,
@@ -42,33 +46,65 @@ public class PasswordsService {
                 includeSpecialCharacters
         );
         long generationDate = System.currentTimeMillis();
-        Password generatedPassword = new Password(
-                generateIdentifier(),
-                generationDate,
-                passwordData.getFirst(),
-                passwordData.getSecond(),
-                passwordData.getThird(),
-                GENERATED,
-                configuration,
-                user
-        );
-        configuration.setPassword(generatedPassword);
+        Password generatedPassword = loadPasswordEntity(token, tail, scopes, password, generationDate, GENERATED,
+                configuration, user);
         passwordsRepository.save(generatedPassword);
         eventsService.registerGeneratedPasswordEvent(generatedPassword, generationDate);
     }
 
-    public void editGeneratedPassword(String passwordId, String token, String tail, String scopes) throws Exception {
+    public void insertPassword(GliderUser user, String token, String tail, String scopes, String password) throws Exception {
+        long insertionDate = System.currentTimeMillis();
+        Password insertedPassword = loadPasswordEntity(token, tail, scopes, password, insertionDate, INSERTED, null, user);
+        passwordsRepository.save(insertedPassword);
+        eventsService.registerInsertedPasswordEvent(insertedPassword, insertionDate);
+    }
+
+    @Returner
+    private Password loadPasswordEntity(String token, String tail, String scopes, String password, long currentDate,
+                                        PasswordType type, PasswordConfiguration configuration,
+                                        GliderUser user) throws Exception {
+        ServerVault vault = ServerVault.getInstance();
+        Triple<String, String, String> passwordData = vault.encryptPasswordData(token, tail, password, scopes);
+        Password passwordEntity = new Password(
+                generateIdentifier(),
+                currentDate,
+                passwordData.getFirst(),
+                passwordData.getSecond(),
+                passwordData.getThird(),
+                type,
+                configuration,
+                user
+        );
+        if (configuration != null)
+            configuration.setPassword(passwordEntity);
+        return passwordEntity;
+    }
+
+    @Wrapper
+    public void editPassword(String token, String passwordId, String tail, String scopes, String password) throws Exception {
+        Password storedPassword = findPasswordById(passwordId);
+        if (storedPassword.getType() == GENERATED)
+            editGeneratedPassword(token, passwordId, tail, scopes);
+        else {
+            if (!Companion.isPasswordValid(password))
+                throw new IllegalStateException("Wrong password value");
+            editInsertedPassword(token, passwordId, tail, scopes, password);
+        }
+        eventsService.registerEditPasswordEvent(storedPassword);
+    }
+
+    private void editGeneratedPassword(String token, String passwordId, String tail, String scopes) throws Exception {
         ServerVault vault = ServerVault.getInstance();
         Pair<String, String> encryptedData = vault.encryptPasswordData(token, tail, scopes);
         passwordsRepository.editGeneratedPassword(encryptedData.getFirst(), encryptedData.getSecond(), passwordId);
-        Password password = findPasswordById(passwordId);
-        eventsService.registerEditGeneratedPasswordEvent(password);
     }
 
-    private Triple<String, String, String> cypherPasswordData(String token, String tail, String password,
-                                                              String scopes) throws Exception {
+    private void editInsertedPassword(String token, String passwordId, String tail, String scopes,
+                                      String password) throws Exception {
         ServerVault vault = ServerVault.getInstance();
-        return vault.encryptPasswordData(token, tail, password, scopes);
+        Triple<String, String, String> encryptedData = vault.encryptPasswordData(token, tail, scopes, password);
+        passwordsRepository.editInsertedPassword(encryptedData.getFirst(), encryptedData.getSecond(),
+                encryptedData.getThird(), passwordId);
     }
 
     public Password findPasswordById(String passwordId) {

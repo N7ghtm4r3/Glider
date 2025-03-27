@@ -20,7 +20,7 @@ object GliderInputsValidator : InputsValidator() {
     fun scopesAreValid(
         scopes: String?,
     ): Boolean {
-        return scopes!!.length <= SCOPES_MAX_LENGTH
+        return scopes == null || scopes.length <= SCOPES_MAX_LENGTH
     }
 
     @Validator

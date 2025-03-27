@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.*;
+import static com.tecknobit.equinoxcore.helpers.InputsValidator.Companion;
 import static com.tecknobit.equinoxcore.network.EquinoxBaseEndpointsSet.BASE_EQUINOX_ENDPOINT;
 import static com.tecknobit.glidercore.ConstantsKt.*;
 import static com.tecknobit.glidercore.helpers.GliderInputsValidator.INSTANCE;
@@ -62,6 +63,38 @@ public class PasswordsController extends DefaultGliderController {
         return successResponse();
     }
 
+    @PostMapping(
+            headers = {
+                    TOKEN_KEY,
+                    DEVICE_IDENTIFIER_KEY
+            }
+    )
+    public String insertPassword(
+            @PathVariable(IDENTIFIER_KEY) String userId,
+            @RequestHeader(TOKEN_KEY) String token,
+            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId,
+            @RequestBody Map<String, Object> payload
+    ) {
+        if (!validRequester(userId, token, deviceId))
+            return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
+        loadJsonHelper(payload);
+        String tail = jsonHelper.getString(TAIL_KEY);
+        if (!INSTANCE.tailIsValid(tail))
+            return failedResponse(WRONG_TAIL_MESSAGE);
+        String scopes = jsonHelper.getString(SCOPES_KEY);
+        if (!INSTANCE.scopesAreValid(scopes))
+            return failedResponse(WRONG_SCOPES_MESSAGE);
+        String password = jsonHelper.getString(PASSWORD_KEY);
+        if (!Companion.isPasswordValid(password))
+            return failedResponse(WRONG_PASSWORD_MESSAGE);
+        try {
+            passwordsService.insertPassword(me, token, tail, scopes, password);
+        } catch (Exception e) {
+            return failedResponse(WRONG_PROCEDURE_MESSAGE);
+        }
+        return successResponse();
+    }
+
     @PatchMapping(
             path = "/{" + PASSWORD_IDENTIFIER_KEY + "}",
             headers = {
@@ -69,7 +102,7 @@ public class PasswordsController extends DefaultGliderController {
                     DEVICE_IDENTIFIER_KEY
             }
     )
-    public String editGeneratedPassword(
+    public String editPassword(
             @PathVariable(IDENTIFIER_KEY) String userId,
             @RequestHeader(TOKEN_KEY) String token,
             @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId,
@@ -85,8 +118,9 @@ public class PasswordsController extends DefaultGliderController {
         String scopes = jsonHelper.getString(SCOPES_KEY);
         if (!INSTANCE.scopesAreValid(scopes))
             return failedResponse(WRONG_SCOPES_MESSAGE);
+        String password = jsonHelper.getString(PASSWORD_KEY);
         try {
-            passwordsService.editGeneratedPassword(passwordId, token, tail, scopes);
+            passwordsService.editPassword(token, passwordId, tail, scopes, password);
         } catch (Exception e) {
             return failedResponse(WRONG_PROCEDURE_MESSAGE);
         }

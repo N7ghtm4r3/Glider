@@ -3,15 +3,12 @@ package com.tecknobit.glider.services.users.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tecknobit.equinoxbackend.environment.services.users.entity.EquinoxUser;
 import com.tecknobit.glider.services.passwords.entities.Password;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.List;
 
 import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.USERS_KEY;
-import static com.tecknobit.glidercore.ConstantsKt.USER_KEY;
+import static com.tecknobit.glidercore.ConstantsKt.*;
 
 @Entity
 @Table(name = USERS_KEY)
@@ -21,12 +18,14 @@ public class GliderUser extends EquinoxUser {
             mappedBy = USER_KEY,
             cascade = CascadeType.ALL
     )
+    @OrderBy(LAST_LOGIN_KEY + " DESC")
     private final List<DeviceUserSession> devices;
 
     @OneToMany(
             mappedBy = USER_KEY,
             cascade = CascadeType.ALL
     )
+    @OrderBy(CREATION_DATE_KEY + " DESC")
     private final List<Password> passwords;
 
     public GliderUser() {

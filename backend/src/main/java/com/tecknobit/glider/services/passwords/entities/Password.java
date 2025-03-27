@@ -10,8 +10,8 @@ import org.hibernate.annotations.OnDelete;
 
 import java.util.List;
 
+import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.PASSWORD_KEY;
 import static com.tecknobit.glidercore.ConstantsKt.*;
-import static com.tecknobit.glidercore.helpers.GliderInputsValidator.TAIL_MAX_LENGTH;
 import static jakarta.persistence.EnumType.STRING;
 import static org.hibernate.annotations.OnDeleteAction.CASCADE;
 
@@ -22,10 +22,7 @@ public class Password extends EquinoxItem {
     @Column(name = CREATION_DATE_KEY)
     private final long creationDate;
 
-    @Column(
-            length = TAIL_MAX_LENGTH,
-            unique = true
-    )
+    @Column(unique = true)
     private final String tail;
 
     @Column
@@ -38,9 +35,9 @@ public class Password extends EquinoxItem {
     private final PasswordType type;
 
     @OneToMany(
-            mappedBy = PASSWORD_KEY,
-            cascade = CascadeType.ALL
+            mappedBy = PASSWORD_KEY
     )
+    @OrderBy(EVENT_DATE_KEY + " DESC")
     private final List<PasswordEvent> events;
 
     @ManyToOne

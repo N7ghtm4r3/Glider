@@ -9,8 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.tecknobit.equinoxbackend.environment.services.builtin.controller.EquinoxController.generateIdentifier;
-import static com.tecknobit.glidercore.enums.PasswordEventType.EDITED;
-import static com.tecknobit.glidercore.enums.PasswordEventType.GENERATED;
+import static com.tecknobit.glidercore.enums.PasswordEventType.*;
 
 @Service
 public class PasswordEventsService {
@@ -24,7 +23,12 @@ public class PasswordEventsService {
     }
 
     @Wrapper
-    public void registerEditGeneratedPasswordEvent(Password password) {
+    public void registerInsertedPasswordEvent(Password password, long insertionDate) {
+        registerPasswordEvent(password, insertionDate, INSERTED);
+    }
+
+    @Wrapper
+    public void registerEditPasswordEvent(Password password) {
         registerPasswordEvent(password, System.currentTimeMillis(), EDITED);
     }
 

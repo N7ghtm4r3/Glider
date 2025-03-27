@@ -10,12 +10,13 @@ import org.springframework.stereotype.Repository;
 
 import static com.tecknobit.equinoxbackend.environment.services.builtin.service.EquinoxItemsHelper._WHERE_;
 import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.IDENTIFIER_KEY;
+import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.PASSWORD_KEY;
 import static com.tecknobit.glidercore.ConstantsKt.*;
 
 @Repository
 public interface PasswordsRepository extends JpaRepository<Password, String> {
 
-    @Modifying(clearAutomatically = true)
+    @Modifying
     @Transactional
     @Query(
             value = "UPDATE " + PASSWORDS_KEY + " SET " +
@@ -27,6 +28,23 @@ public interface PasswordsRepository extends JpaRepository<Password, String> {
     void editGeneratedPassword(
             @Param(TAIL_KEY) String tail,
             @Param(SCOPES_KEY) String scopes,
+            @Param(IDENTIFIER_KEY) String passwordId
+    );
+
+    @Modifying
+    @Transactional
+    @Query(
+            value = "UPDATE " + PASSWORDS_KEY + " SET " +
+                    TAIL_KEY + "=:" + TAIL_KEY + "," +
+                    SCOPES_KEY + "=:" + SCOPES_KEY + "," +
+                    PASSWORD_KEY + "=:" + PASSWORD_KEY +
+                    _WHERE_ + IDENTIFIER_KEY + "=:" + IDENTIFIER_KEY,
+            nativeQuery = true
+    )
+    void editInsertedPassword(
+            @Param(TAIL_KEY) String tail,
+            @Param(SCOPES_KEY) String scopes,
+            @Param(PASSWORD_KEY) String password,
             @Param(IDENTIFIER_KEY) String passwordId
     );
 

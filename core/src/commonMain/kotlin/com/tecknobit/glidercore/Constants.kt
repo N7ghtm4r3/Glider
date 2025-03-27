@@ -30,8 +30,6 @@ const val DEVICE_IDENTIFIER_KEY = "device_id"
 
 const val PASSWORDS_KEY = "passwords"
 
-const val PASSWORD_KEY = "password"
-
 const val PASSWORD_IDENTIFIER_KEY = "password_id"
 
 const val PASSWORD_CONFIGURATIONS_KEY = "password_configurations"
