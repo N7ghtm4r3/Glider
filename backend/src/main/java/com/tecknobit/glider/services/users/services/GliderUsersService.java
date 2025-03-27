@@ -90,6 +90,8 @@ public class GliderUsersService extends EquinoxUsersService<GliderUser, GliderUs
     public void deleteUser(String id) {
         GliderUser user = usersRepository.getReferenceById(id);
         super.deleteUser(id);
+        ServerVault vault = ServerVault.getInstance();
+        vault.deleteLockBox(user.getToken());
         for (ConnectedDevice device : user.getDevices())
             devicesService.deleteDeviceIfNotReferenced(device);
     }

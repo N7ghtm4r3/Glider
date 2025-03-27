@@ -5,6 +5,7 @@ import com.tecknobit.apimanager.apis.encryption.aes.AESServerCipher;
 import kotlin.Pair;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.security.NoSuchAlgorithmException;
@@ -86,6 +87,16 @@ public class ServerVault {
         String[] rawData = bufferedReader.readLine().split(COMMA);
         bufferedReader.close();
         return new Pair<>(rawData[0], rawData[1]);
+    }
+
+    public boolean deleteLockBox(String token) {
+        String lockBoxPathname;
+        try {
+            lockBoxPathname = computeLockBoxPathName(token);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        return new File(lockBoxPathname).delete();
     }
 
     private String computeLockBoxPathName(String token) throws NoSuchAlgorithmException {

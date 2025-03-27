@@ -28,9 +28,11 @@ const val USER_IDENTIFIER_KEY = "user_id"
 
 const val DEVICE_IDENTIFIER_KEY = "device_id"
 
-const val PASSWODS_KEY = "passwords"
+const val PASSWORDS_KEY = "passwords"
 
-const val PASSWOD_KEY = "password"
+const val PASSWORD_KEY = "password"
+
+const val PASSWORD_CONFIGURATIONS_KEY = "password_configurations"
 
 const val TAIL_KEY = "tail"
 

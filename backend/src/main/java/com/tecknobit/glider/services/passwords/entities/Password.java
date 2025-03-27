@@ -1,6 +1,7 @@
 package com.tecknobit.glider.services.passwords.entities;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tecknobit.equinoxbackend.environment.services.builtin.entity.EquinoxItem;
 import com.tecknobit.glider.services.users.entities.GliderUser;
 import com.tecknobit.glidercore.enums.PasswordType;
@@ -9,15 +10,13 @@ import org.hibernate.annotations.OnDelete;
 
 import java.util.List;
 
-import static com.tecknobit.equinoxcore.helpers.InputsValidator.PASSWORD_MAX_LENGTH;
 import static com.tecknobit.glidercore.ConstantsKt.*;
-import static com.tecknobit.glidercore.helpers.GliderInputsValidator.SCOPES_MAX_LENGTH;
 import static com.tecknobit.glidercore.helpers.GliderInputsValidator.TAIL_MAX_LENGTH;
 import static jakarta.persistence.EnumType.STRING;
 import static org.hibernate.annotations.OnDeleteAction.CASCADE;
 
 @Entity
-@Table(name = PASSWODS_KEY)
+@Table(name = PASSWORDS_KEY)
 public class Password extends EquinoxItem {
 
     @Column(name = CREATION_DATE_KEY)
@@ -28,21 +27,17 @@ public class Password extends EquinoxItem {
     )
     private final String tail;
 
-    @Column(
-            length = PASSWORD_MAX_LENGTH
-    )
+    @Column
     private final String password;
 
-    @Column(
-            length = SCOPES_MAX_LENGTH
-    )
+    @Column
     private final String scopes;
 
     @Enumerated(value = STRING)
     private final PasswordType type;
 
     @OneToMany(
-            mappedBy = PASSWOD_KEY,
+            mappedBy = PASSWORD_KEY,
             cascade = CascadeType.ALL
     )
     private final List<PasswordEvent> events;
@@ -51,12 +46,18 @@ public class Password extends EquinoxItem {
     @OnDelete(action = CASCADE)
     private GliderUser user;
 
+    @OneToOne(
+            mappedBy = PASSWORD_KEY,
+            cascade = CascadeType.ALL
+    )
+    private final PasswordConfiguration configuration;
+
     public Password() {
-        this(null, -1, null, null, null, null, List.of());
+        this(null, -1, null, null, null, null, List.of(), null);
     }
 
     public Password(String id, long creationDate, String tail, String password, String scopes, PasswordType type,
-                    List<PasswordEvent> events) {
+                    List<PasswordEvent> events, PasswordConfiguration configuration) {
         super(id);
         this.creationDate = creationDate;
         this.tail = tail;
@@ -64,6 +65,7 @@ public class Password extends EquinoxItem {
         this.scopes = scopes;
         this.type = type;
         this.events = events;
+        this.configuration = configuration;
     }
 
     @JsonGetter(CREATION_DATE_KEY)
@@ -89,6 +91,11 @@ public class Password extends EquinoxItem {
 
     public List<PasswordEvent> getEvents() {
         return events;
+    }
+
+    @JsonIgnore
+    public PasswordConfiguration getConfiguration() {
+        return configuration;
     }
 
 }
