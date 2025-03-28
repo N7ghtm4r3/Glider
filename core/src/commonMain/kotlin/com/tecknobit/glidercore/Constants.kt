@@ -34,7 +34,7 @@ const val PASSWORD_IDENTIFIER_KEY = "password_id"
 
 const val PASSWORD_CONFIGURATIONS_KEY = "password_configurations"
 
-const val PASSWORD_LENGTH = "length"
+const val PASSWORD_LENGTH_KEY = "length"
 
 const val TAIL_KEY = "tail"
 

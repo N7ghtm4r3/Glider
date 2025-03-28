@@ -56,15 +56,14 @@ public class PasswordsController extends DefaultGliderController {
         String scopes = jsonHelper.getString(SCOPES_KEY);
         if (!INSTANCE.scopesAreValid(scopes))
             return failedResponse(WRONG_SCOPES_MESSAGE);
-        int length = jsonHelper.getInt(PASSWORD_LENGTH);
+        int length = jsonHelper.getInt(PASSWORD_LENGTH_KEY);
         if (!INSTANCE.passwordLengthValid(length))
             return failedResponse(WRONG_PASSWORD_MESSAGE);
         try {
-            passwordsService.generatePassword(me, token, tail, scopes, length, jsonHelper);
+            return successResponse(passwordsService.generatePassword(me, token, tail, scopes, length, jsonHelper));
         } catch (Exception e) {
             return failedResponse(WRONG_PROCEDURE_MESSAGE);
         }
-        return successResponse();
     }
 
     @PostMapping(

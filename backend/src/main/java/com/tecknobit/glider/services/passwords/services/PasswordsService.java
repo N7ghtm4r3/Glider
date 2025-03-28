@@ -37,7 +37,7 @@ public class PasswordsService {
     @Autowired
     private PasswordEventsService eventsService;
 
-    public void generatePassword(GliderUser user, String token, String tail, String scopes, int length,
+    public String generatePassword(GliderUser user, String token, String tail, String scopes, int length,
                                  JsonHelper hResponse) throws Exception {
         boolean includeNumbers = hResponse.getBoolean(INCLUDE_NUMBERS_KEY, true);
         boolean includeUppercaseLetters = hResponse.getBoolean(INCLUDE_UPPERCASE_LETTERS_KEY, true);
@@ -57,6 +57,7 @@ public class PasswordsService {
                 configuration, user);
         passwordsRepository.save(generatedPassword);
         eventsService.registerGeneratedPasswordEvent(generatedPassword, generationDate);
+        return password;
     }
 
     public void insertPassword(GliderUser user, String token, String tail, String scopes, String password) throws Exception {
