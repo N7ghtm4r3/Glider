@@ -13,11 +13,23 @@ import org.springframework.stereotype.Service;
 
 import java.security.NoSuchAlgorithmException;
 
+import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.PROFILE_PIC_KEY;
+
 @Service
 public class GliderUsersService extends EquinoxUsersService<GliderUser, GliderUsersRepository> {
 
     @Autowired
     private DevicesService devicesService;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JSONObject getDynamicAccountData(String userId) {
+        JSONObject dynamicData = super.getDynamicAccountData(userId);
+        dynamicData.remove(PROFILE_PIC_KEY);
+        return dynamicData;
+    }
 
     /**
      * Method to sign up a new user in the system
