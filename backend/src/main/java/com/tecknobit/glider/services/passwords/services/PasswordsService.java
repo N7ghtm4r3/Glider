@@ -134,10 +134,16 @@ public class PasswordsService {
 
     private List<Password> filterPasswords(List<Password> passwords, Set<String> keywords) {
         List<Password> filteredPasswords = new ArrayList<>();
-        for (Password password : passwords)
-            if (keywords.isEmpty() || (keywords.contains(password.getTail()) || password.scopesMatch(keywords)))
+        for (Password password : passwords) {
+            String tail = password.getTail().toLowerCase();
+            if (keywords.isEmpty() || (tailMatches(keywords, tail) || password.scopesMatch(keywords)))
                 filteredPasswords.add(password);
+        }
         return filteredPasswords;
+    }
+
+    private boolean tailMatches(Set<String> keywords, String tail) {
+        return !keywords.stream().filter(keyword -> tail.contains(keyword.toLowerCase())).toList().isEmpty();
     }
 
     public void notifyCopiedPassword(String passwordId) {

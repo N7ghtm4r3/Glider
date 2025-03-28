@@ -121,8 +121,12 @@ public class Password extends EquinoxItem {
     }
 
     public boolean scopesMatch(Set<String> keywords) {
-        Set<String> scopesSet = new HashSet<>(List.of(scopes.split(COMMA)));
-        return keywords.stream().anyMatch(scopesSet::contains);
+        Set<String> scopesSet = new HashSet<>(List.of(scopes.toLowerCase().split(COMMA)));
+        for (String scope : scopesSet)
+            for (String keyword : keywords)
+                if (scope.contains(keyword))
+                    return true;
+        return false;
     }
 
 }

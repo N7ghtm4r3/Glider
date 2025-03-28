@@ -153,7 +153,7 @@ public class PasswordsController extends DefaultGliderController {
     }
 
     @GetMapping(
-            path = KEYCHAIN_ENDPOINT,
+            path = "/" + KEYCHAIN_ENDPOINT,
             headers = {
                     TOKEN_KEY,
                     DEVICE_IDENTIFIER_KEY
@@ -197,7 +197,7 @@ public class PasswordsController extends DefaultGliderController {
     }
 
     @PatchMapping(
-            path = "/{" + PASSWORD_IDENTIFIER_KEY + "}" + REFRESH_ENDPOINT,
+            path = "/{" + PASSWORD_IDENTIFIER_KEY + "}/" + REFRESH_ENDPOINT,
             headers = {
                     TOKEN_KEY,
                     DEVICE_IDENTIFIER_KEY
