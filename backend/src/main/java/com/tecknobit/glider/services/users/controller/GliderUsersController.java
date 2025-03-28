@@ -164,7 +164,7 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
     ) {
         if (!isMe(userId, token) || !me.deviceBelongsToMe(deviceId))
             return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
-        return (T) usersService.getPagedDevices(page, pageSize, userId);
+        return (T) successResponse(usersService.getPagedDevices(page, pageSize, userId));
     }
 
     @DeleteMapping(

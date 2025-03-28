@@ -65,7 +65,7 @@ public interface DevicesRepository extends JpaRepository<ConnectedDevice, String
     );
 
     @Query(
-            value = "SELECT COUNT(*) FROM " + USER_DEVICES_KEY +
+            value = "SELECT DISTINCT COUNT(*) FROM " + USER_DEVICES_KEY +
                     _WHERE_ + USER_IDENTIFIER_KEY + "=:" + USER_IDENTIFIER_KEY,
             nativeQuery = true
     )
@@ -74,7 +74,7 @@ public interface DevicesRepository extends JpaRepository<ConnectedDevice, String
     );
 
     @Query(
-            value = "SELECT new com.tecknobit.glider.services.users.dtos.DeviceLastLogin(" +
+            value = "SELECT DISTINCT new com.tecknobit.glider.services.users.dtos.DeviceLastLogin(" +
                     "d," +
                     "ud." + "lastLogin" +
                     ") FROM com.tecknobit.glider.services.users.entities.ConnectedDevice d" +
