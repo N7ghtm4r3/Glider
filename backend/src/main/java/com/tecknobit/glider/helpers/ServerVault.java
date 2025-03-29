@@ -62,6 +62,11 @@ public class ServerVault {
         return new Triple<>(encryptedTail, encryptedPassword, encryptedScopes);
     }
 
+    public String encryptPassword(String token, String password) throws Exception {
+        AESServerCipher cipher = getCipherInstance(token);
+        return cipher.encryptBase64(password);
+    }
+
     public Pair<String, String> encryptPasswordData(String token, String tail, String scopes) throws Exception {
         AESServerCipher cipher = getCipherInstance(token);
         if (scopes == null)

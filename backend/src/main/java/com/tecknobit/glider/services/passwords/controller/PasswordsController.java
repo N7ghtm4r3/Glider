@@ -197,7 +197,7 @@ public class PasswordsController extends DefaultGliderController {
     }
 
     @PatchMapping(
-            path = "/{" + PASSWORD_IDENTIFIER_KEY + "}/" + REFRESH_ENDPOINT,
+            path = "/{" + PASSWORD_IDENTIFIER_KEY + "}" + REFRESH_ENDPOINT,
             headers = {
                     TOKEN_KEY,
                     DEVICE_IDENTIFIER_KEY
@@ -212,9 +212,8 @@ public class PasswordsController extends DefaultGliderController {
         if (!validPasswordRequest(userId, token, deviceId, passwordId))
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
         try {
-            passwordsService.refreshGeneratedPassword(passwordId);
-            return successResponse();
-        } catch (IllegalStateException e) {
+            return successResponse(passwordsService.refreshGeneratedPassword(token, passwordId));
+        } catch (Exception e) {
             return failedResponse(WRONG_PROCEDURE_MESSAGE);
         }
     }

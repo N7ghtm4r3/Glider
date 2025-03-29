@@ -151,14 +151,17 @@ public class PasswordsService {
         eventsService.registerCopiedPasswordEvent(password);
     }
 
-    public void refreshGeneratedPassword(String passwordId) {
+    public String refreshGeneratedPassword(String token, String passwordId) throws Exception {
         Password password = findPasswordById(passwordId);
         if (password.getType() == INSERTED)
             throw new IllegalStateException("Wrong password type");
         PasswordGenerator generator = PasswordGenerator.getInstance();
         String refreshedPassword = generator.generatePassword(password.getConfiguration());
-        passwordsRepository.refreshPassword(refreshedPassword, passwordId);
+        ServerVault vault = ServerVault.getInstance();
+        String encryptedPassword = vault.encryptPassword(token, refreshedPassword);
+        passwordsRepository.refreshPassword(encryptedPassword, passwordId);
         eventsService.registerRefreshedPasswordEvent(password);
+        return refreshedPassword;
     }
 
     private Password findPasswordById(String passwordId) {

@@ -57,3 +57,5 @@ const val INCLUDE_UPPERCASE_LETTERS_KEY = "include_uppercase_letters"
 const val INCLUDE_SPECIAL_CHARACTERS_KEY = "include_special_characters"
 
 const val LAST_LOGIN_KEY = "last_login"
+
+const val EVENTS_KEY = "events"
