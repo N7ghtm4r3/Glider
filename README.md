@@ -58,7 +58,7 @@ dependencies {
 ### Clients
 
 - [Android](https://play.google.com/store/apps/details?id=com.tecknobit.glider)
-- [Glider desktop version](https://github.com/N7ghtm4r3/Glider-Clients/releases/tag/1.1.1)
+- [Glider desktop version](https://github.com/N7ghtm4r3/Glider-Clients/releases/tag/2.0.0)
 - iOS -> source code available, but cannot distribute due
   missing [Apple Developer Program license](https://developer.apple.com/programs/)
 - [Glider webapp version](https://github.com/N7ghtm4r3/Glider-WebApp)
