@@ -139,6 +139,7 @@ public class PasswordsService {
             if (keywords.isEmpty() || (tailMatches(keywords, tail) || password.scopesMatch(keywords)))
                 filteredPasswords.add(password);
         }
+        filteredPasswords.sort((o1, o2) -> Math.toIntExact(o2.getCreationDate() - o1.getCreationDate()));
         return filteredPasswords;
     }
 
