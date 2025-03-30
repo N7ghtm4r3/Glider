@@ -2,6 +2,7 @@ package com.tecknobit.glider.services.users.services;
 
 import com.tecknobit.equinoxbackend.environment.services.users.entity.EquinoxUser;
 import com.tecknobit.equinoxbackend.environment.services.users.service.EquinoxUsersService;
+import com.tecknobit.equinoxbackend.resourcesutils.ResourcesManager;
 import com.tecknobit.equinoxcore.pagination.PaginatedResponse;
 import com.tecknobit.glider.helpers.ServerVault;
 import com.tecknobit.glider.services.users.entities.ConnectedDevice;
@@ -15,9 +16,19 @@ import java.security.NoSuchAlgorithmException;
 
 import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.PROFILE_PIC_KEY;
 
+/**
+ * The {@code GliderUsersService} class is useful to manage all the user database operations
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see ResourcesManager
+ * @see EquinoxUsersService
+ */
 @Service
 public class GliderUsersService extends EquinoxUsersService<GliderUser, GliderUsersRepository> {
 
+    /**
+     * {@code devicesService} instance used to manage the database operations for the devices
+     */
     @Autowired
     private DevicesService devicesService;
 
@@ -85,10 +96,24 @@ public class GliderUsersService extends EquinoxUsersService<GliderUser, GliderUs
         return deviceData;
     }
 
+    /**
+     * Method used to retrieve the devices owned by the user
+     *
+     * @param page     The page requested
+     * @param pageSize The size of the items to insert in the page
+     * @param userId   The identifier of the user
+     * @return the devices owned by the user as {@link PaginatedResponse} as {@link ConnectedDevice}
+     */
     public PaginatedResponse<ConnectedDevice> getPagedDevices(int page, int pageSize, String userId) {
         return devicesService.getDevices(page, pageSize, userId);
     }
 
+    /**
+     * Method used to disconnect a device from the session
+     *
+     * @param userId   The identifier of the user
+     * @param deviceId The identifier of the device
+     */
     public void disconnectDevice(String userId, String deviceId) {
         devicesService.disconnectDevice(userId, deviceId);
     }

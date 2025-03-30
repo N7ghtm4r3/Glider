@@ -1,6 +1,7 @@
 package com.tecknobit.glider.services.users.controller;
 
 import com.tecknobit.apimanager.annotations.RequestPath;
+import com.tecknobit.equinoxbackend.environment.services.builtin.controller.EquinoxController;
 import com.tecknobit.equinoxbackend.environment.services.users.controller.EquinoxUsersController;
 import com.tecknobit.equinoxbackend.environment.services.users.entity.EquinoxUser;
 import com.tecknobit.equinoxcore.annotations.CustomParametersOrder;
@@ -13,12 +14,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
+import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.DELETE;
 import static com.tecknobit.apimanager.apis.APIRequest.RequestMethod.GET;
 import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.*;
 import static com.tecknobit.equinoxcore.network.EquinoxBaseEndpointsSet.DYNAMIC_ACCOUNT_DATA_ENDPOINT;
 import static com.tecknobit.equinoxcore.pagination.PaginatedResponse.*;
 import static com.tecknobit.glidercore.ConstantsKt.*;
 
+/**
+ * The {@code GliderUsersController} class is useful to manage all the user operations
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see EquinoxController
+ * @see EquinoxUsersController
+ */
 @RestController
 public class GliderUsersController extends EquinoxUsersController<GliderUser, GliderUsersRepository, GliderUsersService> {
 
@@ -95,7 +104,14 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
         return validateDeviceData(custom);
     }
 
+    /**
+     * Method used to validate the data of the device where the user trying to authenticate
+     *
+     * @param custom The custom parameters from retrieve the device data
+     * @return whether the device data are valid as {@link String}, null if they are, error message otherwise
+     */
     @Validator
+    @CustomParametersOrder(order = DEVICE_KEY)
     private String validateDeviceData(Object... custom) {
         String deviceData = (String) custom[0];
         if (deviceData == null)
@@ -149,24 +165,45 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
         return null;
     }
 
+    /**
+     * Method to get the connected device of the user
+     *
+     * @param userId   The identifier of the user
+     * @param token    The token of the user
+     * @param deviceId The identifier of the device of the user
+     * @param page     The page requested
+     * @param pageSize The size of the items to insert in the page
+     * @return the result of the request as {@link T}
+     */
     @GetMapping(
             path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + "/" + DEVICES_KEY,
             headers = {
                     TOKEN_KEY
             }
     )
+    @RequestPath(path = "/api/v1/users/{id}/devices", method = GET)
     public <T> T getDevices(
-            @RequestParam(name = PAGE_KEY, defaultValue = DEFAULT_PAGE_HEADER_VALUE, required = false) int page,
-            @RequestParam(name = PAGE_SIZE_KEY, defaultValue = DEFAULT_PAGE_SIZE_HEADER_VALUE, required = false) int pageSize,
             @PathVariable(IDENTIFIER_KEY) String userId,
             @RequestHeader(TOKEN_KEY) String token,
-            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId
+            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId,
+            @RequestParam(name = PAGE_KEY, defaultValue = DEFAULT_PAGE_HEADER_VALUE, required = false) int page,
+            @RequestParam(name = PAGE_SIZE_KEY, defaultValue = DEFAULT_PAGE_SIZE_HEADER_VALUE, required = false) int pageSize
     ) {
         if (!isMe(userId, token) || !me.deviceBelongsToMe(deviceId))
             return (T) failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
         return (T) successResponse(usersService.getPagedDevices(page, pageSize, userId));
     }
 
+    /**
+     * Method to disconnect a device from the current session
+     *
+     * @param userId The identifier of the user
+     * @param disconnectingDeviceId The identifier of the device to disconnect
+     * @param token The token of the user
+     * @param deviceId The identifier of the device of the user
+     *
+     * @return the result of the request as {@link String}
+     */
     @DeleteMapping(
             path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + "/" + DEVICES_KEY + "/{" + DEVICE_IDENTIFIER_KEY + "}",
             headers = {
@@ -174,6 +211,7 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
                     DEVICE_IDENTIFIER_KEY
             }
     )
+    @RequestPath(path = "/api/v1/users/{id}/devices/{device_id}", method = DELETE)
     public String disconnectDevice(
             @PathVariable(IDENTIFIER_KEY) String userId,
             @PathVariable(DEVICE_IDENTIFIER_KEY) String disconnectingDeviceId,

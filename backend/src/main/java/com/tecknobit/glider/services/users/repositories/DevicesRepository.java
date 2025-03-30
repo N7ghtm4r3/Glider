@@ -17,9 +17,23 @@ import static com.tecknobit.equinoxbackend.environment.services.builtin.service.
 import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.IDENTIFIER_KEY;
 import static com.tecknobit.glidercore.ConstantsKt.*;
 
+/**
+ * The {@code DevicesRepository} interface is useful to manage the queries for the devices operations
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see JpaRepository
+ * @see ConnectedDevice
+ */
 @Repository
 public interface DevicesRepository extends JpaRepository<ConnectedDevice, String> {
 
+    /**
+     * Query used to attach a device to a user
+     *
+     * @param sessionId The identifier of the session
+     * @param userId    The identifier of the user
+     * @param deviceId  The identifier of the device
+     */
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query(
@@ -40,6 +54,12 @@ public interface DevicesRepository extends JpaRepository<ConnectedDevice, String
             @Param(DEVICE_IDENTIFIER_KEY) String deviceId
     );
 
+    /**
+     * Query used to count the total references of the device between sessions
+     *
+     * @param deviceId The identifier of the device
+     * @return the total references as {@code long}
+     */
     @Query(
             value = "SELECT COUNT(*) FROM " + USER_DEVICES_KEY +
                     _WHERE_ + DEVICE_IDENTIFIER_KEY + "=:" + DEVICE_IDENTIFIER_KEY,
@@ -49,6 +69,13 @@ public interface DevicesRepository extends JpaRepository<ConnectedDevice, String
             @Param(DEVICE_IDENTIFIER_KEY) String deviceId
     );
 
+    /**
+     * Query used to update the last login by a device in the specified session
+     *
+     * @param userId The identifier of the user
+     * @param deviceId The identifier of the device
+     * @param lastLogin The last login timestamp
+     */
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query(
@@ -64,6 +91,12 @@ public interface DevicesRepository extends JpaRepository<ConnectedDevice, String
             @Param(LAST_LOGIN_KEY) long lastLogin
     );
 
+    /**
+     * Query used to count the total devices owned by a user
+     *
+     * @param userId The identifier of the user
+     * @return the total devices as {@code long}
+     */
     @Query(
             value = "SELECT DISTINCT COUNT(*) FROM " + USER_DEVICES_KEY +
                     _WHERE_ + USER_IDENTIFIER_KEY + "=:" + USER_IDENTIFIER_KEY,
@@ -73,6 +106,14 @@ public interface DevicesRepository extends JpaRepository<ConnectedDevice, String
             @Param(USER_IDENTIFIER_KEY) String userId
     );
 
+    /**
+     * Query used to retrieve all the devices owned by the user
+     *
+     * @param userId The identifier of the user
+     * @param pageable The parameters to paginate the query
+     *
+     * @return the devices owned by the user as {@link List} of {@link DeviceLastLogin}
+     */
     @Query(
             value = "SELECT DISTINCT new com.tecknobit.glider.services.users.dtos.DeviceLastLogin(" +
                     "d," +
@@ -87,6 +128,12 @@ public interface DevicesRepository extends JpaRepository<ConnectedDevice, String
             Pageable pageable
     );
 
+    /**
+     * Query used to disconnect a device from the session
+     *
+     * @param userId The identifier of the user
+     * @param deviceId The identifier of the device
+     */
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query(
