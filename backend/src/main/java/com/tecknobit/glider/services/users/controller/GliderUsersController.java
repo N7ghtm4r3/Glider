@@ -166,7 +166,7 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
     }
 
     /**
-     * Method to get the connected device of the user
+     * Endpoint used to get the connected device of the user
      *
      * @param userId   The identifier of the user
      * @param token    The token of the user
@@ -195,7 +195,7 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
     }
 
     /**
-     * Method to disconnect a device from the current session
+     * Endpoint used to disconnect a device from the current session
      *
      * @param userId The identifier of the user
      * @param disconnectingDeviceId The identifier of the device to disconnect
