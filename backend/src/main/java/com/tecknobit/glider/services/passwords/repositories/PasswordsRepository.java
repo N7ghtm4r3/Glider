@@ -1,6 +1,7 @@
 package com.tecknobit.glider.services.passwords.repositories;
 
 import com.tecknobit.glider.services.passwords.entities.Password;
+import com.tecknobit.glidercore.enums.PasswordType;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,9 +18,23 @@ import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.IDENTIFIER_KEY;
 import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.PASSWORD_KEY;
 import static com.tecknobit.glidercore.ConstantsKt.*;
 
+/**
+ * The {@code PasswordsRepository} interface is useful to manage the queries for the passwords operations
+ *
+ * @author N7ghtm4r3 - Tecknobit
+ * @see JpaRepository
+ * @see Password
+ */
 @Repository
 public interface PasswordsRepository extends JpaRepository<Password, String> {
 
+    /**
+     * Query used to edit a {@link PasswordType#GENERATED} password
+     *
+     * @param tail       The tail of the password
+     * @param scopes     The scopes of the password
+     * @param passwordId The identifier of the password
+     */
     @Modifying
     @Transactional
     @Query(
@@ -35,6 +50,14 @@ public interface PasswordsRepository extends JpaRepository<Password, String> {
             @Param(IDENTIFIER_KEY) String passwordId
     );
 
+    /**
+     * Query used to edit a {@link PasswordType#INSERTED} password
+     *
+     * @param tail The tail of the password
+     * @param scopes The scopes of the password
+     * @param password The password value
+     * @param passwordId The identifier of the password
+     */
     @Modifying
     @Transactional
     @Query(
@@ -52,6 +75,14 @@ public interface PasswordsRepository extends JpaRepository<Password, String> {
             @Param(IDENTIFIER_KEY) String passwordId
     );
 
+    /**
+     * Query used to count the total passwords
+     *
+     * @param userId The identifier of the user
+     * @param types The types of the passwords to include in the count
+     *
+     * @return the total passwords as {@code long}
+     */
     @Query(
             value = "SELECT COUNT(*) FROM " + PASSWORDS_KEY +
                     _WHERE_ + USER_IDENTIFIER_KEY + "=:" + USER_IDENTIFIER_KEY +
@@ -63,6 +94,15 @@ public interface PasswordsRepository extends JpaRepository<Password, String> {
             @Param(TYPE_KEY) Set<String> types
     );
 
+    /**
+     * Query used to retrieve the passwords of the user
+     *
+     * @param userId The identifier of the user
+     * @param types The types of the passwords to include in the count
+     * @param pageable The parameters to paginate the query
+     *
+     * @return the passwords of the user as {@link List} of {@link Password}
+     */
     @Query(
             value = "SELECT * FROM " + PASSWORDS_KEY +
                     _WHERE_ + USER_IDENTIFIER_KEY + "=:" + USER_IDENTIFIER_KEY +
@@ -75,6 +115,12 @@ public interface PasswordsRepository extends JpaRepository<Password, String> {
             Pageable pageable
     );
 
+    /**
+     * Query used to refresh a {@link PasswordType#GENERATED} password
+     *
+     * @param password The value of the refreshed password
+     * @param passwordId The identifier of the password
+     */
     @Modifying
     @Transactional
     @Query(
@@ -88,6 +134,11 @@ public interface PasswordsRepository extends JpaRepository<Password, String> {
             @Param(IDENTIFIER_KEY) String passwordId
     );
 
+    /**
+     * Query used to delete a password
+     *
+     * @param passwordId The identifier of the password
+     */
     @Modifying
     @Transactional
     @Query(
