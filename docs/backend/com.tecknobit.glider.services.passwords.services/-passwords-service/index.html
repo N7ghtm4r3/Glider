@@ -1,0 +1,973 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>PasswordsService</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+    <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+    <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+    <link href="../../../styles/style.css" rel="Stylesheet">
+    <link href="../../../styles/main.css" rel="Stylesheet">
+    <link href="../../../styles/prism.css" rel="Stylesheet">
+    <link href="../../../styles/logo-styles.css" rel="Stylesheet">
+    <link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+    <link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+    <script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+    <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+    <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+    <script type="text/javascript" src="../../../scripts/main.js" defer></script>
+    <script type="text/javascript" src="../../../scripts/prism.js" async></script>
+    <script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
+    <script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script>
+</head>
+<body>
+<div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+        <a class="library-name--link" href="../../../index.html">
+            Glider
+        </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+            <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active=""
+                        data-filter=":backend:dokkaHtmlPartial/main">jvm
+                </button>
+                <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                    <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                            data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox"
+                            aria-expanded="false" aria-label="Toggle source sets"></button>
+                    <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                        <div class="dropdown--header"><span>Platform filter</span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":backend:dokkaHtmlPartial/main"
+                                       data-filter=":backend:dokkaHtmlPartial/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+    <div id="container">
+        <div class="sidebar" id="leftColumn">
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                    data-role="dropdown-listbox">
+                    <div class="dropdown--header">
+                            <span>
+                                    Glider
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+        <div id="main">
+            <div class="main-content" data-page-type="classlike" id="content"
+                 pageids="backend::com.tecknobit.glider.services.passwords.services/PasswordsService///PointingToDeclaration//-612206970">
+                <div class="breadcrumbs"><a href="../../index.html">backend</a><span class="delimiter">/</span><a
+                        href="../index.html">com.tecknobit.glider.services.passwords.services</a><span
+                        class="delimiter">/</span><span class="current">PasswordsService</span></div>
+                <div class="cover ">
+                    <h1 class="cover"><span>Passwords</span>
+                        <wbr>
+                        <span><span>Service</span></span></h1>
+                    <div class="platform-hinted " data-platform-hinted="data-platform-hinted">
+                        <div class="content sourceset-dependent-content" data-active=""
+                             data-togglable=":backend:dokkaHtmlPartial/main">
+                            <div class="symbol monospace">
+                                <div class="block">
+                                    <div class="block"><span class="token annotation builtin">@</span><span
+                                            data-unresolved-link="org.springframework.stereotype/Service///PointingToDeclaration/"><span
+                                            class="token annotation builtin">Service</span></span></div>
+                                </div>
+                                <span class="token keyword">open </span><span class="token keyword">class </span><a
+                                    href="index.html">PasswordsService</a></div>
+                            <p class="paragraph">The <code class="lang-kotlin">PasswordsService</code> class is useful
+                                to manage all the password database operations</p><span class="kdoc-tag"><h4 class="">Author</h4><p
+                                class="paragraph">N7ghtm4r3 - Tecknobit</p></span></div>
+                    </div>
+                </div>
+                <div class="tabbedcontent">
+                    <div class="tabs-section" tabs-section="tabs-section">
+                        <button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">
+                            Members
+                        </button>
+                    </div>
+                    <div class="tabs-section-body">
+                        <div data-togglable="CONSTRUCTOR">
+                            <h2 class="">Constructors</h2>
+                            <div class="table"><a data-name="518069778%2FConstructors%2F-612206970"
+                                                  anchor-label="PasswordsService"
+                                                  id="518069778%2FConstructors%2F-612206970"
+                                                  data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-togglable="CONSTRUCTOR"
+                                     data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="-passwords-service.html"><span>Passwords</span><wbr><span><span>Service</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="518069778%2FConstructors%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">constructor</span><span
+                                                                class="token punctuation">(</span><span
+                                                                class="token punctuation">)</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div data-togglable="PROPERTY">
+                            <h2 class="">Properties</h2>
+                            <div class="table"><a data-name="-441171217%2FProperties%2F-612206970"
+                                                  anchor-label="eventsService" id="-441171217%2FProperties%2F-612206970"
+                                                  data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="events-service.html"><span>events</span><wbr><span><span>Service</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-441171217%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace">
+                                                            <div class="block">
+                                                                <div class="block"><span
+                                                                        class="token annotation builtin">@</span><span
+                                                                        data-unresolved-link="org.springframework.beans.factory.annotation/Autowired///PointingToDeclaration/"><span
+                                                                        class="token annotation builtin">Autowired</span></span>
+                                                                </div>
+                                                            </div>
+                                                            <span class="token keyword">private </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">var </span><a
+                                                                href="events-service.html">eventsService</a><span
+                                                                class="token operator">: </span><a
+                                                                href="../-password-events-service/index.html">PasswordEventsService</a>
+                                                        </div>
+                                                        <div class="brief "><code
+                                                                class="lang-kotlin">eventsService</code> instance used
+                                                            to manage the events related to a password
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="650375145%2FProperties%2F-612206970" anchor-label="passwordsRepository"
+                                   id="650375145%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="passwords-repository.html"><span>passwords</span><wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="650375145%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace">
+                                                            <div class="block">
+                                                                <div class="block"><span
+                                                                        class="token annotation builtin">@</span><span
+                                                                        data-unresolved-link="org.springframework.beans.factory.annotation/Autowired///PointingToDeclaration/"><span
+                                                                        class="token annotation builtin">Autowired</span></span>
+                                                                </div>
+                                                            </div>
+                                                            <span class="token keyword">private </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">var </span><a
+                                                                href="passwords-repository.html">passwordsRepository</a><span
+                                                                class="token operator">: </span><a
+                                                                href="../../com.tecknobit.glider.services.passwords.repositories/-passwords-repository/index.html">PasswordsRepository</a>
+                                                        </div>
+                                                        <div class="brief "><code class="lang-kotlin">passwordsRepository</code>
+                                                            instance used to manage the database operations for the
+                                                            passwords
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div data-togglable="FUNCTION">
+                            <h2 class="">Functions</h2>
+                            <div class="table"><a data-name="1831752644%2FFunctions%2F-612206970"
+                                                  anchor-label="deletePassword" id="1831752644%2FFunctions%2F-612206970"
+                                                  data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="delete-password.html"><span>delete</span><wbr><span><span>Password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1831752644%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="delete-password.html"><span
+                                                                class="token function">deletePassword</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span
+                                                                class="parameter ">passwordId<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span></div>
+                                                        <div class="brief ">Method used to delete a password</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="1388270868%2FFunctions%2F-612206970" anchor-label="editGeneratedPassword"
+                                   id="1388270868%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="edit-generated-password.html"><span>edit</span><wbr><span>Generated</span><wbr><span><span>Password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1388270868%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">private </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="edit-generated-password.html"><span
+                                                                class="token function">editGeneratedPassword</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">token<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">passwordId<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">tail<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">scopes<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span></div>
+                                                        <div class="brief ">Method used to edit a <a
+                                                                href="../../../core/com.tecknobit.glidercore.enums/-password-type/-g-e-n-e-r-a-t-e-d/index.html">GENERATED</a>
+                                                            password
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-1609958515%2FFunctions%2F-612206970" anchor-label="editInsertedPassword"
+                                   id="-1609958515%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="edit-inserted-password.html"><span>edit</span><wbr><span>Inserted</span><wbr><span><span>Password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1609958515%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">private </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="edit-inserted-password.html"><span
+                                                                class="token function">editInsertedPassword</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">token<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">passwordId<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">tail<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">scopes<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">password<span class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span></div>
+                                                        <div class="brief ">Method used to edit a <a
+                                                                href="../../../core/com.tecknobit.glidercore.enums/-password-type/-i-n-s-e-r-t-e-d/index.html">INSERTED</a>
+                                                            password
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-1927333435%2FFunctions%2F-612206970" anchor-label="editPassword"
+                                   id="-1927333435%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="edit-password.html"><span>edit</span><wbr><span><span>Password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1927333435%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="edit-password.html"><span class="token function">editPassword</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">token<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">passwordId<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">tail<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">scopes<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">password<span class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span></div>
+                                                        <div class="brief ">Method used to edit a password</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="1246403322%2FFunctions%2F-612206970" anchor-label="filterPasswords"
+                                   id="1246403322%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="filter-passwords.html"><span>filter</span><wbr><span><span>Passwords</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1246403322%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">private </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="filter-passwords.html"><span
+                                                                class="token function">filterPasswords</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span
+                                                                class="parameter ">passwords<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html">List</a><span
+                                                                class="token operator">&lt;</span><a
+                                                                href="../../com.tecknobit.glider.services.passwords.entities/-password/index.html">Password</a><span
+                                                                class="token operator">&gt;</span><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">keywords<span class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/util/Set.html">Set</a><span
+                                                                class="token operator">&lt;</span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator">&gt;</span></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/util/List.html">List</a><span
+                                                                class="token operator">&lt;</span><a
+                                                                href="../../com.tecknobit.glider.services.passwords.entities/-password/index.html">Password</a><span
+                                                                class="token operator">&gt;</span></div>
+                                                        <div class="brief ">Method used to apply the keywords filter to
+                                                            the result list
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-869533884%2FFunctions%2F-612206970" anchor-label="findPasswordById"
+                                   id="-869533884%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="find-password-by-id.html"><span>find</span><wbr><span>Password</span><wbr><span>By</span><wbr><span><span>Id</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-869533884%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">private </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="find-password-by-id.html"><span
+                                                                class="token function">findPasswordById</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span
+                                                                class="parameter ">passwordId<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="../../com.tecknobit.glider.services.passwords.entities/-password/index.html">Password</a>
+                                                        </div>
+                                                        <div class="brief ">Method used to find a password by its
+                                                            identifier
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="1539632580%2FFunctions%2F-612206970" anchor-label="generatePassword"
+                                   id="1539632580%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="generate-password.html"><span>generate</span><wbr><span><span>Password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1539632580%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="generate-password.html"><span
+                                                                class="token function">generatePassword</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">user<span
+                                                                class="token operator">: </span><a
+                                                                href="../../com.tecknobit.glider.services.users.entities/-glider-user/index.html">GliderUser</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">token<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">tail<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">scopes<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">length<span
+                                                                class="token operator">: </span><a
+                                                                href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">hResponse<span
+                                                                class="token operator">: </span><span
+                                                                data-unresolved-link="com.tecknobit.apimanager.formatters/JsonHelper///PointingToDeclaration/">JsonHelper</span></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>
+                                                        </div>
+                                                        <div class="brief ">Method used to generate a password</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="1332414620%2FFunctions%2F-612206970" anchor-label="getKeychain"
+                                   id="1332414620%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="get-keychain.html"><span>get</span><wbr><span><span>Keychain</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1332414620%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="get-keychain.html"><span class="token function">getKeychain</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">userId<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">token<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">page<span
+                                                                class="token operator">: </span><a
+                                                                href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">pageSize<span class="token operator">: </span><a
+                                                                href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">keywords<span class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/util/Set.html">Set</a><span
+                                                                class="token operator">&lt;</span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator">&gt;</span><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">types<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/util/Set.html">Set</a><span
+                                                                class="token operator">&lt;</span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator">&gt;</span></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><span
+                                                                data-unresolved-link="com.tecknobit.equinoxcore.pagination/PaginatedResponse///PointingToDeclaration/">PaginatedResponse</span><span
+                                                                class="token operator">&lt;</span><a
+                                                                href="../../com.tecknobit.glider.services.passwords.entities/-password/index.html">Password</a><span
+                                                                class="token operator">&gt;</span></div>
+                                                        <div class="brief ">Method used to get the keychain of the
+                                                            user
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="1757578693%2FFunctions%2F-612206970" anchor-label="getPassword"
+                                   id="1757578693%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="get-password.html"><span>get</span><wbr><span><span>Password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1757578693%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="get-password.html"><span class="token function">getPassword</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">token<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">passwordId<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="../../com.tecknobit.glider.services.passwords.dtos/-password-mask/index.html">PasswordMask</a>
+                                                        </div>
+                                                        <div class="brief ">Method used to get a password details</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-102826785%2FFunctions%2F-612206970" anchor-label="insertPassword"
+                                   id="-102826785%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="insert-password.html"><span>insert</span><wbr><span><span>Password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-102826785%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="insert-password.html"><span
+                                                                class="token function">insertPassword</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">user<span
+                                                                class="token operator">: </span><a
+                                                                href="../../com.tecknobit.glider.services.users.entities/-glider-user/index.html">GliderUser</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">token<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">tail<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">scopes<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">password<span class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span></div>
+                                                        <div class="brief ">Method used to insert a password</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-722519944%2FFunctions%2F-612206970" anchor-label="loadPasswordEntity"
+                                   id="-722519944%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="load-password-entity.html"><span>load</span><wbr><span>Password</span><wbr><span><span>Entity</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-722519944%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">private </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="load-password-entity.html"><span
+                                                                class="token function">loadPasswordEntity</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">token<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">tail<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">scopes<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">password<span class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">currentDate<span
+                                                                class="token operator">: </span><a
+                                                                href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-long/index.html">Long</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">type<span
+                                                                class="token operator">: </span><a
+                                                                href="../../../core/com.tecknobit.glidercore.enums/-password-type/index.html">PasswordType</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">configuration<span
+                                                                class="token operator">: </span><a
+                                                                href="../../com.tecknobit.glider.services.passwords.entities/-password-configuration/index.html">PasswordConfiguration</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">user<span
+                                                                class="token operator">: </span><a
+                                                                href="../../com.tecknobit.glider.services.users.entities/-glider-user/index.html">GliderUser</a></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="../../com.tecknobit.glider.services.passwords.entities/-password/index.html">Password</a>
+                                                        </div>
+                                                        <div class="brief ">Method to load a <a
+                                                                href="../../com.tecknobit.glider.services.passwords.entities/-password/index.html">Password</a>
+                                                            entity with the password data
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-1916931902%2FFunctions%2F-612206970" anchor-label="notifyCopiedPassword"
+                                   id="-1916931902%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="notify-copied-password.html"><span>notify</span><wbr><span>Copied</span><wbr><span><span>Password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1916931902%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="notify-copied-password.html"><span
+                                                                class="token function">notifyCopiedPassword</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span
+                                                                class="parameter ">passwordId<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span></div>
+                                                        <div class="brief ">Method used to notify the <a
+                                                                href="../../../core/com.tecknobit.glidercore.enums/-password-event-type/-c-o-p-i-e-d/index.html">COPIED</a>
+                                                            event
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-791935297%2FFunctions%2F-612206970"
+                                   anchor-label="refreshGeneratedPassword" id="-791935297%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="refresh-generated-password.html"><span>refresh</span><wbr><span>Generated</span><wbr><span><span>Password</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-791935297%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="refresh-generated-password.html"><span
+                                                                class="token function">refreshGeneratedPassword</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">token<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">passwordId<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>
+                                                        </div>
+                                                        <div class="brief ">Method used to refresh a <a
+                                                                href="../../../core/com.tecknobit.glidercore.enums/-password-type/-g-e-n-e-r-a-t-e-d/index.html">GENERATED</a>
+                                                            password
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-523716033%2FFunctions%2F-612206970" anchor-label="tailMatches"
+                                   id="-523716033%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="tail-matches.html"><span>tail</span><wbr><span><span>Matches</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-523716033%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">private </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="tail-matches.html"><span class="token function">tailMatches</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span
+                                                                class="parameter ">keywords<span class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/util/Set.html">Set</a><span
+                                                                class="token operator">&lt;</span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator">&gt;</span><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">tail<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a>
+                                                        </div>
+                                                        <div class="brief ">Method used to check whether the tail of the
+                                                            password matches with any keywords
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+                <span>© 2025 Copyright</span>
+                <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

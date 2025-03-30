@@ -1,167 +1,185 @@
 # Glider
-**v1.0.5**
 
-This is a Java Based open source self-hosted project useful to manage the creation and the storage of your passwords
-with the **Glider** ecosystem
+**v2.0.0**
 
-## Implementation
+This is an open source self-hosted project useful to manage the creation and the storage of
+your passwords with the Glider system.
 
-Add the JitPack repository to your build file
+This repository contains the backend versions of **Glider**,
+so if you want to customize you can fork it and work on it, if there are any errors, fixes to do or
+some idea to upgrade this project, please open a ticket or contact us to talk about, thanks and good
+use!
 
-### Gradle
+## Customize the application
 
-- Add it in your root build.gradle at the end of repositories
+To customize and create your own version of this application you need to have
+the <a href="https://github.com/N7ghtm4r3/Glider/tree/main/core">
+core library</a> implemented in your project and published into maven local system
 
-    #### Gradle (Short)
-         
-    ```gradle
-    repositories {
-        ...
-        maven { url 'https://jitpack.io' }
-    }
-    ```
+### Clone the core library and publish to maven local
 
-    #### Gradle (Kotlin)
-         
-    ```gradle
-    repositories {
-        ...
-        maven("https://jitpack.io")
-    }
-    ```
-    
-- Add the dependency
+- Clone the repository or download the zip file of the current version available
 
-    #### Gradle (Short)
-         
-    ```gradle
-    dependencies {
-        implementation 'com.github.N7ghtm4r3:Glider:1.0.5'
-    }
-    ```
+- Open the folder file in your development environment and publish to maven local with the
+  **publishMavenPublicationToMavenLocal** gradle task, take a
+  look <a href="https://docs.gradle.org/current/userguide/publishing_maven.html">here</a>
+  for a help
 
-    #### Gradle (Kotlin)
-         
-    ```gradle
-    dependencies {
-        implementation("com.github.N7ghtm4r3:Glider:1.0.5")
-    }
-    ```
+### Implement the core library to your application
 
-### Maven
+- #### Gradle (Short)
 
-- Add it in your root build.gradle at the end of repositories
+```gradle
+repositories {
+  ...
+  mavenLocal()
+}
 
-```xml
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-```
-- Add the dependency
-
-```xml
-<dependency>
-    <groupId>com.github.N7ghtm4r3</groupId>
-  <artifactId>Glider</artifactId>
-  <version>1.0.5</version>
-</dependency>
+dependencies {
+  implementation 'com.tecknobit.glidercore:glidercore:2.0.0'
+}
 ```
 
-## 🛠 Skills
-- Java
+#### Gradle (Kotlin)
 
-## Roadmap
+```gradle
+repositories {
+  ...
+  mavenLocal()
+}
 
-This project will be constantly developed to reach different platforms to work on, following the platforms releases steps:
+dependencies {
+  implementation("com.tecknobit.glidercore:glidercore:2.0.0")
+}
+```
 
-- Mobile
-  - <a href="https://github.com/N7ghtm4r3/Glider-Android#readme">Android</a> -> **available!**
-  - iOS
-- <a href="https://github.com/N7ghtm4r3/Glider-Desktop">Desktop Glider version</a> -> **available!**
-- <a href="https://github.com/N7ghtm4r3/Glider/tree/main/documd/GliderBackend.md">Backend service "out-of-the-box"</a>
+## Architecture
+
+### Clients
+
+- [Android](https://play.google.com/store/apps/details?id=com.tecknobit.glider)
+- [Glider desktop version](https://github.com/N7ghtm4r3/Glider-Clients/releases/tag/2.0.0)
+- iOS -> source code available, but cannot distribute due
+  missing [Apple Developer Program license](https://developer.apple.com/programs/)
+- [Glider webapp version](https://github.com/N7ghtm4r3/Glider-WebApp)
+
+### Backend
+
+- [Backend service "out-of-the-box"](https://github.com/N7ghtm4r3/Glider/releases/tag/2.0.0)
 
 ## Usages
 
-To start the **Glider** service on your own backend infrastructure you will need to following 
-these steps
+### Backend configuration
 
-### First run
+> [!WARNING]  
+> Note: the service will run using the *HTTP* protocol as default, it is recommended to implement an *SSL* or *TLS*
+> certificate to secure communication on your infrastructure.
+>
+> **Wikis**
+>
+> To create a self-signed certificate you can
+> look <a href="https://tecadmin.net/step-by-step-guide-to-creating-self-signed-ssl-certificates/">here</a>
+>
+> To implement a certificate in Spring you can
+> look <a href="https://www.thomasvitale.com/https-spring-boot-ssl-certificate/">here</a>
+>
+> If you encounter any problems with the creation of the keystore you can
+> look <a href="https://stackoverflow.com/questions/906402/how-to-import-an-existing-x-509-certificate-and-private-key-in-java-keystore-to">
+> here</a> to get more information, or
+> use the following command to add the **private key** to the keystore:
+> ```xml
+> openssl pkcs12 -export -in your_certificate_file.crt -inkey your_private_key.key -out your_out_pkcs12_file.p12 -name your_alias_name -CAfile your_certificate_file.crt -caname root
+> ```
 
-```java
-public static void main(String[] args) {
-        
-    /**
-     * if set on true this session will allow only one device connected, if set on false this session allow 
-     * multiple devices connected
-     * **/
-    boolean isSingleUseMode = //flag value
+#### Default configuration
 
-    /**
-     * if set on true this session will create a QRCode (hosted on the next port that you choose, e.g. 21 -> 22) 
-     * with the credentials to connect at the session create, if set on false this option will be disabled
-     * **/
-    boolean QRCodeLoginEnabled = //flag value
+The default properties to launch the backend service as designed are the following:
 
-    /**
-     * the service port where the Glider' service will accept the requests
-     * **/
-    int hostPort = //port value
+``` properties
+# The properties considered critical could alter the flow of how the backend service was designed, so we do not recommend
+# to change them
 
-    /**
-     * whether the session can accept requests outside localhost
-     * **/
-    boolean runInLocalhost = //flag value;
+spring.datasource.url=jdbc:mysql://localhost:3306/glider?createDatabaseIfNotExist=true
+server.port=1758
+spring.datasource.username=root
+spring.jpa.generate-ddl=true 
+spring.jpa.hibernate.ddl.auto=update
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.mvc.dispatch-options-request=true
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+```
 
-    //Creation of the launcher        
-    GliderLauncher launcher = new GliderLauncher("your_database_path", "session_password", isSingleUseMode,
-            QRCodeLoginEnabled, hostPort,  runInLocalhost);
+| Property                                  | Default value                                                    |    Not-Critical    | Recommended to change |
+|-------------------------------------------|------------------------------------------------------------------|:------------------:|:---------------------:|
+| spring.datasource.url                     | jdbc:mysql://localhost:3306/glider?createDatabaseIfNotExist=true | :white_check_mark: |          :x:          | 
+| server.port                               | 1758                                                             | :white_check_mark: |           /           |
+| spring.datasource.username                | root                                                             | :white_check_mark: |  :white_check_mark:   |
+| spring.jpa.generate-ddl                   | update                                                           |        :x:         |          :x:          |
+| spring.jpa.hibernate.ddl.auto             | auto                                                             |        :x:         |          :x:          |           
+| spring.jpa.properties.hibernate.dialect   | org.hibernate.dialect.MySQL8Dialect                              |        :x:         |          :x:          |           
+| spring.mvc.dispatch-options-request       | true                                                             |        :x:         |          :x:          |           
+| spring.servlet.multipart.max-file-size    | 10MB                                                             | :white_check_mark: |           /           |           
+| spring.servlet.multipart.max-request-size | 10MB                                                             | :white_check_mark: |           /           |
 
-    //Starting of the service
-    launcher.startService();
+The **spring.datasource.username** if is not set is used the default password of the MySQL environment
 
-    /**
-     * This will make throw an Exception to make you save the session data:
-     * {
-     *   "databasePath": "your_database_path.db",
-     *   "secretKey": "your_secret_key",
-     *   "ivSpec": "your_iv_spec",
-     *   "token": "your_token"
-     * }
-     **/
-}
-``` 
+#### Custom configuration
 
-### Normal workflow run
+To customize the properties to launch the backend service you must create a file **in the same folder where you placed
+the server file (.jar)** and call it **"custom.properties"** as below:
 
-```java
-public static void main(String[] args) throws Exception {
-    
-    //Pass the credentials created at the first run with a file in JSON format
-    GliderLauncher launcher = new GliderLauncher(new File("path_to_credentials_file.json"));
+``` bash
+  folderOfWhereYouPlacedTheServerFile
+   |-- custom.properties
+   |-- glider.jar
+  ```
 
-    //Pass the credentials created at the first run in JSON format
-    GliderLauncher launcher = new GliderLauncher(new JSONObject("{\n" +
-            "    \"databasePath\": \"your_database_path.db\",\n" +
-            "    \"secretKey\": \"your_secret_key\",\n" +
-            "    \"ivSpec\": \"your_iv_spec\",\n" +
-            "    \"token\": \"your_token\"\n" +
-            "}"));
+If your custom properties do not contain the properties of the default configuration will be used these default
+properties instead,
+so if you need to change some default properties you have to overwrite them.
 
-    //Pass the credentials created at the first run one by one
-    GliderLauncher launcher = new GliderLauncher("your_database_path", "your_token", "your_iv_spec",
-            "your_secret_key");
+Take a look to the official page of **Spring** for a high
+customization <a href="https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html">
+here</a>
 
-    //Starting of the service
-    launcher.startService();
-}
-``` 
+### Run the service
 
-## Authors
+To start the **Glider** service on your own infrastructure you have to follow these steps
 
-- [@N7ghtm4r3](https://www.github.com/N7ghtm4r3)
+#### Requirements
+
+- At least **Java 18 JDK** installed on your machine
+- An SQL environment installed, it is recommended to use **MySQL**
+- The SQL service running on "localhost:3306/glider" by default, or if has been customized, with the custom data to
+  format correctly the connection URL
+
+#### Launch the service
+
+When you have to start the service you will have different scenarios:
+
+- At the first launch the server will be interrupted and will be thrown the
+  **SaveData** exception to store the server secret to manage the user accesses to
+  the server, share it **only to the users that you retains allowed to access to your server**
+  ``` java
+  Exception in thread "main" com.tecknobit.apimanager.exceptions.SaveData: Note: is not an error, but is an alert!
+  Please you should safely save: the_server_secret_generated to correctly register a new user in the Glider system
+  ```
+- If is not the first launch the service will start directly
+- If you need to recreate the server secret you need to launch the service with the **rss** command like this:
+  ``` java
+  java -jar Glider.jar rss // this will generate a new server secret overwriting the current server secret
+  ```
+- If you need to delete the server secret, just note that when the service will be launched again will be generated a
+  new
+  server secret to work correctly, you need to launch the service with the **dss** or **dssi** command like this:
+  ``` java
+  // dss command
+  java -jar Glider.jar dss // this will delete the current server secret
+  
+   // dssi command
+  java -jar Glider.jar dssi // this will delete the current server secret and interrupts the server workflow right next
+  ```
 
 ## Support
 
@@ -178,19 +196,21 @@ Thank you for your help!
 [![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white)](https://twitter.com/tecknobit)
 
 [![](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white)](https://www.oracle.com/java/)
+[![](https://img.shields.io/badge/Kotlin-0095D5?&style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
 
-[![](https://jitpack.io/v/N7ghtm4r3/Glider.svg)](https://jitpack.io/#N7ghtm4r3/Glider)
+[![](https://img.shields.io/badge/Spring_Boot-F2F4F9?style=for-the-badge&logo=spring-boot)](https://spring.io/projects/spring-boot)
 
 ## Donations
 
 If you want support project and developer
 
-| Crypto  | Address| Network |
-| ------------- | ------------- | ------------- |
-| ![](https://img.shields.io/badge/Bitcoin-000000?style=for-the-badge&logo=bitcoin&logoColor=white) | **3H3jyCzcRmnxroHthuXh22GXXSmizin2yp** | Bitcoin |
-| ![](https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=Ethereum&logoColor=white)  | **0x1b45bc41efeb3ed655b078f95086f25fc83345c4**  | Ethereum |
+| Crypto                                                                                              | Address                                          | Network  |
+|-----------------------------------------------------------------------------------------------------|--------------------------------------------------|----------|
+| ![](https://img.shields.io/badge/Bitcoin-000000?style=for-the-badge&logo=bitcoin&logoColor=white)   | **3H3jyCzcRmnxroHthuXh22GXXSmizin2yp**           | Bitcoin  |
+| ![](https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=Ethereum&logoColor=white) | **0x1b45bc41efeb3ed655b078f95086f25fc83345c4**   | Ethereum |
+| ![](https://img.shields.io/badge/Solana-000?style=for-the-badge&logo=Solana&logoColor=9945FF)       | **AtPjUnxYFHw3a6Si9HinQtyPTqsdbfdKX3dJ1xiDjbrL** | Solana   |
 
 If you want support project and developer
 with <a href="https://www.paypal.com/donate/?hosted_button_id=5QMN5UQH7LDT4">PayPal</a>
 
-Copyright © 2024 Tecknobit
+Copyright © 2025 Tecknobit
