@@ -102,7 +102,7 @@
         </div>
         <div id="main">
             <div class="main-content" data-page-type="member" id="content"
-                 pageids="backend::com.tecknobit.glider.services.users.controller/GliderUsersController/disconnectDevice/#java.lang.String#java.lang.String#java.lang.String#java.lang.String/PointingToDeclaration//-612206970">
+                 pageids="backend::com.tecknobit.glider.services.users.controller/GliderUsersController/disconnectDevice/#java.lang.String#java.lang.String#java.lang.String#java.util.Map<java.lang.String,java.lang.String>/PointingToDeclaration//-612206970">
                 <div class="breadcrumbs"><a href="../../index.html">backend</a><span class="delimiter">/</span><a
                         href="../index.html">com.tecknobit.glider.services.users.controller</a><span
                         class="delimiter">/</span><a href="index.html">GliderUsersController</a><span class="delimiter">/</span><span
@@ -122,7 +122,7 @@
                                         class="token annotation builtin">DeleteMapping</span></span><span
                                         class="token punctuation">(</span><span>path<span
                                         class="token operator"> = </span><span class="breakable-word"><span
-                                        class="token string">"USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + "/" + DEVICES_KEY + "/{" + DEVICE_IDENTIFIER_KEY + "}""</span></span><span
+                                        class="token string">"USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + "/" + DEVICES_KEY"</span></span><span
                                         class="token punctuation">, </span></span>
                                     <wbr>
                                     <span>headers<span class="token operator"> = </span><span class="token punctuation">[</span><span
@@ -145,16 +145,6 @@
                                 href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
                                 class="token punctuation">, </span></span><span class="parameter "><span><span
                                 class="token annotation builtin">@</span><span
-                                data-unresolved-link="org.springframework.web.bind.annotation/PathVariable///PointingToDeclaration/"><span
-                                class="token annotation builtin">PathVariable</span></span><span
-                                class="token punctuation">(</span><span>value<span
-                                class="token operator"> = </span><span class="breakable-word"><span
-                                class="token string">"device_id"</span></span></span><wbr><span
-                                class="token punctuation">)</span>&nbsp;</span>disconnectingDeviceId<span
-                                class="token operator">: </span><a
-                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
-                                class="token punctuation">, </span></span><span class="parameter "><span><span
-                                class="token annotation builtin">@</span><span
                                 data-unresolved-link="org.springframework.web.bind.annotation/RequestHeader///PointingToDeclaration/"><span
                                 class="token annotation builtin">RequestHeader</span></span><span
                                 class="token punctuation">(</span><span>value<span
@@ -172,8 +162,19 @@
                                 class="token string">"device_id"</span></span></span><wbr><span
                                 class="token punctuation">)</span>&nbsp;</span>deviceId<span
                                 class="token operator">: </span><a
-                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
-                                class="token punctuation">)</span><span class="token operator">: </span><a
+                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                class="token punctuation">, </span></span><span class="parameter "><span><span
+                                class="token annotation builtin">@</span><span
+                                data-unresolved-link="org.springframework.web.bind.annotation/RequestBody///PointingToDeclaration/"><span
+                                class="token annotation builtin">RequestBody</span></span>&nbsp;</span>payload<span
+                                class="token operator">: </span><a
+                                href="https://docs.oracle.com/javase/8/docs/api/java/util/Map.html">Map</a><span
+                                class="token operator">&lt;</span><a
+                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                class="token punctuation">, </span><a
+                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                class="token operator">&gt;</span></span></span><span class="token punctuation">)</span><span
+                                class="token operator">: </span><a
                                 href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></div>
                         <p class="paragraph">Endpoint used to disconnect a device from the current session</p><span
                             class="kdoc-tag"><h4 class="">Return</h4><p
@@ -188,17 +189,6 @@
                                     </div>
                                     <div>
                                         <div class="title"><p class="paragraph">The identifier of the user</p></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
-                                 data-filterable-set=":backend:dokkaHtmlPartial/main">
-                                <div class="main-subrow keyValue ">
-                                    <div class=""><span class="inline-flex"><div><u><span>disconnecting</span><wbr><span>Device</span><wbr><span><span>Id</span></span></u></div></span>
-                                    </div>
-                                    <div>
-                                        <div class="title"><p class="paragraph">The identifier of the device to
-                                            disconnect</p></div>
                                     </div>
                                 </div>
                             </div>

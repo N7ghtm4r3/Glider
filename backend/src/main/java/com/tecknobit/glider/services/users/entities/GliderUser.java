@@ -1,6 +1,7 @@
 package com.tecknobit.glider.services.users.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tecknobit.equinoxbackend.annotations.EmptyConstructor;
 import com.tecknobit.equinoxbackend.environment.services.builtin.entity.EquinoxItem;
 import com.tecknobit.equinoxbackend.environment.services.users.entity.EquinoxUser;
 import com.tecknobit.glider.services.passwords.entities.Password;
@@ -8,8 +9,8 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
-import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.USERS_KEY;
-import static com.tecknobit.glidercore.ConstantsKt.*;
+import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.*;
+import static com.tecknobit.glidercore.ConstantsKt.LAST_LOGIN_KEY;
 
 /**
  * The {@code GliderUser} class is useful to represent a base Glider's system user
@@ -47,6 +48,7 @@ public class GliderUser extends EquinoxUser {
      *
      * @apiNote empty constructor required
      */
+    @EmptyConstructor
     public GliderUser() {
         this(null, null, null, null, null, null, null, List.of(),
                 List.of());
@@ -100,6 +102,8 @@ public class GliderUser extends EquinoxUser {
      */
     @JsonIgnore
     public boolean deviceBelongsToMe(String deviceId) {
+        if (deviceId == null)
+            return false;
         for (DeviceUserSession deviceSession : devices) {
             ConnectedDevice device = deviceSession.getDevice();
             if (device.getId().equals(deviceId))

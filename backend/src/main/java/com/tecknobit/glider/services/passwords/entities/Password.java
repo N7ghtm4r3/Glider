@@ -3,6 +3,7 @@ package com.tecknobit.glider.services.passwords.entities;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.tecknobit.equinoxbackend.annotations.EmptyConstructor;
 import com.tecknobit.equinoxbackend.environment.services.builtin.entity.EquinoxItem;
 import com.tecknobit.glider.services.users.entities.GliderUser;
 import com.tecknobit.glidercore.enums.PasswordType;
@@ -15,8 +16,10 @@ import java.util.List;
 import java.util.Set;
 
 import static com.tecknobit.equinoxbackend.environment.services.builtin.service.EquinoxItemsHelper.COMMA;
+import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.CREATION_DATE_KEY;
 import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.PASSWORD_KEY;
-import static com.tecknobit.glidercore.ConstantsKt.*;
+import static com.tecknobit.glidercore.ConstantsKt.EVENT_DATE_KEY;
+import static com.tecknobit.glidercore.ConstantsKt.PASSWORDS_KEY;
 import static jakarta.persistence.EnumType.STRING;
 import static org.hibernate.annotations.OnDeleteAction.CASCADE;
 
@@ -91,6 +94,7 @@ public class Password extends EquinoxItem {
      *
      * @apiNote empty constructor required
      */
+    @EmptyConstructor
     public Password() {
         this(null, -1, null, null, null, null, List.of(), null, null);
     }

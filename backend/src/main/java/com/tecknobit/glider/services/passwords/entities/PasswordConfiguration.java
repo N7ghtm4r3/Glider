@@ -1,5 +1,6 @@
 package com.tecknobit.glider.services.passwords.entities;
 
+import com.tecknobit.equinoxbackend.annotations.EmptyConstructor;
 import com.tecknobit.equinoxbackend.environment.services.builtin.entity.EquinoxItem;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,6 +57,7 @@ public class PasswordConfiguration extends EquinoxItem {
      *
      * @apiNote empty constructor required
      */
+    @EmptyConstructor
     public PasswordConfiguration() {
         this(null, 0, false, false, false);
     }

@@ -9,6 +9,7 @@ import com.tecknobit.equinoxcore.annotations.Validator;
 import com.tecknobit.glider.services.users.entities.GliderUser;
 import com.tecknobit.glider.services.users.repositories.GliderUsersRepository;
 import com.tecknobit.glider.services.users.services.GliderUsersService;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,7 +47,7 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
     @Override
     @CustomParametersOrder(order = DEVICE_KEY)
     protected Object[] getSignUpCustomParams() {
-        return new Object[]{jsonHelper.getString(DEVICE_KEY)};
+        return new Object[]{jsonHelper.getJSONObject(DEVICE_KEY)};
     }
 
     /**
@@ -81,7 +82,7 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
     @Override
     @CustomParametersOrder(order = DEVICE_KEY)
     protected Object[] getSignInCustomParams() {
-        return new Object[]{jsonHelper.getString(DEVICE_KEY)};
+        return new Object[]{jsonHelper.getJSONObject(DEVICE_KEY)};
     }
 
     /**
@@ -113,7 +114,7 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
     @Validator
     @CustomParametersOrder(order = DEVICE_KEY)
     private String validateDeviceData(Object... custom) {
-        String deviceData = (String) custom[0];
+        JSONObject deviceData = (JSONObject) custom[0];
         if (deviceData == null)
             return WRONG_DEVICE_DATA_MESSAGE;
         return null;
@@ -198,26 +199,26 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
      * Endpoint used to disconnect a device from the current session
      *
      * @param userId The identifier of the user
-     * @param disconnectingDeviceId The identifier of the device to disconnect
      * @param token The token of the user
      * @param deviceId The identifier of the device of the user
      *
      * @return the result of the request as {@link String}
      */
     @DeleteMapping(
-            path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + "/" + DEVICES_KEY + "/{" + DEVICE_IDENTIFIER_KEY + "}",
+            path = USERS_KEY + "/{" + IDENTIFIER_KEY + "}" + "/" + DEVICES_KEY,
             headers = {
-                    TOKEN_KEY,
-                    DEVICE_IDENTIFIER_KEY
+                    TOKEN_KEY
             }
     )
-    @RequestPath(path = "/api/v1/users/{id}/devices/{device_id}", method = DELETE)
+    @RequestPath(path = "/api/v1/users/{id}/devices", method = DELETE)
     public String disconnectDevice(
             @PathVariable(IDENTIFIER_KEY) String userId,
-            @PathVariable(DEVICE_IDENTIFIER_KEY) String disconnectingDeviceId,
             @RequestHeader(TOKEN_KEY) String token,
-            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId
+            @RequestHeader(DEVICE_IDENTIFIER_KEY) String deviceId,
+            @RequestBody Map<String, String> payload
     ) {
+        loadJsonHelper(payload);
+        String disconnectingDeviceId = jsonHelper.getString(DEVICE_IDENTIFIER_KEY);
         if (!isMe(userId, token) || !me.deviceBelongsToMe(deviceId) || !me.deviceBelongsToMe(disconnectingDeviceId))
             return failedResponse(NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE);
         usersService.disconnectDevice(userId, disconnectingDeviceId);

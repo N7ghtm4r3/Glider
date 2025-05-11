@@ -16,15 +16,17 @@ import com.tecknobit.glidercore.enums.PasswordType;
 import kotlin.Pair;
 import kotlin.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import static com.tecknobit.equinoxbackend.environment.services.builtin.controller.EquinoxController.generateIdentifier;
 import static com.tecknobit.equinoxcore.helpers.InputsValidator.Companion;
+import static com.tecknobit.equinoxcore.pagination.PaginatedResponse.DEFAULT_PAGE;
+import static com.tecknobit.equinoxcore.pagination.PaginatedResponse.DEFAULT_PAGE_SIZE;
 import static com.tecknobit.glidercore.ConstantsKt.*;
 import static com.tecknobit.glidercore.enums.PasswordType.GENERATED;
 import static com.tecknobit.glidercore.enums.PasswordType.INSERTED;
@@ -229,11 +231,16 @@ public class PasswordsService {
      */
     public PaginatedResponse<Password> getKeychain(String userId, String token, int page, int pageSize,
                                                    Set<String> keywords, Set<String> types) throws Exception {
-        List<Password> passwords = passwordsRepository.getPasswords(userId, types, PageRequest.of(page, pageSize));
+        List<Password> passwords = passwordsRepository.getPasswords(userId, types);
         ServerVault vault = ServerVault.getInstance();
         vault.decryptPasswords(token, passwords);
         passwords = filterPasswords(passwords, keywords);
-        long totalPasswords = passwordsRepository.countPasswords(userId, types) - passwords.size();
+        long totalPasswords = passwords.size();
+        if (page < 0)
+            page = DEFAULT_PAGE;
+        if (pageSize < 0)
+            pageSize = DEFAULT_PAGE_SIZE;
+        passwords = pagePasswords(passwords, page, pageSize);
         return new PaginatedResponse<>(passwords, page, pageSize, totalPasswords);
     }
 
@@ -251,8 +258,27 @@ public class PasswordsService {
             if (keywords.isEmpty() || (tailMatches(keywords, tail) || password.scopesMatch(keywords)))
                 filteredPasswords.add(password);
         }
-        filteredPasswords.sort((o1, o2) -> Math.toIntExact(o2.getCreationDate() - o1.getCreationDate()));
         return filteredPasswords;
+    }
+
+    /**
+     * Method used to paginate the passwords list
+     *
+     * @param page     The page requested
+     * @param pageSize The size of the items to insert in the page
+     * @return the passwords list paged as {@link List} of {@link Password}
+     */
+    private List<Password> pagePasswords(List<Password> passwords, int page, int pageSize) {
+        int passwordsSize = passwords.size();
+        if (passwordsSize == 0)
+            return Collections.EMPTY_LIST;
+        int from = page * pageSize;
+        int to = from + pageSize;
+        if (from > passwordsSize)
+            from = passwordsSize;
+        if (to > passwordsSize)
+            to = passwordsSize;
+        return passwords.subList(from, to);
     }
 
     /**

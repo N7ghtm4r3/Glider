@@ -120,16 +120,6 @@
     ]
   },
   {
-    "name": "const val CREATION_DATE_KEY: String",
-    "description": "com.tecknobit.glidercore.CREATION_DATE_KEY",
-    "location": "core/com.tecknobit.glidercore/-c-r-e-a-t-i-o-n_-d-a-t-e_-k-e-y.html",
-    "searchKeys": [
-      "CREATION_DATE_KEY",
-      "const val CREATION_DATE_KEY: String",
-      "com.tecknobit.glidercore.CREATION_DATE_KEY"
-    ]
-  },
-  {
     "name": "const val DEVICES_KEY: String",
     "description": "com.tecknobit.glidercore.DEVICES_KEY",
     "location": "core/com.tecknobit.glidercore/-d-e-v-i-c-e-s_-k-e-y.html",
@@ -367,26 +357,6 @@
       "USER_DEVICES_KEY",
       "const val USER_DEVICES_KEY: String",
       "com.tecknobit.glidercore.USER_DEVICES_KEY"
-    ]
-  },
-  {
-    "name": "const val USER_IDENTIFIER_KEY: String",
-    "description": "com.tecknobit.glidercore.USER_IDENTIFIER_KEY",
-    "location": "core/com.tecknobit.glidercore/-u-s-e-r_-i-d-e-n-t-i-f-i-e-r_-k-e-y.html",
-    "searchKeys": [
-      "USER_IDENTIFIER_KEY",
-      "const val USER_IDENTIFIER_KEY: String",
-      "com.tecknobit.glidercore.USER_IDENTIFIER_KEY"
-    ]
-  },
-  {
-    "name": "const val USER_KEY: String",
-    "description": "com.tecknobit.glidercore.USER_KEY",
-    "location": "core/com.tecknobit.glidercore/-u-s-e-r_-k-e-y.html",
-    "searchKeys": [
-      "USER_KEY",
-      "const val USER_KEY: String",
-      "com.tecknobit.glidercore.USER_KEY"
     ]
   },
   {
@@ -630,16 +600,6 @@
     ]
   },
   {
-    "name": "abstract fun countPasswords(userId: String, types: Set<String>): Long",
-    "description": "com.tecknobit.glider.services.passwords.repositories.PasswordsRepository.countPasswords",
-    "location": "backend/com.tecknobit.glider.services.passwords.repositories/-passwords-repository/count-passwords.html",
-    "searchKeys": [
-      "countPasswords",
-      "abstract fun countPasswords(userId: String, types: Set<String>): Long",
-      "com.tecknobit.glider.services.passwords.repositories.PasswordsRepository.countPasswords"
-    ]
-  },
-  {
     "name": "abstract fun deletePassword(passwordId: String)",
     "description": "com.tecknobit.glider.services.passwords.repositories.PasswordsRepository.deletePassword",
     "location": "backend/com.tecknobit.glider.services.passwords.repositories/-passwords-repository/delete-password.html",
@@ -690,12 +650,12 @@
     ]
   },
   {
-    "name": "abstract fun getPasswords(userId: String, types: Set<String>, pageable: Pageable): List<Password>",
+    "name": "abstract fun getPasswords(userId: String, types: Set<String>): List<Password>",
     "description": "com.tecknobit.glider.services.passwords.repositories.PasswordsRepository.getPasswords",
     "location": "backend/com.tecknobit.glider.services.passwords.repositories/-passwords-repository/get-passwords.html",
     "searchKeys": [
       "getPasswords",
-      "abstract fun getPasswords(userId: String, types: Set<String>, pageable: Pageable): List<Password>",
+      "abstract fun getPasswords(userId: String, types: Set<String>): List<Password>",
       "com.tecknobit.glider.services.passwords.repositories.PasswordsRepository.getPasswords"
     ]
   },
@@ -1360,12 +1320,12 @@
     ]
   },
   {
-    "name": "open fun disconnectDevice(userId: String, disconnectingDeviceId: String, token: String, deviceId: String): String",
+    "name": "open fun disconnectDevice(userId: String, token: String, deviceId: String, payload: Map<String, String>): String",
     "description": "com.tecknobit.glider.services.users.controller.GliderUsersController.disconnectDevice",
     "location": "backend/com.tecknobit.glider.services.users.controller/-glider-users-controller/disconnect-device.html",
     "searchKeys": [
       "disconnectDevice",
-      "open fun disconnectDevice(userId: String, disconnectingDeviceId: String, token: String, deviceId: String): String",
+      "open fun disconnectDevice(userId: String, token: String, deviceId: String, payload: Map<String, String>): String",
       "com.tecknobit.glider.services.users.controller.GliderUsersController.disconnectDevice"
     ]
   },
@@ -1997,6 +1957,16 @@
       "loadPasswordEntity",
       "private open fun loadPasswordEntity(token: String, tail: String, scopes: String, password: String, currentDate: Long, type: PasswordType, configuration: PasswordConfiguration, user: GliderUser): Password",
       "com.tecknobit.glider.services.passwords.services.PasswordsService.loadPasswordEntity"
+    ]
+  },
+  {
+    "name": "private open fun pagePasswords(passwords: List<Password>, page: Int, pageSize: Int): List<Password>",
+    "description": "com.tecknobit.glider.services.passwords.services.PasswordsService.pagePasswords",
+    "location": "backend/com.tecknobit.glider.services.passwords.services/-passwords-service/page-passwords.html",
+    "searchKeys": [
+      "pagePasswords",
+      "private open fun pagePasswords(passwords: List<Password>, page: Int, pageSize: Int): List<Password>",
+      "com.tecknobit.glider.services.passwords.services.PasswordsService.pagePasswords"
     ]
   },
   {

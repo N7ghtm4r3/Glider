@@ -1,6 +1,6 @@
 # Glider
 
-**v2.0.0**
+**v2.0.1**
 
 This is an open source self-hosted project useful to manage the creation and the storage of
 your passwords with the Glider system.
@@ -36,7 +36,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.tecknobit.glidercore:glidercore:2.0.0'
+  implementation 'com.tecknobit.glidercore:glidercore:2.0.1'
 }
 ```
 
@@ -49,7 +49,7 @@ repositories {
 }
 
 dependencies {
-  implementation("com.tecknobit.glidercore:glidercore:2.0.0")
+  implementation("com.tecknobit.glidercore:glidercore:2.0.1")
 }
 ```
 
@@ -58,14 +58,14 @@ dependencies {
 ### Clients
 
 - [Android](https://play.google.com/store/apps/details?id=com.tecknobit.glider)
-- [Glider desktop version](https://github.com/N7ghtm4r3/Glider-Clients/releases/tag/2.0.0)
+- [Glider desktop version](https://github.com/N7ghtm4r3/Glider-Clients/releases/tag/2.0.1)
 - iOS -> source code available, but cannot distribute due
   missing [Apple Developer Program license](https://developer.apple.com/programs/)
 - [Glider webapp version](https://github.com/N7ghtm4r3/Glider-WebApp)
 
 ### Backend
 
-- [Backend service "out-of-the-box"](https://github.com/N7ghtm4r3/Glider/releases/tag/2.0.0)
+- [Backend service "out-of-the-box"](https://github.com/N7ghtm4r3/Glider/releases/tag/2.0.1)
 
 ## Usages
 
