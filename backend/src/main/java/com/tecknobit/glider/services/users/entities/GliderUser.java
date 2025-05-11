@@ -8,8 +8,8 @@ import jakarta.persistence.*;
 
 import java.util.List;
 
-import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.USERS_KEY;
-import static com.tecknobit.glidercore.ConstantsKt.*;
+import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.*;
+import static com.tecknobit.glidercore.ConstantsKt.LAST_LOGIN_KEY;
 
 /**
  * The {@code GliderUser} class is useful to represent a base Glider's system user

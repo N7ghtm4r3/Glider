@@ -1,15 +1,18 @@
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("maven-publish")
-    id("com.android.library") version "8.2.2"
+    alias(libs.plugins.androidLibrary)
     kotlin("multiplatform")
     kotlin("plugin.serialization") version "2.0.20"
 }
 
 group = "com.tecknobit.glider"
-version = "2.0.0"
+version = "2.0.1"
 
 repositories {
     google()
@@ -37,7 +40,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "Glider-Core"
+            baseName = "glidercore"
             isStatic = true
         }
     }
@@ -57,8 +60,8 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation("io.github.n7ghtm4r3:equinox-core:1.0.9")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+                implementation(libs.equinox.core)
+                implementation(libs.kotlinx.serialization.json)
             }
         }
 
@@ -69,7 +72,7 @@ kotlin {
 
 android {
     namespace = "com.tecknobit.glidercore"
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         minSdk = 24
     }
@@ -81,7 +84,7 @@ afterEvaluate {
             create<MavenPublication>("maven") {
                 groupId = "com.tecknobit.glidercore"
                 artifactId = "glidercore"
-                version = "2.0.0"
+                version = "2.0.1"
                 from(components["kotlin"])
             }
         }

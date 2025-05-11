@@ -1,16 +1,5 @@
 package com.tecknobit.glidercore
 
-import com.tecknobit.equinoxcore.annotations.FutureEquinoxApi
-
-/**
- * `USER_KEY` the key for the **"user"** field
- */
-@FutureEquinoxApi(
-    releaseVersion = "1.10.0",
-    additionalNotes = "Will be integrated in the CommonKeys.kt file"
-)
-const val USER_KEY = "user"
-
 /**
  * `SESSION_IDENTIFIER_KEY` the key for the **"session_id"** field
  */
@@ -95,15 +84,6 @@ const val SCOPES_KEY = "scopes"
  * `PASSWORD_EVENTS_KEY` the key for the **"password_events"** field
  */
 const val PASSWORD_EVENTS_KEY = "password_events"
-
-/**
- * `CREATION_DATE_KEY` the key for the **"creation_date"** field
- */
-@FutureEquinoxApi(
-    releaseVersion = "1.10.0",
-    additionalNotes = "Will be integrated in the CommonKeys.kt file"
-)
-const val CREATION_DATE_KEY = "creation_date"
 
 /**
  * `EVENT_DATE_KEY` the key for the **"event_date"** field

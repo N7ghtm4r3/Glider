@@ -1,0 +1,31 @@
+[versions]
+agp = "8.6.1"
+dokka = "2.0.0"
+equinox = "1.1.1"
+# backend
+apimanager = "2.2.4"
+jacksonDatabind = "2.15.4"
+json = "20250107"
+mysqlConnectorJava = "8.0.33"
+spring = "3.2.3"
+# core
+kotlinxSerializationJson = "1.8.1"
+
+[libraries]
+equinox-backend = { module = "io.github.n7ghtm4r3:equinox-backend", version.ref = "equinox" }
+equinox-core = { module = "io.github.n7ghtm4r3:equinox-core", version.ref = "equinox" }
+dokka-base = { module = "org.jetbrains.dokka:dokka-base", version.ref = "dokka" }
+# backend
+apimanager = { module = "com.github.N7ghtm4r3:APIManager", version.ref = "apimanager" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jacksonDatabind" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "spring" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring" }
+mysql-connector-java = { module = "mysql:mysql-connector-java", version.ref = "mysqlConnectorJava" }
+json = { module = "org.json:json", version.ref = "json" }
+# core
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+
+[plugins]
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+
