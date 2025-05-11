@@ -102,6 +102,8 @@ public class GliderUser extends EquinoxUser {
      */
     @JsonIgnore
     public boolean deviceBelongsToMe(String deviceId) {
+        if (deviceId == null)
+            return false;
         for (DeviceUserSession deviceSession : devices) {
             ConnectedDevice device = deviceSession.getDevice();
             if (device.getId().equals(deviceId))
