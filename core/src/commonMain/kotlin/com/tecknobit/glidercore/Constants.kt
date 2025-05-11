@@ -41,11 +41,6 @@ const val BROWSER_KEY = "browser"
 const val TYPE_KEY = "type"
 
 /**
- * `USER_IDENTIFIER_KEY` the key for the **"user_id"** field
- */
-const val USER_IDENTIFIER_KEY = "user_id"
-
-/**
  * `DEVICE_IDENTIFIER_KEY` the key for the **"device_id"** field
  */
 const val DEVICE_IDENTIFIER_KEY = "device_id"

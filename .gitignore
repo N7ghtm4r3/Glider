@@ -40,3 +40,4 @@ bin/
 .kotlin
 gradle.properties
 local.properties
+resources/vault

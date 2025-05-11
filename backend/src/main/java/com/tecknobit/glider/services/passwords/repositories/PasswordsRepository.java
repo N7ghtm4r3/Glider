@@ -3,7 +3,6 @@ package com.tecknobit.glider.services.passwords.repositories;
 import com.tecknobit.glider.services.passwords.entities.Password;
 import com.tecknobit.glidercore.enums.PasswordType;
 import jakarta.transaction.Transactional;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,8 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.tecknobit.equinoxbackend.environment.services.builtin.service.EquinoxItemsHelper._WHERE_;
-import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.IDENTIFIER_KEY;
-import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.PASSWORD_KEY;
+import static com.tecknobit.equinoxcore.helpers.CommonKeysKt.*;
 import static com.tecknobit.glidercore.ConstantsKt.*;
 
 /**
@@ -76,43 +74,23 @@ public interface PasswordsRepository extends JpaRepository<Password, String> {
     );
 
     /**
-     * Query used to count the total passwords
-     *
-     * @param userId The identifier of the user
-     * @param types The types of the passwords to include in the count
-     *
-     * @return the total passwords as {@code long}
-     */
-    @Query(
-            value = "SELECT COUNT(*) FROM " + PASSWORDS_KEY +
-                    _WHERE_ + USER_IDENTIFIER_KEY + "=:" + USER_IDENTIFIER_KEY +
-                    " AND " + TYPE_KEY + " IN (:" + TYPE_KEY + ")",
-            nativeQuery = true
-    )
-    long countPasswords(
-            @Param(USER_IDENTIFIER_KEY) String userId,
-            @Param(TYPE_KEY) Set<String> types
-    );
-
-    /**
      * Query used to retrieve the passwords of the user
      *
      * @param userId The identifier of the user
      * @param types The types of the passwords to include in the count
-     * @param pageable The parameters to paginate the query
      *
      * @return the passwords of the user as {@link List} of {@link Password}
      */
     @Query(
             value = "SELECT * FROM " + PASSWORDS_KEY +
                     _WHERE_ + USER_IDENTIFIER_KEY + "=:" + USER_IDENTIFIER_KEY +
-                    " AND " + TYPE_KEY + " IN (:" + TYPE_KEY + ")",
+                    " AND " + TYPE_KEY + " IN (:" + TYPE_KEY + ")" +
+                    " ORDER BY " + CREATION_DATE_KEY + " DESC",
             nativeQuery = true
     )
     List<Password> getPasswords(
             @Param(USER_IDENTIFIER_KEY) String userId,
-            @Param(TYPE_KEY) Set<String> types,
-            Pageable pageable
+            @Param(TYPE_KEY) Set<String> types
     );
 
     /**
