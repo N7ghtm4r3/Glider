@@ -1,0 +1,1092 @@
+<!doctype html>
+<html class="no-js">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>DefaultGliderController</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js","js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+    <script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async></script>
+    <script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+    <link href="../../../styles/style.css" rel="Stylesheet">
+    <link href="../../../styles/main.css" rel="Stylesheet">
+    <link href="../../../styles/prism.css" rel="Stylesheet">
+    <link href="../../../styles/logo-styles.css" rel="Stylesheet">
+    <link href="../../../styles/font-jb-sans-auto.css" rel="Stylesheet">
+    <link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+    <script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+    <script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+    <script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+    <script type="text/javascript" src="../../../scripts/main.js" defer></script>
+    <script type="text/javascript" src="../../../scripts/prism.js" async></script>
+    <script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer></script>
+    <script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script>
+</head>
+<body>
+<div class="root">
+    <nav class="navigation theme-dark" id="navigation-wrapper">
+        <a class="library-name--link" href="../../../index.html">
+            Glider
+        </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+            <div class="filter-section filter-section_loading" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active=""
+                        data-filter=":backend:dokkaHtmlPartial/main">jvm
+                </button>
+                <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                    <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                            data-role="dropdown-toggle" aria-controls="platform-tags-listbox" aria-haspopup="listbox"
+                            aria-expanded="false" aria-label="Toggle source sets"></button>
+                    <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox">
+                        <div class="dropdown--header"><span>Platform filter</span>
+                            <button class="button" data-role="dropdown-toggle" aria-label="Close platform filter">
+                                <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                            </button>
+                        </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id=":backend:dokkaHtmlPartial/main"
+                                       data-filter=":backend:dokkaHtmlPartial/main">
+                                <span class="checkbox--icon"></span>
+                                jvm
+                            </label>
+                        </li>
+                    </ul>
+                    <div class="dropdown--overlay"></div>
+                </div>
+            </div>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </nav>
+    <div id="container">
+        <div class="sidebar" id="leftColumn">
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                    data-role="dropdown-listbox">
+                    <div class="dropdown--header">
+                            <span>
+                                    Glider
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </div>
+        <div id="main">
+            <div class="main-content" data-page-type="classlike" id="content"
+                 pageids="backend::com.tecknobit.glider.services.shared.controllers/DefaultGliderController///PointingToDeclaration//-612206970">
+                <div class="breadcrumbs"><a href="../../index.html">backend</a><span class="delimiter">/</span><a
+                        href="../index.html">com.tecknobit.glider.services.shared.controllers</a><span
+                        class="delimiter">/</span><span class="current">DefaultGliderController</span></div>
+                <div class="cover ">
+                    <h1 class="cover"><span>Default</span>
+                        <wbr>
+                        <span>Glider</span>
+                        <wbr>
+                        <span><span>Controller</span></span></h1>
+                    <div class="platform-hinted " data-platform-hinted="data-platform-hinted">
+                        <div class="content sourceset-dependent-content" data-active=""
+                             data-togglable=":backend:dokkaHtmlPartial/main">
+                            <div class="symbol monospace">
+                                <div class="block">
+                                    <div class="block"><span class="token annotation builtin">@</span><span
+                                            data-unresolved-link="org.springframework.web.bind.annotation/RestController///PointingToDeclaration/"><span
+                                            class="token annotation builtin">RestController</span></span></div>
+                                </div>
+                                <span class="token keyword">abstract </span><span class="token keyword">class </span><a
+                                    href="index.html">DefaultGliderController</a> : <span
+                                    data-unresolved-link="com.tecknobit.equinoxbackend.environment.services.builtin.controller/EquinoxController///PointingToDeclaration/">EquinoxController</span><span
+                                    class="token operator">&lt;</span><span
+                                    data-unresolved-link="com.tecknobit.equinoxbackend.environment.services.builtin.controller/EquinoxController///PointingToGenericParameters(0)/">T</span><span
+                                    class="token punctuation">, </span><span
+                                    data-unresolved-link="com.tecknobit.equinoxbackend.environment.services.builtin.controller/EquinoxController///PointingToGenericParameters(1)/">R</span><span
+                                    class="token punctuation">, </span><span
+                                    data-unresolved-link="com.tecknobit.equinoxbackend.environment.services.builtin.controller/EquinoxController///PointingToGenericParameters(2)/">H</span><span
+                                    class="token operator">&gt; </span></div>
+                            <p class="paragraph">The <code class="lang-kotlin">DefaultGliderController</code> class is
+                                useful to give the base behavior of the <strong>Glider's controllers</strong></p><span
+                                class="kdoc-tag"><h4 class="">Author</h4><p class="paragraph">N7ghtm4r3 - Tecknobit</p></span>
+                            <h4 class="">Inheritors</h4>
+                            <div class="table">
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex"><div><a
+                                                href="../../com.tecknobit.glider.services.passwords.controller/-passwords-controller/index.html">PasswordsController</a></div></span>
+                                        </div>
+                                        <div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tabbedcontent">
+                    <div class="tabs-section" tabs-section="tabs-section">
+                        <button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">
+                            Members
+                        </button>
+                    </div>
+                    <div class="tabs-section-body">
+                        <div data-togglable="CONSTRUCTOR">
+                            <h2 class="">Constructors</h2>
+                            <div class="table"><a data-name="-2137667166%2FConstructors%2F-612206970"
+                                                  anchor-label="DefaultGliderController"
+                                                  id="-2137667166%2FConstructors%2F-612206970"
+                                                  data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-togglable="CONSTRUCTOR"
+                                     data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="-default-glider-controller.html"><span>Default</span><wbr><span>Glider</span><wbr><span><span>Controller</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2137667166%2FConstructors%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">constructor</span><span
+                                                                class="token punctuation">(</span><span
+                                                                class="token punctuation">)</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div data-togglable="PROPERTY">
+                            <h2 class="">Properties</h2>
+                            <div class="table"><a data-name="-1126030305%2FProperties%2F-612206970"
+                                                  anchor-label="configuration"
+                                                  id="-1126030305%2FProperties%2F-612206970"
+                                                  data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1126030305%2FProperties%2F-612206970"><span><span>configuration</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1126030305%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">val </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1126030305%2FProperties%2F-612206970">configuration</a><span
+                                                                class="token operator">: </span><span
+                                                                data-unresolved-link="com.tecknobit.equinoxbackend.configuration/EquinoxBackendConfiguration///PointingToDeclaration/">EquinoxBackendConfiguration</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-204942289%2FProperties%2F-612206970" anchor-label="jsonHelper"
+                                   id="-204942289%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-204942289%2FProperties%2F-612206970"><span>json</span><wbr><span><span>Helper</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-204942289%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">var </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-204942289%2FProperties%2F-612206970">jsonHelper</a><span
+                                                                class="token operator">: </span><span
+                                                                data-unresolved-link="com.tecknobit.apimanager.formatters/JsonHelper///PointingToDeclaration/">JsonHelper</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="761981837%2FProperties%2F-612206970" anchor-label="me"
+                                   id="761981837%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#761981837%2FProperties%2F-612206970"><span><span>me</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="761981837%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">var </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#761981837%2FProperties%2F-612206970">me</a><span
+                                                                class="token operator">: </span><span
+                                                                data-unresolved-link="com.tecknobit.equinoxbackend.environment.services.builtin.controller/EquinoxController///PointingToGenericParameters(0)/">T</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="960711571%2FProperties%2F-612206970" anchor-label="messageSource"
+                                   id="960711571%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#960711571%2FProperties%2F-612206970"><span>message</span><wbr><span><span>Source</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="960711571%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">var </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#960711571%2FProperties%2F-612206970">messageSource</a><span
+                                                                class="token operator">: </span><span
+                                                                data-unresolved-link="org.springframework.context/MessageSource///PointingToDeclaration/">MessageSource</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-2093580415%2FProperties%2F-612206970"
+                                   anchor-label="NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE"
+                                   id="-2093580415%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-2093580415%2FProperties%2F-612206970"><span>NOT_</span><wbr><span>AUTHORIZED_</span><wbr><span>OR_</span><wbr><span>WRONG_</span><wbr><span>DETAILS_</span><wbr><span>MESSAGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2093580415%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">val </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-2093580415%2FProperties%2F-612206970">NOT_AUTHORIZED_OR_WRONG_DETAILS_MESSAGE</a><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator"> = </span><span
+                                                                class="token string">"not_authorized"</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-853614113%2FProperties%2F-612206970" anchor-label="resourcesProvider"
+                                   id="-853614113%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-853614113%2FProperties%2F-612206970"><span>resources</span><wbr><span><span>Provider</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-853614113%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">var </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-853614113%2FProperties%2F-612206970">resourcesProvider</a><span
+                                                                class="token operator">: </span><span
+                                                                data-unresolved-link="com.tecknobit.equinoxbackend.resourcesutils/ResourcesProvider///PointingToDeclaration/">ResourcesProvider</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="833130069%2FProperties%2F-612206970"
+                                   anchor-label="RESPONSE_SUCCESSFUL_MESSAGE" id="833130069%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#833130069%2FProperties%2F-612206970"><span>RESPONSE_</span><wbr><span>SUCCESSFUL_</span><wbr><span>MESSAGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="833130069%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">val </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#833130069%2FProperties%2F-612206970">RESPONSE_SUCCESSFUL_MESSAGE</a><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator"> = </span><span
+                                                                class="token string">"operation_executed_successfully"</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="312620102%2FProperties%2F-612206970" anchor-label="serverProtector"
+                                   id="312620102%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#312620102%2FProperties%2F-612206970"><span>server</span><wbr><span><span>Protector</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="312620102%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">var </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#312620102%2FProperties%2F-612206970">serverProtector</a><span
+                                                                class="token operator">: </span><span
+                                                                data-unresolved-link="com.tecknobit.apimanager.apis/ServerProtector///PointingToDeclaration/">ServerProtector</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-1203078365%2FProperties%2F-612206970" anchor-label="usersRepository"
+                                   id="-1203078365%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1203078365%2FProperties%2F-612206970"><span>users</span><wbr><span><span>Repository</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1203078365%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">var </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1203078365%2FProperties%2F-612206970">usersRepository</a><span
+                                                                class="token operator">: </span><span
+                                                                data-unresolved-link="com.tecknobit.equinoxbackend.environment.services.builtin.controller/EquinoxController///PointingToGenericParameters(1)/">R</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-1379507293%2FProperties%2F-612206970" anchor-label="WRONG_EMAIL_MESSAGE"
+                                   id="-1379507293%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1379507293%2FProperties%2F-612206970"><span>WRONG_</span><wbr><span>EMAIL_</span><wbr><span>MESSAGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1379507293%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">val </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1379507293%2FProperties%2F-612206970">WRONG_EMAIL_MESSAGE</a><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator"> = </span><span
+                                                                class="token string">"wrong_email"</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="2036762611%2FProperties%2F-612206970"
+                                   anchor-label="WRONG_LANGUAGE_MESSAGE" id="2036762611%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#2036762611%2FProperties%2F-612206970"><span>WRONG_</span><wbr><span>LANGUAGE_</span><wbr><span>MESSAGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2036762611%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">val </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#2036762611%2FProperties%2F-612206970">WRONG_LANGUAGE_MESSAGE</a><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator"> = </span><span
+                                                                class="token string">"wrong_language"</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="949884448%2FProperties%2F-612206970" anchor-label="WRONG_NAME_MESSAGE"
+                                   id="949884448%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#949884448%2FProperties%2F-612206970"><span>WRONG_</span><wbr><span>NAME_</span><wbr><span>MESSAGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="949884448%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">val </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#949884448%2FProperties%2F-612206970">WRONG_NAME_MESSAGE</a><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator"> = </span><span
+                                                                class="token string">"wrong_name"</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-641690352%2FProperties%2F-612206970"
+                                   anchor-label="WRONG_PASSWORD_MESSAGE" id="-641690352%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-641690352%2FProperties%2F-612206970"><span>WRONG_</span><wbr><span>PASSWORD_</span><wbr><span>MESSAGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-641690352%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">val </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-641690352%2FProperties%2F-612206970">WRONG_PASSWORD_MESSAGE</a><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator"> = </span><span
+                                                                class="token string">"wrong_password"</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-1822338484%2FProperties%2F-612206970"
+                                   anchor-label="WRONG_PROCEDURE_MESSAGE" id="-1822338484%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1822338484%2FProperties%2F-612206970"><span>WRONG_</span><wbr><span>PROCEDURE_</span><wbr><span>MESSAGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1822338484%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">val </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1822338484%2FProperties%2F-612206970">WRONG_PROCEDURE_MESSAGE</a><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator"> = </span><span
+                                                                class="token string">"wrong_procedure"</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="1045152708%2FProperties%2F-612206970" anchor-label="WRONG_SURNAME_MESSAGE"
+                                   id="1045152708%2FProperties%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#1045152708%2FProperties%2F-612206970"><span>WRONG_</span><wbr><span>SURNAME_</span><wbr><span>MESSAGE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1045152708%2FProperties%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">val </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#1045152708%2FProperties%2F-612206970">WRONG_SURNAME_MESSAGE</a><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator"> = </span><span
+                                                                class="token string">"wrong_surname"</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div data-togglable="FUNCTION">
+                            <h2 class="">Functions</h2>
+                            <div class="table"><a data-name="-569406398%2FFunctions%2F-612206970"
+                                                  anchor-label="failedResponse" id="-569406398%2FFunctions%2F-612206970"
+                                                  data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-569406398%2FFunctions%2F-612206970"><span>failed</span><wbr><span><span>Response</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-569406398%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-569406398%2FFunctions%2F-612206970"><span
+                                                                class="token function">failedResponse</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span
+                                                                class="parameter ">errorKey<span class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-1400604697%2FFunctions%2F-612206970" anchor-label="generateIdentifier"
+                                   id="-1400604697%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1400604697%2FFunctions%2F-612206970"><span>generate</span><wbr><span><span>Identifier</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1400604697%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1400604697%2FFunctions%2F-612206970"><span
+                                                                class="token function">generateIdentifier</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="778897073%2FFunctions%2F-612206970"
+                                   anchor-label="getInternationalizedMessage" id="778897073%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#778897073%2FFunctions%2F-612206970"><span>get</span><wbr><span>Internationalized</span><wbr><span><span>Message</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="778897073%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#778897073%2FFunctions%2F-612206970"><span
+                                                                class="token function">getInternationalizedMessage</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span
+                                                                class="parameter ">messageKey<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="1939318198%2FFunctions%2F-612206970" anchor-label="initEquinoxEnvironment"
+                                   id="1939318198%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#1939318198%2FFunctions%2F-612206970"><span>init</span><wbr><span>Equinox</span><wbr><span><span>Environment</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1939318198%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#1939318198%2FFunctions%2F-612206970"><span
+                                                                class="token function">initEquinoxEnvironment</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span
+                                                                class="parameter ">context<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">Class</a><span
+                                                                class="token operator">&lt;</span><span
+                                                                class="token keyword">out </span><a
+                                                                href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-any/index.html">Any</a><span
+                                                                class="token operator">&gt;</span><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">args<span
+                                                                class="token operator">: </span><a
+                                                                href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-array/index.html">Array</a><span
+                                                                class="token operator">&lt;</span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token operator">&gt;</span></span></span><span
+                                                                class="token punctuation">)</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-1245505476%2FFunctions%2F-612206970" anchor-label="isMe"
+                                   id="-1245505476%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1245505476%2FFunctions%2F-612206970"><span>is</span><wbr><span><span>Me</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1245505476%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1245505476%2FFunctions%2F-612206970"><span
+                                                                class="token function">isMe</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">id<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">token<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-264279978%2FFunctions%2F-612206970" anchor-label="loadJsonHelper"
+                                   id="-264279978%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-264279978%2FFunctions%2F-612206970"><span>load</span><wbr><span>Json</span><wbr><span><span>Helper</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-264279978%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-264279978%2FFunctions%2F-612206970"><span
+                                                                class="token function">loadJsonHelper</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span
+                                                                class="parameter ">payload<span
+                                                                class="token operator">: </span><span
+                                                                data-unresolved-link="org.json/JSONObject///PointingToDeclaration/">JSONObject</span></span></span><span
+                                                                class="token punctuation">)</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="23709763%2FFunctions%2F-612206970" anchor-label="plainResponse"
+                                   id="23709763%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#23709763%2FFunctions%2F-612206970"><span>plain</span><wbr><span><span>Response</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="23709763%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#23709763%2FFunctions%2F-612206970"><span
+                                                                class="token function">plainResponse</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">status<span
+                                                                class="token operator">: </span><span
+                                                                data-unresolved-link="com.tecknobit.equinoxcore.network/ResponseStatus///PointingToDeclaration/">ResponseStatus</span><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">message<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-1136418670%2FFunctions%2F-612206970" anchor-label="setSessionLocale"
+                                   id="-1136418670%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1136418670%2FFunctions%2F-612206970"><span>set</span><wbr><span>Session</span><wbr><span><span>Locale</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1136418670%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-1136418670%2FFunctions%2F-612206970"><span
+                                                                class="token function">setSessionLocale</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">locale<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-362629056%2FFunctions%2F-612206970" anchor-label="successResponse"
+                                   id="-362629056%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#961709425%2FFunctions%2F-612206970"><span>success</span><wbr><span><span>Response</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-362629056%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#961709425%2FFunctions%2F-612206970"><span
+                                                                class="token function">successResponse</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a>
+                                                        </div>
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><span
+                                                                class="token operator">&lt;</span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-760539749%2FFunctions%2F-612206970">V</a><span
+                                                                class="token operator">&gt; </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-760539749%2FFunctions%2F-612206970"><span
+                                                                class="token function">successResponse</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">value<span
+                                                                class="token operator">: </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-760539749%2FFunctions%2F-612206970">V</a></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html">HashMap</a><span
+                                                                class="token operator">&lt;</span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span><a
+                                                                href="../../com.tecknobit.glider.services.users.controller/-glider-users-controller/index.html#-760539749%2FFunctions%2F-612206970">V</a><span
+                                                                class="token operator">&gt;</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a data-name="-1344696535%2FFunctions%2F-612206970" anchor-label="validRequester"
+                                   id="-1344696535%2FFunctions%2F-612206970"
+                                   data-filterable-set=":backend:dokkaHtmlPartial/main"></a>
+                                <div class="table-row" data-filterable-current=":backend:dokkaHtmlPartial/main"
+                                     data-filterable-set=":backend:dokkaHtmlPartial/main">
+                                    <div class="main-subrow keyValue ">
+                                        <div class=""><span class="inline-flex">
+                  <div><a href="valid-requester.html"><span>valid</span><wbr><span><span>Requester</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1344696535%2FFunctions%2F-612206970"></span>
+                    <div class="copy-popup-wrapper "><span
+                            class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+                                        <div>
+                                            <div class="title">
+                                                <div class="platform-hinted "
+                                                     data-platform-hinted="data-platform-hinted">
+                                                    <div class="content sourceset-dependent-content" data-active=""
+                                                         data-togglable=":backend:dokkaHtmlPartial/main">
+                                                        <div class="symbol monospace"><span class="token keyword">protected </span><span
+                                                                class="token keyword">open </span><span
+                                                                class="token keyword">fun </span><a
+                                                                href="valid-requester.html"><span
+                                                                class="token function">validRequester</span></a><span
+                                                                class="token punctuation">(</span><span
+                                                                class="parameters "><span class="parameter ">userId<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">token<span
+                                                                class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a><span
+                                                                class="token punctuation">, </span></span><span
+                                                                class="parameter ">deviceId<span class="token operator">: </span><a
+                                                                href="https://docs.oracle.com/javase/8/docs/api/java/lang/String.html">String</a></span></span><span
+                                                                class="token punctuation">)</span><span
+                                                                class="token operator">: </span><a
+                                                                href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a>
+                                                        </div>
+                                                        <div class="brief ">Method used to validate the requester's
+                                                            identifier, token and the device id from requested an
+                                                            operation
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+                <span>© 2025 Copyright</span>
+                <span class="pull-right">
+            <span>Generated by </span>
+            <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                <span>dokka</span>
+            </a>
+        </span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
