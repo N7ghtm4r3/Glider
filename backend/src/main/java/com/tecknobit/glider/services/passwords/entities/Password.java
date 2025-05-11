@@ -3,6 +3,7 @@ package com.tecknobit.glider.services.passwords.entities;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.tecknobit.equinoxbackend.annotations.EmptyConstructor;
 import com.tecknobit.equinoxbackend.environment.services.builtin.entity.EquinoxItem;
 import com.tecknobit.glider.services.users.entities.GliderUser;
 import com.tecknobit.glidercore.enums.PasswordType;
@@ -93,6 +94,7 @@ public class Password extends EquinoxItem {
      *
      * @apiNote empty constructor required
      */
+    @EmptyConstructor
     public Password() {
         this(null, -1, null, null, null, null, List.of(), null, null);
     }

@@ -1,5 +1,6 @@
 package com.tecknobit.glider.services.users.entities;
 
+import com.tecknobit.equinoxbackend.annotations.EmptyConstructor;
 import com.tecknobit.equinoxbackend.environment.services.builtin.entity.EquinoxItem;
 import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
@@ -48,6 +49,7 @@ public class DeviceUserSession extends EquinoxItem {
      *
      * @apiNote empty constructor required
      */
+    @EmptyConstructor
     public DeviceUserSession() {
         this(null, null, -1);
     }

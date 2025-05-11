@@ -1,6 +1,7 @@
 package com.tecknobit.glider.services.users.entities;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.tecknobit.equinoxbackend.annotations.EmptyConstructor;
 import com.tecknobit.equinoxbackend.environment.services.builtin.entity.EquinoxItem;
 import com.tecknobit.glidercore.enums.ConnectedDeviceType;
 import jakarta.persistence.*;
@@ -64,6 +65,7 @@ public class ConnectedDevice extends EquinoxItem {
      *
      * @apiNote empty constructor required
      */
+    @EmptyConstructor
     public ConnectedDevice() {
         this(null, null, null, null, null);
     }

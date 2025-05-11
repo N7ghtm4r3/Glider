@@ -1,6 +1,7 @@
 package com.tecknobit.glider.services.users.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tecknobit.equinoxbackend.annotations.EmptyConstructor;
 import com.tecknobit.equinoxbackend.environment.services.builtin.entity.EquinoxItem;
 import com.tecknobit.equinoxbackend.environment.services.users.entity.EquinoxUser;
 import com.tecknobit.glider.services.passwords.entities.Password;
@@ -47,6 +48,7 @@ public class GliderUser extends EquinoxUser {
      *
      * @apiNote empty constructor required
      */
+    @EmptyConstructor
     public GliderUser() {
         this(null, null, null, null, null, null, null, List.of(),
                 List.of());
