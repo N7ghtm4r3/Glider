@@ -9,6 +9,7 @@ import com.tecknobit.equinoxcore.annotations.Validator;
 import com.tecknobit.glider.services.users.entities.GliderUser;
 import com.tecknobit.glider.services.users.repositories.GliderUsersRepository;
 import com.tecknobit.glider.services.users.services.GliderUsersService;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,7 +47,7 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
     @Override
     @CustomParametersOrder(order = DEVICE_KEY)
     protected Object[] getSignUpCustomParams() {
-        return new Object[]{jsonHelper.getString(DEVICE_KEY)};
+        return new Object[]{jsonHelper.getJSONObject(DEVICE_KEY)};
     }
 
     /**
@@ -81,7 +82,7 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
     @Override
     @CustomParametersOrder(order = DEVICE_KEY)
     protected Object[] getSignInCustomParams() {
-        return new Object[]{jsonHelper.getString(DEVICE_KEY)};
+        return new Object[]{jsonHelper.getJSONObject(DEVICE_KEY)};
     }
 
     /**
@@ -113,7 +114,7 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
     @Validator
     @CustomParametersOrder(order = DEVICE_KEY)
     private String validateDeviceData(Object... custom) {
-        String deviceData = (String) custom[0];
+        JSONObject deviceData = (JSONObject) custom[0];
         if (deviceData == null)
             return WRONG_DEVICE_DATA_MESSAGE;
         return null;
