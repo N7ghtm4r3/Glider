@@ -29,8 +29,19 @@ public class GliderUsersService extends EquinoxUsersService<GliderUser, GliderUs
     /**
      * {@code devicesService} instance used to manage the database operations for the devices
      */
+    private final DevicesService devicesService;
+
+    /**
+     * Constructor to init the {@link EquinoxUsersService} service
+     *
+     * @param usersRepository The instance for the users repository
+     * @param devicesService  The instance used to manage the database operations for the devices
+     */
     @Autowired
-    private DevicesService devicesService;
+    public GliderUsersService(GliderUsersRepository usersRepository, DevicesService devicesService) {
+        super(usersRepository);
+        this.devicesService = devicesService;
+    }
 
     /**
      * {@inheritDoc}

@@ -2,6 +2,7 @@ package com.tecknobit.glider.helpers;
 
 import com.tecknobit.apimanager.apis.APIRequest;
 import com.tecknobit.apimanager.apis.encryption.aes.AESServerCipher;
+import com.tecknobit.equinoxcore.annotations.FutureEquinoxApi;
 import com.tecknobit.equinoxcore.annotations.Wrapper;
 import com.tecknobit.glider.services.passwords.entities.Password;
 import com.tecknobit.glidercore.enums.PasswordType;
@@ -27,6 +28,13 @@ import static com.tecknobit.equinoxbackend.resourcesutils.ResourcesManager.RESOU
  *
  * @author N7ghtm4r3 - Tecknobit
  */
+@FutureEquinoxApi(
+        releaseVersion = "1.2.0",
+        protoBehavior = """
+                This could be integrated as official standalone api in Equinox, adapting to a general purpose.
+                Check to integrate that as well and replace this
+                """
+)
 public class ServerVault {
 
     /**

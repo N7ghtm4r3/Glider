@@ -47,8 +47,17 @@ public class PasswordsController extends DefaultGliderController {
     /**
      * {@code passwordsService} helper to manage the passwords database operations
      */
+    private final PasswordsService passwordsService;
+
+    /**
+     * Constructor used to init the controller
+     *
+     * @param passwordsService The helper to manage the passwords database operations
+     */
     @Autowired
-    private PasswordsService passwordsService;
+    public PasswordsController(PasswordsService passwordsService) {
+        this.passwordsService = passwordsService;
+    }
 
     /**
      * Endpoint used to generate a new password for a user

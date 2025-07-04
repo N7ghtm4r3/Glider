@@ -42,14 +42,24 @@ public class PasswordsService {
     /**
      * {@code passwordsRepository} instance used to manage the database operations for the passwords
      */
-    @Autowired
-    private PasswordsRepository passwordsRepository;
+    private final PasswordsRepository passwordsRepository;
 
     /**
      * {@code eventsService} instance used to manage the events related to a password
      */
+    private final PasswordEventsService eventsService;
+
+    /**
+     * Constructor used to init the service
+     *
+     * @param passwordsRepository The instance used to manage the database operations for the passwords
+     * @param eventsService       The instance used to manage the events related to a password
+     */
     @Autowired
-    private PasswordEventsService eventsService;
+    public PasswordsService(PasswordsRepository passwordsRepository, PasswordEventsService eventsService) {
+        this.passwordsRepository = passwordsRepository;
+        this.eventsService = eventsService;
+    }
 
     /**
      * Method used to generate a password
