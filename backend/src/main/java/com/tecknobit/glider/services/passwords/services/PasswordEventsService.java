@@ -22,8 +22,17 @@ public class PasswordEventsService {
     /**
      * {@code eventsRepository} instance used to manage the database operations for the events
      */
+    private final PasswordEventsRepository eventsRepository;
+
+    /**
+     * Constructor used to init the service
+     *
+     * @param eventsRepository The instance used to manage the database operations for the events
+     */
     @Autowired
-    private PasswordEventsRepository eventsRepository;
+    public PasswordEventsService(PasswordEventsRepository eventsRepository) {
+        this.eventsRepository = eventsRepository;
+    }
 
     /**
      * Method used to register the {@link PasswordEventType#GENERATED} event

@@ -1,6 +1,6 @@
 # Glider
 
-**v2.0.1**
+**v2.0.2**
 
 This is an open source self-hosted project useful to manage the creation and the storage of
 your passwords with the Glider system.
@@ -36,7 +36,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.tecknobit.glidercore:glidercore:2.0.1'
+  implementation 'com.tecknobit.glidercore:glidercore:2.0.2'
 }
 ```
 
@@ -49,7 +49,7 @@ repositories {
 }
 
 dependencies {
-  implementation("com.tecknobit.glidercore:glidercore:2.0.1")
+  implementation("com.tecknobit.glidercore:glidercore:2.0.2")
 }
 ```
 
@@ -58,14 +58,14 @@ dependencies {
 ### Clients
 
 - [Android](https://play.google.com/store/apps/details?id=com.tecknobit.glider)
-- [Glider desktop version](https://github.com/N7ghtm4r3/Glider-Clients/releases/tag/2.0.1)
+- [Glider desktop version](https://github.com/N7ghtm4r3/Glider-Clients/releases/tag/2.0.2)
 - iOS -> source code available, but cannot distribute due
   missing [Apple Developer Program license](https://developer.apple.com/programs/)
 - [Glider webapp version](https://github.com/N7ghtm4r3/Glider-WebApp)
 
 ### Backend
 
-- [Backend service "out-of-the-box"](https://github.com/N7ghtm4r3/Glider/releases/tag/2.0.1)
+- [Backend service "out-of-the-box"](https://github.com/N7ghtm4r3/Glider/releases/tag/2.0.2)
 
 ## Usages
 
@@ -95,32 +95,17 @@ dependencies {
 
 The default properties to launch the backend service as designed are the following:
 
-``` properties
-# The properties considered critical could alter the flow of how the backend service was designed, so we do not recommend
-# to change them
-
-spring.datasource.url=jdbc:mysql://localhost:3306/glider?createDatabaseIfNotExist=true
-server.port=1758
-spring.datasource.username=root
-spring.jpa.generate-ddl=true 
-spring.jpa.hibernate.ddl.auto=update
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
-spring.mvc.dispatch-options-request=true
-spring.servlet.multipart.max-file-size=10MB
-spring.servlet.multipart.max-request-size=10MB
-```
-
-| Property                                  | Default value                                                    |    Not-Critical    | Recommended to change |
-|-------------------------------------------|------------------------------------------------------------------|:------------------:|:---------------------:|
-| spring.datasource.url                     | jdbc:mysql://localhost:3306/glider?createDatabaseIfNotExist=true | :white_check_mark: |          :x:          | 
-| server.port                               | 1758                                                             | :white_check_mark: |           /           |
-| spring.datasource.username                | root                                                             | :white_check_mark: |  :white_check_mark:   |
-| spring.jpa.generate-ddl                   | update                                                           |        :x:         |          :x:          |
-| spring.jpa.hibernate.ddl.auto             | auto                                                             |        :x:         |          :x:          |           
-| spring.jpa.properties.hibernate.dialect   | org.hibernate.dialect.MySQL8Dialect                              |        :x:         |          :x:          |           
-| spring.mvc.dispatch-options-request       | true                                                             |        :x:         |          :x:          |           
-| spring.servlet.multipart.max-file-size    | 10MB                                                             | :white_check_mark: |           /           |           
-| spring.servlet.multipart.max-request-size | 10MB                                                             | :white_check_mark: |           /           |
+| Property                                  | Default value                                                    |
+|-------------------------------------------|------------------------------------------------------------------|
+| spring.datasource.url                     | jdbc:mysql://localhost:3306/glider?createDatabaseIfNotExist=true | 
+| server.port                               | 1758                                                             |
+| spring.datasource.username                | root                                                             |
+| spring.jpa.generate-ddl                   | update                                                           |
+| spring.jpa.hibernate.ddl.auto             | auto                                                             |           
+| spring.jpa.properties.hibernate.dialect   | org.hibernate.dialect.MySQL8Dialect                              |           
+| spring.mvc.dispatch-options-request       | true                                                             |           
+| spring.servlet.multipart.max-file-size    | 10MB                                                             |           
+| spring.servlet.multipart.max-request-size | 10MB                                                             |
 
 The **spring.datasource.username** if is not set is used the default password of the MySQL environment
 
@@ -130,10 +115,10 @@ To customize the properties to launch the backend service you must create a file
 the server file (.jar)** and call it **"custom.properties"** as below:
 
 ``` bash
-  folderOfWhereYouPlacedTheServerFile
-   |-- custom.properties
-   |-- glider.jar
-  ```
+folderOfWhereYouPlacedTheServerFile
+├── custom.properties
+└── glider.jar
+```
 
 If your custom properties do not contain the properties of the default configuration will be used these default
 properties instead,

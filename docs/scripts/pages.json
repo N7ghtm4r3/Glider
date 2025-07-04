@@ -711,16 +711,6 @@
   },
   {
     "name": "constructor()",
-    "description": "com.tecknobit.glider.services.passwords.controller.PasswordsController.PasswordsController",
-    "location": "backend/com.tecknobit.glider.services.passwords.controller/-passwords-controller/-passwords-controller.html",
-    "searchKeys": [
-      "PasswordsController",
-      "constructor()",
-      "com.tecknobit.glider.services.passwords.controller.PasswordsController.PasswordsController"
-    ]
-  },
-  {
-    "name": "constructor()",
     "description": "com.tecknobit.glider.services.passwords.entities.Password.Password",
     "location": "backend/com.tecknobit.glider.services.passwords.entities/-password/-password.html",
     "searchKeys": [
@@ -751,42 +741,12 @@
   },
   {
     "name": "constructor()",
-    "description": "com.tecknobit.glider.services.passwords.services.PasswordEventsService.PasswordEventsService",
-    "location": "backend/com.tecknobit.glider.services.passwords.services/-password-events-service/-password-events-service.html",
-    "searchKeys": [
-      "PasswordEventsService",
-      "constructor()",
-      "com.tecknobit.glider.services.passwords.services.PasswordEventsService.PasswordEventsService"
-    ]
-  },
-  {
-    "name": "constructor()",
-    "description": "com.tecknobit.glider.services.passwords.services.PasswordsService.PasswordsService",
-    "location": "backend/com.tecknobit.glider.services.passwords.services/-passwords-service/-passwords-service.html",
-    "searchKeys": [
-      "PasswordsService",
-      "constructor()",
-      "com.tecknobit.glider.services.passwords.services.PasswordsService.PasswordsService"
-    ]
-  },
-  {
-    "name": "constructor()",
     "description": "com.tecknobit.glider.services.shared.controllers.DefaultGliderController.DefaultGliderController",
     "location": "backend/com.tecknobit.glider.services.shared.controllers/-default-glider-controller/-default-glider-controller.html",
     "searchKeys": [
       "DefaultGliderController",
       "constructor()",
       "com.tecknobit.glider.services.shared.controllers.DefaultGliderController.DefaultGliderController"
-    ]
-  },
-  {
-    "name": "constructor()",
-    "description": "com.tecknobit.glider.services.users.controller.GliderUsersController.GliderUsersController",
-    "location": "backend/com.tecknobit.glider.services.users.controller/-glider-users-controller/-glider-users-controller.html",
-    "searchKeys": [
-      "GliderUsersController",
-      "constructor()",
-      "com.tecknobit.glider.services.users.controller.GliderUsersController.GliderUsersController"
     ]
   },
   {
@@ -830,23 +790,23 @@
     ]
   },
   {
-    "name": "constructor()",
+    "name": "constructor(devicesRepository: DevicesRepository)",
     "description": "com.tecknobit.glider.services.users.services.DevicesService.DevicesService",
     "location": "backend/com.tecknobit.glider.services.users.services/-devices-service/-devices-service.html",
     "searchKeys": [
       "DevicesService",
-      "constructor()",
+      "constructor(devicesRepository: DevicesRepository)",
       "com.tecknobit.glider.services.users.services.DevicesService.DevicesService"
     ]
   },
   {
-    "name": "constructor()",
-    "description": "com.tecknobit.glider.services.users.services.GliderUsersService.GliderUsersService",
-    "location": "backend/com.tecknobit.glider.services.users.services/-glider-users-service/-glider-users-service.html",
+    "name": "constructor(eventsRepository: PasswordEventsRepository)",
+    "description": "com.tecknobit.glider.services.passwords.services.PasswordEventsService.PasswordEventsService",
+    "location": "backend/com.tecknobit.glider.services.passwords.services/-password-events-service/-password-events-service.html",
     "searchKeys": [
-      "GliderUsersService",
-      "constructor()",
-      "com.tecknobit.glider.services.users.services.GliderUsersService.GliderUsersService"
+      "PasswordEventsService",
+      "constructor(eventsRepository: PasswordEventsRepository)",
+      "com.tecknobit.glider.services.passwords.services.PasswordEventsService.PasswordEventsService"
     ]
   },
   {
@@ -930,6 +890,26 @@
     ]
   },
   {
+    "name": "constructor(passwordsRepository: PasswordsRepository, eventsService: PasswordEventsService)",
+    "description": "com.tecknobit.glider.services.passwords.services.PasswordsService.PasswordsService",
+    "location": "backend/com.tecknobit.glider.services.passwords.services/-passwords-service/-passwords-service.html",
+    "searchKeys": [
+      "PasswordsService",
+      "constructor(passwordsRepository: PasswordsRepository, eventsService: PasswordEventsService)",
+      "com.tecknobit.glider.services.passwords.services.PasswordsService.PasswordsService"
+    ]
+  },
+  {
+    "name": "constructor(passwordsService: PasswordsService)",
+    "description": "com.tecknobit.glider.services.passwords.controller.PasswordsController.PasswordsController",
+    "location": "backend/com.tecknobit.glider.services.passwords.controller/-passwords-controller/-passwords-controller.html",
+    "searchKeys": [
+      "PasswordsController",
+      "constructor(passwordsService: PasswordsService)",
+      "com.tecknobit.glider.services.passwords.controller.PasswordsController.PasswordsController"
+    ]
+  },
+  {
     "name": "constructor(sessionId: String, device: ConnectedDevice, lastLogin: Long)",
     "description": "com.tecknobit.glider.services.users.entities.DeviceUserSession.DeviceUserSession",
     "location": "backend/com.tecknobit.glider.services.users.entities/-device-user-session/-device-user-session.html",
@@ -937,6 +917,26 @@
       "DeviceUserSession",
       "constructor(sessionId: String, device: ConnectedDevice, lastLogin: Long)",
       "com.tecknobit.glider.services.users.entities.DeviceUserSession.DeviceUserSession"
+    ]
+  },
+  {
+    "name": "constructor(usersRepository: GliderUsersRepository, devicesService: DevicesService)",
+    "description": "com.tecknobit.glider.services.users.services.GliderUsersService.GliderUsersService",
+    "location": "backend/com.tecknobit.glider.services.users.services/-glider-users-service/-glider-users-service.html",
+    "searchKeys": [
+      "GliderUsersService",
+      "constructor(usersRepository: GliderUsersRepository, devicesService: DevicesService)",
+      "com.tecknobit.glider.services.users.services.GliderUsersService.GliderUsersService"
+    ]
+  },
+  {
+    "name": "constructor(usersService: GliderUsersService)",
+    "description": "com.tecknobit.glider.services.users.controller.GliderUsersController.GliderUsersController",
+    "location": "backend/com.tecknobit.glider.services.users.controller/-glider-users-controller/-glider-users-controller.html",
+    "searchKeys": [
+      "GliderUsersController",
+      "constructor(usersService: GliderUsersService)",
+      "com.tecknobit.glider.services.users.controller.GliderUsersController.GliderUsersController"
     ]
   },
   {
@@ -2040,66 +2040,6 @@
     ]
   },
   {
-    "name": "private open var devicesRepository: DevicesRepository",
-    "description": "com.tecknobit.glider.services.users.services.DevicesService.devicesRepository",
-    "location": "backend/com.tecknobit.glider.services.users.services/-devices-service/devices-repository.html",
-    "searchKeys": [
-      "devicesRepository",
-      "private open var devicesRepository: DevicesRepository",
-      "com.tecknobit.glider.services.users.services.DevicesService.devicesRepository"
-    ]
-  },
-  {
-    "name": "private open var devicesService: DevicesService",
-    "description": "com.tecknobit.glider.services.users.services.GliderUsersService.devicesService",
-    "location": "backend/com.tecknobit.glider.services.users.services/-glider-users-service/devices-service.html",
-    "searchKeys": [
-      "devicesService",
-      "private open var devicesService: DevicesService",
-      "com.tecknobit.glider.services.users.services.GliderUsersService.devicesService"
-    ]
-  },
-  {
-    "name": "private open var eventsRepository: PasswordEventsRepository",
-    "description": "com.tecknobit.glider.services.passwords.services.PasswordEventsService.eventsRepository",
-    "location": "backend/com.tecknobit.glider.services.passwords.services/-password-events-service/events-repository.html",
-    "searchKeys": [
-      "eventsRepository",
-      "private open var eventsRepository: PasswordEventsRepository",
-      "com.tecknobit.glider.services.passwords.services.PasswordEventsService.eventsRepository"
-    ]
-  },
-  {
-    "name": "private open var eventsService: PasswordEventsService",
-    "description": "com.tecknobit.glider.services.passwords.services.PasswordsService.eventsService",
-    "location": "backend/com.tecknobit.glider.services.passwords.services/-passwords-service/events-service.html",
-    "searchKeys": [
-      "eventsService",
-      "private open var eventsService: PasswordEventsService",
-      "com.tecknobit.glider.services.passwords.services.PasswordsService.eventsService"
-    ]
-  },
-  {
-    "name": "private open var passwordsRepository: PasswordsRepository",
-    "description": "com.tecknobit.glider.services.passwords.services.PasswordsService.passwordsRepository",
-    "location": "backend/com.tecknobit.glider.services.passwords.services/-passwords-service/passwords-repository.html",
-    "searchKeys": [
-      "passwordsRepository",
-      "private open var passwordsRepository: PasswordsRepository",
-      "com.tecknobit.glider.services.passwords.services.PasswordsService.passwordsRepository"
-    ]
-  },
-  {
-    "name": "private open var passwordsService: PasswordsService",
-    "description": "com.tecknobit.glider.services.passwords.controller.PasswordsController.passwordsService",
-    "location": "backend/com.tecknobit.glider.services.passwords.controller/-passwords-controller/passwords-service.html",
-    "searchKeys": [
-      "passwordsService",
-      "private open var passwordsService: PasswordsService",
-      "com.tecknobit.glider.services.passwords.controller.PasswordsController.passwordsService"
-    ]
-  },
-  {
     "name": "private open var sessions: List<DeviceUserSession>",
     "description": "com.tecknobit.glider.services.users.entities.ConnectedDevice.sessions",
     "location": "backend/com.tecknobit.glider.services.users.entities/-connected-device/sessions.html",
@@ -2210,6 +2150,46 @@
     ]
   },
   {
+    "name": "private val devicesRepository: DevicesRepository",
+    "description": "com.tecknobit.glider.services.users.services.DevicesService.devicesRepository",
+    "location": "backend/com.tecknobit.glider.services.users.services/-devices-service/devices-repository.html",
+    "searchKeys": [
+      "devicesRepository",
+      "private val devicesRepository: DevicesRepository",
+      "com.tecknobit.glider.services.users.services.DevicesService.devicesRepository"
+    ]
+  },
+  {
+    "name": "private val devicesService: DevicesService",
+    "description": "com.tecknobit.glider.services.users.services.GliderUsersService.devicesService",
+    "location": "backend/com.tecknobit.glider.services.users.services/-glider-users-service/devices-service.html",
+    "searchKeys": [
+      "devicesService",
+      "private val devicesService: DevicesService",
+      "com.tecknobit.glider.services.users.services.GliderUsersService.devicesService"
+    ]
+  },
+  {
+    "name": "private val eventsRepository: PasswordEventsRepository",
+    "description": "com.tecknobit.glider.services.passwords.services.PasswordEventsService.eventsRepository",
+    "location": "backend/com.tecknobit.glider.services.passwords.services/-password-events-service/events-repository.html",
+    "searchKeys": [
+      "eventsRepository",
+      "private val eventsRepository: PasswordEventsRepository",
+      "com.tecknobit.glider.services.passwords.services.PasswordEventsService.eventsRepository"
+    ]
+  },
+  {
+    "name": "private val eventsService: PasswordEventsService",
+    "description": "com.tecknobit.glider.services.passwords.services.PasswordsService.eventsService",
+    "location": "backend/com.tecknobit.glider.services.passwords.services/-passwords-service/events-service.html",
+    "searchKeys": [
+      "eventsService",
+      "private val eventsService: PasswordEventsService",
+      "com.tecknobit.glider.services.passwords.services.PasswordsService.eventsService"
+    ]
+  },
+  {
     "name": "private val generator: PasswordGenerator",
     "description": "com.tecknobit.glider.services.passwords.helpers.PasswordGenerator.generator",
     "location": "backend/com.tecknobit.glider.services.passwords.helpers/-password-generator/generator.html",
@@ -2217,6 +2197,26 @@
       "generator",
       "private val generator: PasswordGenerator",
       "com.tecknobit.glider.services.passwords.helpers.PasswordGenerator.generator"
+    ]
+  },
+  {
+    "name": "private val passwordsRepository: PasswordsRepository",
+    "description": "com.tecknobit.glider.services.passwords.services.PasswordsService.passwordsRepository",
+    "location": "backend/com.tecknobit.glider.services.passwords.services/-passwords-service/passwords-repository.html",
+    "searchKeys": [
+      "passwordsRepository",
+      "private val passwordsRepository: PasswordsRepository",
+      "com.tecknobit.glider.services.passwords.services.PasswordsService.passwordsRepository"
+    ]
+  },
+  {
+    "name": "private val passwordsService: PasswordsService",
+    "description": "com.tecknobit.glider.services.passwords.controller.PasswordsController.passwordsService",
+    "location": "backend/com.tecknobit.glider.services.passwords.controller/-passwords-controller/passwords-service.html",
+    "searchKeys": [
+      "passwordsService",
+      "private val passwordsService: PasswordsService",
+      "com.tecknobit.glider.services.passwords.controller.PasswordsController.passwordsService"
     ]
   },
   {

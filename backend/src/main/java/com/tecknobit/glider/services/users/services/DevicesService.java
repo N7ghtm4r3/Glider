@@ -28,8 +28,17 @@ public class DevicesService {
     /**
      * {@code devicesRepository} instance used to manage the database operations for the devices
      */
+    private final DevicesRepository devicesRepository;
+
+    /**
+     * Constructor used to init the service
+     *
+     * @param devicesRepository The instance used to manage the database operations for the devices
+     */
     @Autowired
-    private DevicesRepository devicesRepository;
+    public DevicesService(DevicesRepository devicesRepository) {
+        this.devicesRepository = devicesRepository;
+    }
 
     /**
      * Method used to store a device

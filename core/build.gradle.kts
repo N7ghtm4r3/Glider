@@ -1,6 +1,3 @@
-@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
-
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -12,7 +9,7 @@ plugins {
 }
 
 group = "com.tecknobit.glider"
-version = "2.0.1"
+version = "2.0.2"
 
 repositories {
     google()
@@ -84,7 +81,7 @@ afterEvaluate {
             create<MavenPublication>("maven") {
                 groupId = "com.tecknobit.glidercore"
                 artifactId = "glidercore"
-                version = "2.0.1"
+                version = "2.0.2"
                 from(components["kotlin"])
             }
         }

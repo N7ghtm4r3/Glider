@@ -10,6 +10,7 @@ import com.tecknobit.glider.services.users.entities.GliderUser;
 import com.tecknobit.glider.services.users.repositories.GliderUsersRepository;
 import com.tecknobit.glider.services.users.services.GliderUsersService;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,6 +37,16 @@ public class GliderUsersController extends EquinoxUsersController<GliderUser, Gl
      * {@code WRONG_DEVICE_DATA_MESSAGE} message to use when the device data are wrong
      */
     public static final String WRONG_DEVICE_DATA_MESSAGE = "wrong_device_data";
+
+    /**
+     * Constructor to init the controller
+     *
+     * @param usersService The helper to manage the users database operations
+     */
+    @Autowired
+    public GliderUsersController(GliderUsersService usersService) {
+        super(usersService);
+    }
 
     /**
      * Method used to get the list of the custom parameters of a custom {@link EquinoxUser} from the payload of the {@link #signUp(Map)}
